@@ -1,6 +1,6 @@
 # 📜 RELTRONER STUDIO LICENSE
 
-Copyright © 2025 by **Raidan**  
+Copyright © 2025-2026 by **Raidan**  
 All rights reserved.
 
 This work, including all content, assets, writings, world-building, character concepts, and creative naming such as **Reltroner**, **Reltronland**, **Asthortera**, **Reltroner Studio**, and related terms, is the intellectual property of **Raidan**.
@@ -33,7 +33,7 @@ This license is enforced to protect the **integrity, originality, and future pot
 
 For licensing requests, collaborations, or permissions, please contact:
 
-📧 **reltroner@gmail.com** 
+📧 **reltroner@gmail.com**
 
-> *"Imagination is a fortress. You are free to visit, but not to conquer."*
+> _"Imagination is a fortress. You are free to visit, but not to conquer."_
 > — Raidan, Founder of Reltroner Studio

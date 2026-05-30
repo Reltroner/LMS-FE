@@ -3,11 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import { getSiteUrl } from "@/lib/seo/metadata";
 import { site } from "@/lib/seo/site";
 
 import "./globals.css";
 
-const siteUrl = `https://${site.domain}`;
+const siteUrl = getSiteUrl();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,11 @@ export const metadata: Metadata = {
     siteName: site.name,
     type: "website",
     url: siteUrl,
+  },
+  twitter: {
+    card: "summary",
+    title: site.title,
+    description: site.description,
   },
 };
 

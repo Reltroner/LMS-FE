@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
@@ -12,7 +12,9 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "contentlayer": "^0.3.4",
     "next": "16.2.6",
+    "next-contentlayer": "^0.3.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
@@ -23,6 +25,7 @@
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
