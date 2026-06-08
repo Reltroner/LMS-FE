@@ -1,39 +1,11 @@
 "use client";
 
+import { mdxComponents } from "@/components/mdx/MdxComponents";
 import { getMDXComponent } from "next-contentlayer/hooks";
-import { createElement, useMemo, type ComponentPropsWithoutRef } from "react";
+import { createElement, useMemo } from "react";
 
 type LessonContentProps = {
   code: string;
-};
-
-const components = {
-  a: ({ className, ...props }: ComponentPropsWithoutRef<"a">) => (
-    <a
-      className={`${className ?? ""} rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950`}
-      {...props}
-    />
-  ),
-  code: ({ className, ...props }: ComponentPropsWithoutRef<"code">) => {
-    const isCodeBlock = className?.includes("language-");
-
-    return (
-      <code
-        className={
-          isCodeBlock
-            ? className
-            : `${className ?? ""} rounded-md bg-zinc-100 px-1.5 py-0.5 font-medium text-zinc-950`
-        }
-        {...props}
-      />
-    );
-  },
-  pre: ({ className, ...props }: ComponentPropsWithoutRef<"pre">) => (
-    <pre
-      className={`${className ?? ""} not-prose overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-4 text-sm leading-7 text-zinc-100 shadow-[0_16px_50px_-24px_rgba(0,0,0,0.45)]`}
-      {...props}
-    />
-  ),
 };
 
 export function LessonContent({ code }: LessonContentProps) {
@@ -42,7 +14,7 @@ export function LessonContent({ code }: LessonContentProps) {
   return (
     <article className="rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-[0_24px_70px_-48px_rgba(24,24,27,0.35)] sm:p-8 lg:p-10">
       <div className="prose prose-zinc max-w-none text-zinc-700 sm:prose-lg prose-headings:font-semibold prose-headings:tracking-normal prose-headings:text-zinc-950 prose-h2:mt-14 prose-h2:scroll-mt-28 prose-h2:border-t prose-h2:border-zinc-200 prose-h2:pt-8 prose-h3:mt-10 prose-h3:text-xl prose-p:leading-8 prose-a:font-semibold prose-a:text-zinc-950 prose-a:decoration-zinc-300 prose-a:underline-offset-4 hover:prose-a:text-zinc-700 prose-strong:text-zinc-950 prose-code:rounded-md prose-code:bg-zinc-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[0.95em] prose-code:font-medium prose-code:text-zinc-950 prose-code:before:content-none prose-code:after:content-none prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 prose-li:marker:text-zinc-400 prose-blockquote:border-l-zinc-300 prose-blockquote:text-zinc-700 prose-table:my-10 prose-table:w-full prose-th:border prose-th:border-zinc-200 prose-th:bg-zinc-50 prose-th:px-4 prose-th:py-3 prose-th:text-left prose-th:font-semibold prose-th:text-zinc-950 prose-td:border prose-td:border-zinc-200 prose-td:px-4 prose-td:py-3 prose-img:rounded-2xl prose-img:border prose-img:border-zinc-200">
-        {createElement(MDXContent, { components })}
+        {createElement(MDXContent, { components: mdxComponents })}
       </div>
     </article>
   );

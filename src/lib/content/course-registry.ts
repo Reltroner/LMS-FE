@@ -1,12 +1,24 @@
-import { backendEngineeringFundamentalsCourse } from "@/content/courses/backend-engineering/course";
+import { courses } from "@/catalog/courses";
 import type { Course } from "@/types/course";
 
-const courses = [backendEngineeringFundamentalsCourse] as const satisfies readonly Course[];
+const courseList = courses as readonly Course[];
 
 export function getAllCourses(): readonly Course[] {
-  return courses;
+  return courseList;
 }
 
 export function getCourseBySlug(slug: string): Course | undefined {
-  return courses.find((course) => course.slug === slug);
+  return courseList.find((course) => course.slug === slug);
+}
+
+export function getCourseBySlugOrAlias(slug: string): Course | undefined {
+  return courseList.find((course) => course.slug === slug || course.aliases?.includes(slug));
+}
+
+export function getCourseRouteSlugs(course: Course): readonly string[] {
+  return [course.slug, ...(course.aliases ?? [])];
+}
+
+export function getAllCourseRouteSlugs(): readonly string[] {
+  return courseList.flatMap((course) => getCourseRouteSlugs(course));
 }

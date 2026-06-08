@@ -2,45 +2,93 @@ import { defineDocumentType, makeSource } from "contentlayer/source-files";
 
 export const Lesson = defineDocumentType(() => ({
   name: "Lesson",
-  filePathPattern: "courses/**/*.mdx",
+  filePathPattern: "courses/*/lessons/*.mdx",
   contentType: "mdx",
   fields: {
     title: {
       type: "string",
       required: true,
     },
-    description: {
+    summary: {
       type: "string",
       required: true,
     },
-    duration: {
-      type: "string",
+    kind: {
+      type: "enum",
+      options: ["lesson", "lab", "checkpoint", "capstone"],
       required: true,
     },
-    order: {
+    status: {
+      type: "enum",
+      options: ["draft", "published", "archived"],
+      required: true,
+    },
+    level: {
+      type: "enum",
+      options: ["beginner", "beginner-intermediate", "intermediate", "advanced"],
+      required: true,
+    },
+    durationMinutes: {
       type: "number",
       required: true,
     },
-    module: {
-      type: "string",
+    objectives: {
+      type: "list",
+      of: { type: "string" },
       required: true,
     },
-    course: {
-      type: "string",
+    outputs: {
+      type: "list",
+      of: { type: "string" },
       required: true,
+    },
+    tags: {
+      type: "list",
+      of: { type: "string" },
+      required: true,
+    },
+    resourceIds: {
+      type: "list",
+      of: { type: "string" },
+      required: false,
     },
   },
   computedFields: {
+    courseSlug: {
+      type: "string",
+      resolve: (lesson) => lesson._raw.flattenedPath.split("/")[1] ?? "",
+    },
     slug: {
       type: "string",
       resolve: (lesson) => lesson._raw.sourceFileName.replace(/\.mdx$/, ""),
     },
+    url: {
+      type: "string",
+      resolve: (lesson) => {
+        const courseSlug = lesson._raw.flattenedPath.split("/")[1] ?? "";
+        const lessonSlug = lesson._raw.sourceFileName.replace(/\.mdx$/, "");
+
+        return `/courses/${courseSlug}/lessons/${lessonSlug}`;
+      },
+    },
   },
+}));
+
+export const ResourceNote = defineDocumentType(() => ({
+  name: "ResourceNote",
+  filePathPattern: "courses/*/resources/*.md",
+  contentType: "markdown",
+}));
+
+export const AuthorNote = defineDocumentType(() => ({
+  name: "AuthorNote",
+  filePathPattern: "courses/*/author/*.md",
+  contentType: "markdown",
 }));
 
 export default makeSource({
   contentDirPath: "content",
-  documentTypes: [Lesson],
+  documentTypes: [Lesson, ResourceNote, AuthorNote],
   mdx: {
     mdxOptions: (options) => ({
       ...options,

@@ -3,27 +3,30 @@ import type { MetadataRoute } from "next";
 import { getAllCourses } from "@/lib/content/course-registry";
 import { getAllLessons } from "@/lib/content/lesson-registry";
 import { getAllPaths } from "@/lib/content/path-registry";
+import { courseUrl, lessonUrl, pathUrl } from "@/lib/routes/route-builders";
 import { createCanonicalUrl } from "@/lib/seo/metadata";
 
-const lastModified = new Date();
+export const dynamic = "force-static";
+
+const lastModified = new Date("2026-06-08T00:00:00.000Z");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const pathUrls = getAllPaths().map((path) => ({
-    url: createCanonicalUrl(`/paths/${path.slug}`),
+    url: createCanonicalUrl(pathUrl(path.slug)),
     lastModified,
     changeFrequency: "weekly" as const,
     priority: 0.75,
   }));
 
   const courseUrls = getAllCourses().map((course) => ({
-    url: createCanonicalUrl(`/courses/${course.slug}`),
+    url: createCanonicalUrl(courseUrl(course.slug)),
     lastModified,
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
   const lessonUrls = getAllLessons().map((lesson) => ({
-    url: createCanonicalUrl(`/courses/${lesson.course}/lessons/${lesson.slug}`),
+    url: createCanonicalUrl(lessonUrl(lesson.courseSlug, lesson.slug)),
     lastModified,
     changeFrequency: "weekly" as const,
     priority: 0.7,

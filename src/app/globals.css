@@ -5,6 +5,9 @@
   --background: #ffffff;
   --foreground: #171717;
   --border: #e4e4e7;
+  --font-geist-sans:
+    Arial, Helvetica, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-geist-mono: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @theme inline {

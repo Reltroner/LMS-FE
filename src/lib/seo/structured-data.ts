@@ -1,4 +1,5 @@
 import type { LessonDocument } from "@/lib/content/lesson-registry";
+import { courseUrl, lessonUrl } from "@/lib/routes/route-builders";
 import { createCanonicalUrl } from "@/lib/seo/metadata";
 import { site } from "@/lib/seo/site";
 import type { Course } from "@/types/course";
@@ -56,7 +57,7 @@ export function createCollectionPageStructuredData(courses: readonly Course[]) {
         "@type": "ListItem",
         position: index + 1,
         name: course.title,
-        url: createCanonicalUrl(`/courses/${course.slug}`),
+        url: createCanonicalUrl(courseUrl(course.slug)),
       })),
     },
   } satisfies StructuredDataValue;
@@ -67,8 +68,8 @@ export function createCourseStructuredData(course: Course) {
     "@context": "https://schema.org",
     "@type": "Course",
     name: course.title,
-    description: course.description,
-    url: createCanonicalUrl(`/courses/${course.slug}`),
+    description: course.summary,
+    url: createCanonicalUrl(courseUrl(course.slug)),
     provider: createOrganizationReference(),
     educationalLevel: course.level,
     timeRequired: `PT${course.estimatedHours}H`,
@@ -80,15 +81,15 @@ export function createLessonStructuredData({ course, lesson }: CreateLessonStruc
     "@context": "https://schema.org",
     "@type": "Article",
     headline: lesson.title,
-    description: lesson.description,
-    url: createCanonicalUrl(`/courses/${course.slug}/lessons/${lesson.slug}`),
-    articleSection: lesson.module,
+    description: lesson.summary,
+    url: createCanonicalUrl(lessonUrl(course.slug, lesson.slug)),
+    articleSection: lesson.moduleTitle,
     author: createOrganizationReference(),
     publisher: createOrganizationReference(),
     isPartOf: {
       "@type": "Course",
       name: course.title,
-      url: createCanonicalUrl(`/courses/${course.slug}`),
+      url: createCanonicalUrl(courseUrl(course.slug)),
     },
   } satisfies StructuredDataValue;
 }

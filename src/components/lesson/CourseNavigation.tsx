@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LessonNavigation } from "@/components/lesson/LessonNavigation";
 import type { LessonDocument } from "@/lib/content/lesson-registry";
+import { courseUrl } from "@/lib/routes/route-builders";
 
 type CourseNavigationProps = {
   courseSlug: string;
@@ -34,7 +35,7 @@ export function CourseNavigation({
       </div>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)]">
         <Link
-          href={`/courses/${courseSlug}`}
+          href={courseUrl(courseSlug)}
           className="rounded-2xl border border-zinc-200 bg-white px-5 py-6 transition hover:border-zinc-300 hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950"
         >
           <span className="text-sm font-medium text-zinc-500">Back to Course</span>

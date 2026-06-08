@@ -1,37 +1,48 @@
-import { getAllCourses, getCourseBySlug } from "@/lib/content/course-registry";
+import { getAllCourses } from "@/lib/content/course-registry";
 import { getAllLessons } from "@/lib/content/lesson-registry";
+import { getAllPaths } from "@/lib/content/path-registry";
+import { courseUrl, lessonUrl, pathUrl } from "@/lib/routes/route-builders";
 
-export type SearchItemType = "course" | "lesson";
+export type SearchItemType = "course" | "lesson" | "path";
 
 export type SearchItem = Readonly<{
   id: string;
-  title: string;
-  description: string;
-  url: string;
   type: SearchItemType;
+  title: string;
+  summary: string;
+  url: string;
+  courseSlug?: string;
+  tags: readonly string[];
 }>;
 
 export function getSearchIndex(): readonly SearchItem[] {
   const courseItems = getAllCourses().map((course) => ({
     id: `course:${course.id}`,
-    title: course.title,
-    description: course.description,
-    url: `/courses/${course.slug}`,
     type: "course" as const,
+    title: course.title,
+    summary: course.summary,
+    url: courseUrl(course.slug),
+    tags: [course.category, course.level],
   }));
 
-  const lessonItems = getAllLessons().map((lesson) => {
-    const course = getCourseBySlug(lesson.course);
-    const lessonContext = course ? `${course.title} · ${lesson.description}` : lesson.description;
+  const lessonItems = getAllLessons().map((lesson) => ({
+    id: `lesson:${lesson._id}`,
+    type: "lesson" as const,
+    title: lesson.title,
+    summary: `${lesson.courseTitle} - ${lesson.summary}`,
+    url: lessonUrl(lesson.courseSlug, lesson.slug),
+    courseSlug: lesson.courseSlug,
+    tags: lesson.tags,
+  }));
 
-    return {
-      id: `lesson:${lesson._id}`,
-      title: lesson.title,
-      description: lessonContext,
-      url: `/courses/${lesson.course}/lessons/${lesson.slug}`,
-      type: "lesson" as const,
-    };
-  });
+  const pathItems = getAllPaths().map((path) => ({
+    id: `path:${path.id}`,
+    type: "path" as const,
+    title: path.title,
+    summary: path.summary,
+    url: pathUrl(path.slug),
+    tags: [path.level],
+  }));
 
-  return [...courseItems, ...lessonItems];
+  return [...courseItems, ...lessonItems, ...pathItems];
 }

@@ -1,67 +1,77 @@
 # Reltroner Learning Academy
 
-Engineering foundation for `lms.reltroner.com`, a future content-driven learning platform for engineering skills, AI skills, and project-based learning.
+Frontend-only static LMS shell for `lms.reltroner.com`.
 
-This first chunk intentionally avoids LMS product features. It establishes a clean Next.js App Router baseline that can grow into courses, paths, authors, MDX content, and Vercel deployment later.
+This repository is the LMS application and MDX content engine. It does not store heavy learning media and it does not include backend runtime features.
 
-## Stack
+## Architecture
 
 - Next.js 16 App Router
-- React 19
-- TypeScript with strict mode
-- Tailwind CSS 4
-- ESLint 9 with Next.js config
-- Prettier
-- Husky
-- Commitlint with conventional commits
-- Vercel-ready Next.js defaults
+- Static export only with `output: "export"`
+- Contentlayer-powered MDX lessons
+- TypeScript catalog data for courses, paths, authors, and resources
+- Client-side static search
+- No backend, auth, API routes, SSR, middleware, database, server session, or runtime request dependency
 
-## Folder Structure
+## Content Convention
+
+Lessons live under:
 
 ```text
-src/
-  app/
-  components/
-    layout/
-    marketing/
-    ui/
-  content/
-    authors/
-    courses/
-    paths/
-  lib/
-    constants/
-    mdx/
-    seo/
-    utils/
-  types/
-docs/
-public/
-  icons/
-  images/
+content/courses/<course-slug>/lessons/<lesson-slug>.mdx
 ```
+
+Lesson frontmatter contains lesson metadata only. Course slug, lesson slug, module placement, and order are derived from the folder path and `src/catalog`.
+
+Course resources and author notes can live beside lessons as lightweight markdown:
+
+```text
+content/courses/<course-slug>/resources/
+content/courses/<course-slug>/author/
+```
+
+## Catalog Convention
+
+Typed course and path metadata lives in `src/catalog`.
+
+- `src/catalog/courses/*/course.ts` defines course modules and ordered `lessonSlugs`.
+- `src/catalog/courses/*/resources.ts` defines resource manifests.
+- `src/catalog/paths/*.ts` defines learning paths.
+- `src/lib/content/*` exposes registries used by routes and components.
+
+## Resource Convention
+
+Heavy resources such as video, audio, large images, and PDFs belong in the external asset repository:
+
+```text
+reltroner/reltroner-lms-assets
+```
+
+The LMS references those assets through pinned jsDelivr URLs, currently based on:
+
+```text
+https://cdn.jsdelivr.net/gh/reltroner/reltroner-lms-assets@v0.1.0
+```
+
+Use resource ids in MDX instead of hardcoding media URLs whenever possible.
 
 ## Local Development
 
-Install dependencies:
-
 ```bash
-npm install
-```
-
-Run the development server:
-
-```bash
+npm ci
 npm run dev
 ```
 
 Open `http://localhost:3000`.
 
-Run quality checks:
+## Validation
 
 ```bash
+npm run typecheck
 npm run lint
-npm run format:check
+npm run validate:content
+npm run validate:resources
+npm run check:orphans
 npm run build
 ```
 
@@ -71,9 +81,12 @@ Format files:
 npm run format
 ```
 
-## Git Hooks
+## Static Deployment
 
-Husky is configured with:
+Cloudflare Pages:
 
-- `pre-commit`: runs ESLint and Prettier check
-- `commit-msg`: validates conventional commit messages with Commitlint
+- Install command: `npm ci`
+- Build command: `npm run build`
+- Output directory: `out`
+
+Generated folders such as `.next`, `out`, `.contentlayer`, and `node_modules` are ignored and should not be committed.

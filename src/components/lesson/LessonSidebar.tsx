@@ -1,27 +1,32 @@
 import Link from "next/link";
 
+import type { LessonDocument } from "@/lib/content/lesson-registry";
+import { courseUrl, lessonUrl } from "@/lib/routes/route-builders";
 import type { Course } from "@/types/course";
+import type { CourseModuleWithLessons } from "@/types/module";
 
 type LessonSidebarProps = {
   course: Course;
+  modules: readonly CourseModuleWithLessons<LessonDocument>[];
   currentLessonSlug: string;
   className?: string;
 };
 
 type LessonSidebarContentProps = {
   course: Course;
+  modules: readonly CourseModuleWithLessons<LessonDocument>[];
   currentLessonSlug: string;
 };
 
-function LessonSidebarContent({ course, currentLessonSlug }: LessonSidebarContentProps) {
-  const orderedModules = [...course.modules].sort((a, b) => a.order - b.order);
+function LessonSidebarContent({ course, modules, currentLessonSlug }: LessonSidebarContentProps) {
+  const orderedModules = [...modules].sort((a, b) => a.order - b.order);
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">Course</p>
         <Link
-          href={`/courses/${course.slug}`}
+          href={courseUrl(course.slug)}
           className="block rounded-sm text-lg font-semibold text-zinc-950 hover:text-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950"
         >
           {course.title}
@@ -30,7 +35,9 @@ function LessonSidebarContent({ course, currentLessonSlug }: LessonSidebarConten
       <nav aria-label={`${course.title} outline`}>
         <ol className="space-y-6">
           {orderedModules.map((courseModule) => {
-            const moduleLessons = [...courseModule.lessons].sort((a, b) => a.order - b.order);
+            const moduleLessons = [...courseModule.lessons].sort(
+              (a, b) => a.lessonOrder - b.lessonOrder,
+            );
             const isCurrentModule = moduleLessons.some(
               (lesson) => lesson.slug === currentLessonSlug,
             );
@@ -51,9 +58,9 @@ function LessonSidebarContent({ course, currentLessonSlug }: LessonSidebarConten
                       const isCurrentLesson = moduleLesson.slug === currentLessonSlug;
 
                       return (
-                        <li key={moduleLesson.id}>
+                        <li key={moduleLesson._id}>
                           <Link
-                            href={`/courses/${course.slug}/lessons/${moduleLesson.slug}`}
+                            href={lessonUrl(course.slug, moduleLesson.slug)}
                             aria-current={isCurrentLesson ? "page" : undefined}
                             className={
                               isCurrentLesson
@@ -67,7 +74,7 @@ function LessonSidebarContent({ course, currentLessonSlug }: LessonSidebarConten
                             <span
                               className={`mt-1 block text-xs ${isCurrentLesson ? "text-zinc-300" : "text-zinc-400"}`}
                             >
-                              {moduleLesson.duration} min
+                              {moduleLesson.durationLabel}
                             </span>
                           </Link>
                         </li>
@@ -88,7 +95,12 @@ function LessonSidebarContent({ course, currentLessonSlug }: LessonSidebarConten
   );
 }
 
-export function LessonSidebar({ course, currentLessonSlug, className }: LessonSidebarProps) {
+export function LessonSidebar({
+  course,
+  modules,
+  currentLessonSlug,
+  className,
+}: LessonSidebarProps) {
   return (
     <div className={className}>
       <details className="rounded-[1.75rem] border border-zinc-200 bg-white p-5 shadow-[0_24px_70px_-48px_rgba(24,24,27,0.35)] lg:hidden">
@@ -97,7 +109,11 @@ export function LessonSidebar({ course, currentLessonSlug, className }: LessonSi
           <span className="text-sm font-medium text-zinc-500">{course.modules.length} modules</span>
         </summary>
         <div className="mt-5 border-t border-zinc-200 pt-5">
-          <LessonSidebarContent course={course} currentLessonSlug={currentLessonSlug} />
+          <LessonSidebarContent
+            course={course}
+            modules={modules}
+            currentLessonSlug={currentLessonSlug}
+          />
         </div>
       </details>
       <aside className="hidden lg:block lg:sticky lg:top-24" aria-labelledby="lesson-sidebar-title">
@@ -113,7 +129,11 @@ export function LessonSidebar({ course, currentLessonSlug, className }: LessonSi
               {course.modules.length} modules
             </span>
           </div>
-          <LessonSidebarContent course={course} currentLessonSlug={currentLessonSlug} />
+          <LessonSidebarContent
+            course={course}
+            modules={modules}
+            currentLessonSlug={currentLessonSlug}
+          />
         </div>
       </aside>
     </div>

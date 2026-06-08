@@ -14,7 +14,9 @@ type SearchResultsProps = {
 
 function compareByTypeThenTitle(leftItem: SearchItem, rightItem: SearchItem) {
   if (leftItem.type !== rightItem.type) {
-    return leftItem.type === "course" ? -1 : 1;
+    const typeOrder = { course: 0, lesson: 1, path: 2 } as const;
+
+    return typeOrder[leftItem.type] - typeOrder[rightItem.type];
   }
 
   return leftItem.title.localeCompare(rightItem.title);
@@ -30,9 +32,9 @@ function getVisibleResults(items: readonly SearchItem[], query: string): SearchI
   return orderedItems
     .filter((item) => {
       const title = item.title.toLowerCase();
-      const description = item.description.toLowerCase();
+      const summary = item.summary.toLowerCase();
 
-      return title.includes(query) || description.includes(query);
+      return title.includes(query) || summary.includes(query);
     })
     .sort((leftItem, rightItem) => {
       const leftTitleMatch = leftItem.title.toLowerCase().includes(query);
@@ -120,9 +122,7 @@ export function SearchResults({ items }: SearchResultsProps) {
                       {item.title}
                     </Link>
                   </h3>
-                  <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-600">
-                    {item.description}
-                  </p>
+                  <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-600">{item.summary}</p>
                   <Link
                     href={item.url}
                     className="mt-5 inline-flex items-center gap-2 rounded-sm text-sm font-semibold text-zinc-950 transition hover:text-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950"

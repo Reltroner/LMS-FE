@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { courseUrl } from "@/lib/routes/route-builders";
 import type { Course } from "@/types/course";
 
 type PathCourseListItem = Readonly<{
@@ -50,14 +51,14 @@ export function PathCourseList({ courses }: PathCourseListProps) {
                     </p>
                     <h3 className="text-2xl font-semibold text-zinc-950">
                       <Link
-                        href={`/courses/${courseItem.course.slug}`}
+                        href={courseUrl(courseItem.course.slug)}
                         className="rounded-sm transition hover:text-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950"
                       >
                         {courseItem.course.title}
                       </Link>
                     </h3>
                     <p className="max-w-3xl text-base leading-7 text-zinc-600">
-                      {courseItem.course.description}
+                      {courseItem.course.subtitle}
                     </p>
                   </div>
                   <dl className="grid grid-cols-3 gap-4 sm:min-w-[20rem]">
@@ -87,7 +88,7 @@ export function PathCourseList({ courses }: PathCourseListProps) {
                 </div>
                 <div className="mt-6">
                   <Link
-                    href={`/courses/${courseItem.course.slug}`}
+                    href={courseUrl(courseItem.course.slug)}
                     className="inline-flex items-center gap-2 rounded-sm text-sm font-semibold text-zinc-950 transition hover:text-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950"
                   >
                     View course
@@ -110,8 +111,7 @@ export function PathCourseList({ courses }: PathCourseListProps) {
               Future Courses Placeholder
             </h3>
             <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-600">
-              Additional backend engineering milestones will appear here as new courses become
-              available in this path.
+              Additional milestones will appear here as new courses become available in this path.
             </p>
           </article>
         </li>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import type { LessonDocument } from "@/lib/content/lesson-registry";
+import { courseUrl, lessonUrl } from "@/lib/routes/route-builders";
 import { site } from "@/lib/seo/site";
 import type { Course } from "@/types/course";
 
@@ -61,16 +62,16 @@ export function createMetadata({
 export function createCourseMetadata(course: Course): Metadata {
   return createMetadata({
     title: course.title,
-    description: course.description,
-    path: `/courses/${course.slug}`,
+    description: course.summary,
+    path: courseUrl(course.slug),
   });
 }
 
 export function createLessonMetadata({ course, lesson }: CreateLessonMetadataOptions): Metadata {
   return createMetadata({
     title: `${lesson.title} | ${course.title}`,
-    description: lesson.description,
-    path: `/courses/${course.slug}/lessons/${lesson.slug}`,
+    description: lesson.summary,
+    path: lessonUrl(course.slug, lesson.slug),
     openGraphType: "article",
   });
 }

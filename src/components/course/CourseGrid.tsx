@@ -14,12 +14,6 @@ import {
 import { CourseEmptyState } from "@/components/course/CourseEmptyState";
 import type { Course } from "@/types/course";
 
-const levelMap = {
-  beginner: "Beginner",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-} as const;
-
 const defaultSortValue = courseSortOptions[0].value;
 
 type CourseGridProps = {
@@ -75,7 +69,7 @@ export function CourseGrid({ courses }: CourseGridProps) {
       return true;
     }
 
-    return course.level === levelMap[selectedLevel];
+    return course.level === selectedLevel;
   });
   const visibleCourses = sortCourses(filteredCourses, selectedSort);
 

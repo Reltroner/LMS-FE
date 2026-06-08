@@ -1,6 +1,7 @@
 export const courseLevelOptions = [
   { label: "All levels", value: "all" },
   { label: "Beginner", value: "beginner" },
+  { label: "Beginner Intermediate", value: "beginner-intermediate" },
   { label: "Intermediate", value: "intermediate" },
   { label: "Advanced", value: "advanced" },
 ] as const;

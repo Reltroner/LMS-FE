@@ -1,7 +1,5 @@
-import { fullStackBackendEngineerPath } from "@/content/paths/full-stack-backend-engineer";
+import { learningPaths } from "@/catalog/paths";
 import type { LearningPath } from "@/types/path";
-
-const learningPaths = [fullStackBackendEngineerPath] as const satisfies readonly LearningPath[];
 
 export function getAllPaths(): readonly LearningPath[] {
   return learningPaths;

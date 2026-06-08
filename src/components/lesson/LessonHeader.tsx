@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { LessonDocument } from "@/lib/content/lesson-registry";
+import { courseUrl } from "@/lib/routes/route-builders";
 
 type LessonHeaderProps = {
   courseSlug: string;
@@ -26,7 +27,7 @@ export function LessonHeader({ courseSlug, courseTitle, lesson }: LessonHeaderPr
           </li>
           <li>
             <Link
-              href={`/courses/${courseSlug}`}
+              href={courseUrl(courseSlug)}
               className="rounded-sm hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950"
             >
               {courseTitle}
@@ -41,25 +42,25 @@ export function LessonHeader({ courseSlug, courseTitle, lesson }: LessonHeaderPr
       <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-4">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-zinc-500">
-            {lesson.module}
+            {lesson.moduleTitle}
           </p>
           <h1 className="max-w-4xl text-4xl font-semibold tracking-normal text-zinc-950 sm:text-5xl lg:text-6xl">
             {lesson.title}
           </h1>
-          <p className="max-w-3xl text-lg leading-8 text-zinc-600">{lesson.description}</p>
+          <p className="max-w-3xl text-lg leading-8 text-zinc-600">{lesson.summary}</p>
         </div>
         <dl className="grid gap-3 sm:grid-cols-2 lg:min-w-[20rem]">
           <div className="rounded-2xl border border-zinc-200 bg-white/80 px-4 py-4 backdrop-blur-sm">
             <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
               Module
             </dt>
-            <dd className="mt-2 text-base font-semibold text-zinc-950">{lesson.module}</dd>
+            <dd className="mt-2 text-base font-semibold text-zinc-950">{lesson.moduleTitle}</dd>
           </div>
           <div className="rounded-2xl border border-zinc-200 bg-white/80 px-4 py-4 backdrop-blur-sm">
             <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
               Duration
             </dt>
-            <dd className="mt-2 text-base font-semibold text-zinc-950">{lesson.duration}</dd>
+            <dd className="mt-2 text-base font-semibold text-zinc-950">{lesson.durationLabel}</dd>
           </div>
         </dl>
       </div>
