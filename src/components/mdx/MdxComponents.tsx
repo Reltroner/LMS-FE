@@ -15,7 +15,7 @@ import { TemplateBlock } from "./TemplateBlock";
 export const mdxComponents = {
   a: ({ className, ...props }: ComponentPropsWithoutRef<"a">) => (
     <a
-      className={`${className ?? ""} rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950`}
+      className={`${className ?? ""} rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring`}
       {...props}
     />
   ),
@@ -27,7 +27,7 @@ export const mdxComponents = {
         className={
           isCodeBlock
             ? className
-            : `${className ?? ""} rounded-md bg-zinc-100 px-1.5 py-0.5 font-medium text-zinc-950`
+            : `${className ?? ""} rounded-md bg-primary/10 px-1.5 py-0.5 font-medium text-foreground`
         }
         {...props}
       />
@@ -35,7 +35,7 @@ export const mdxComponents = {
   },
   pre: ({ className, ...props }: ComponentPropsWithoutRef<"pre">) => (
     <pre
-      className={`${className ?? ""} not-prose overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-4 text-sm leading-7 text-zinc-100 shadow-[0_16px_50px_-24px_rgba(0,0,0,0.45)]`}
+      className={`${className ?? ""} not-prose overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950 px-5 py-4 text-sm leading-7 text-slate-100 shadow-[0_16px_50px_-24px_rgba(0,0,0,0.45)]`}
       {...props}
     />
   ),

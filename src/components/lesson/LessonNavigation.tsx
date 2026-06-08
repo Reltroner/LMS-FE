@@ -33,7 +33,7 @@ type LessonNavigationLinkProps = {
 function LessonNavigationLink({ direction, courseSlug, lesson }: LessonNavigationLinkProps) {
   if (!lesson) {
     return (
-      <div className="rounded-2xl border border-dashed border-zinc-200 bg-white px-5 py-6 text-sm font-medium text-zinc-400">
+      <div className="rounded-2xl border border-dashed border-border bg-white/70 px-5 py-6 text-sm font-medium text-muted-foreground">
         No {direction.toLowerCase()} lesson
       </div>
     );
@@ -42,11 +42,11 @@ function LessonNavigationLink({ direction, courseSlug, lesson }: LessonNavigatio
   return (
     <Link
       href={lessonUrl(courseSlug, lesson.slug)}
-      className="rounded-2xl border border-zinc-200 bg-white px-5 py-6 transition hover:border-zinc-300 hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-zinc-950"
+      className="rounded-2xl border border-border bg-white px-5 py-6 transition hover:border-primary/30 hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
     >
-      <span className="text-sm font-medium text-zinc-500">{direction}</span>
-      <span className="mt-2 block text-base font-semibold text-zinc-950">{lesson.title}</span>
-      <span className="mt-3 block text-sm leading-6 text-zinc-600">{lesson.summary}</span>
+      <span className="text-sm font-medium text-muted-foreground">{direction}</span>
+      <span className="mt-2 block text-base font-semibold text-foreground">{lesson.title}</span>
+      <span className="mt-3 block text-sm leading-6 text-muted-foreground">{lesson.summary}</span>
     </Link>
   );
 }

@@ -2,9 +2,19 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --border: #e4e4e7;
+  --background: #f6f8fb;
+  --foreground: #07111f;
+  --muted-foreground: #64748b;
+  --border: #dbe4ef;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --primary: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --accent: #06b6d4;
+  --accent-foreground: #0e7490;
+  --ring: #2563eb;
+  --success: #047857;
+  --warning: #b45309;
   --font-geist-sans:
     Arial, Helvetica, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-geist-mono: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
@@ -13,7 +23,17 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -23,11 +43,43 @@
 }
 
 body {
-  background: var(--background);
+  min-width: 320px;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(37, 99, 235, 0.1), transparent 34rem),
+    radial-gradient(circle at 92% 12%, rgba(6, 182, 212, 0.1), transparent 30rem),
+    linear-gradient(180deg, #f8fbff 0%, var(--background) 32%, #eef4fb 100%);
   color: var(--foreground);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.18);
+  color: var(--foreground);
+}
+
+:focus-visible {
+  outline-color: var(--ring);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

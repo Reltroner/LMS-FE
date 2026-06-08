@@ -10,16 +10,20 @@ export function AudioEmbed({ resourceId, className }: AudioEmbedProps) {
 
   if (!resource || resource.type !== "audio") {
     return (
-      <p className={className ?? "text-sm text-zinc-500"}>
+      <p className={className ?? "text-sm text-muted-foreground"}>
         Audio resource unavailable: {resourceId}
       </p>
     );
   }
 
   return (
-    <audio className={`w-full ${className ?? ""}`.trim()} controls preload="metadata">
+    <audio
+      className={`w-full rounded-2xl border border-border bg-white p-3 shadow-sm ${className ?? ""}`.trim()}
+      controls
+      preload="metadata"
+    >
       <source src={resource.url} />
-      <a href={resource.url} target="_blank" rel="noreferrer">
+      <a href={resource.url} target="_blank" rel="noopener noreferrer">
         Open audio
       </a>
     </audio>

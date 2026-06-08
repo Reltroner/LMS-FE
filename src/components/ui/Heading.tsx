@@ -1,16 +1,18 @@
+import { cn } from "@/lib/utils/cn";
+
 type HeadingProps = {
   children: React.ReactNode;
   className?: string;
   level?: 1 | 2 | 3;
 };
 
-const baseClassName = "font-semibold tracking-normal text-zinc-950";
+const baseClassName = "font-semibold tracking-normal text-foreground";
 
 export function Heading({ children, className, level = 2 }: HeadingProps) {
   const classNames = {
-    1: `text-4xl sm:text-5xl ${baseClassName} ${className ?? ""}`,
-    2: `text-3xl sm:text-4xl ${baseClassName} ${className ?? ""}`,
-    3: `text-2xl ${baseClassName} ${className ?? ""}`,
+    1: cn("text-4xl leading-tight sm:text-5xl lg:text-6xl", baseClassName, className),
+    2: cn("text-3xl leading-tight sm:text-4xl", baseClassName, className),
+    3: cn("text-2xl leading-snug", baseClassName, className),
   };
 
   if (level === 1) {

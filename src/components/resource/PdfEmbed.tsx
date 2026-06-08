@@ -11,17 +11,21 @@ export function PdfEmbed({ resourceId, showPreview = false, className }: PdfEmbe
 
   if (!resource || resource.type !== "pdf") {
     return (
-      <p className={className ?? "text-sm text-zinc-500"}>PDF resource unavailable: {resourceId}</p>
+      <p className={className ?? "text-sm text-muted-foreground"}>
+        PDF resource unavailable: {resourceId}
+      </p>
     );
   }
 
   return (
-    <div className={`space-y-4 ${className ?? ""}`.trim()}>
+    <div
+      className={`not-prose space-y-4 rounded-2xl border border-border bg-white p-5 shadow-sm ${className ?? ""}`.trim()}
+    >
       <a
         href={resource.url}
         target="_blank"
-        rel="noreferrer"
-        className="inline-flex rounded-sm text-sm font-semibold text-zinc-950 underline decoration-zinc-300 underline-offset-4 hover:text-zinc-700"
+        rel="noopener noreferrer"
+        className="inline-flex rounded-sm text-sm font-semibold text-primary underline decoration-primary/30 underline-offset-4 hover:text-primary/80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
       >
         Open PDF
       </a>
@@ -29,7 +33,7 @@ export function PdfEmbed({ resourceId, showPreview = false, className }: PdfEmbe
         <iframe
           title={resource.title}
           src={resource.url}
-          className="h-[32rem] w-full rounded-2xl border border-zinc-200"
+          className="h-[32rem] w-full rounded-2xl border border-border"
         />
       ) : null}
     </div>

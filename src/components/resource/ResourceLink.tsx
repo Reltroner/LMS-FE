@@ -14,7 +14,7 @@ export function ResourceLink({ resourceId, children, className }: ResourceLinkPr
   }
 
   return (
-    <a href={resource.url} target="_blank" rel="noreferrer" className={className}>
+    <a href={resource.url} target="_blank" rel="noopener noreferrer" className={className}>
       {children ?? resource.title}
     </a>
   );

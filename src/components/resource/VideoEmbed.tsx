@@ -10,7 +10,7 @@ export function VideoEmbed({ resourceId, className }: VideoEmbedProps) {
 
   if (!resource || resource.type !== "video") {
     return (
-      <p className={className ?? "text-sm text-zinc-500"}>
+      <p className={className ?? "text-sm text-muted-foreground"}>
         Video resource unavailable: {resourceId}
       </p>
     );
@@ -18,13 +18,13 @@ export function VideoEmbed({ resourceId, className }: VideoEmbedProps) {
 
   return (
     <video
-      className={`w-full rounded-2xl border border-zinc-200 bg-zinc-950 ${className ?? ""}`.trim()}
+      className={`w-full rounded-2xl border border-border bg-slate-950 shadow-sm ${className ?? ""}`.trim()}
       controls
       preload="metadata"
       poster={resource.posterUrl}
     >
       <source src={resource.url} />
-      <a href={resource.url} target="_blank" rel="noreferrer">
+      <a href={resource.url} target="_blank" rel="noopener noreferrer">
         Open video
       </a>
     </video>

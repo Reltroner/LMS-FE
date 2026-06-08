@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SearchInput } from "@/components/search/SearchInput";
 import { SearchResults } from "@/components/search/SearchResults";
+import { Badge } from "@/components/ui/Badge";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Heading";
 import { Section } from "@/components/ui/Section";
@@ -34,16 +35,14 @@ export default function SearchPage() {
           <div className="space-y-8 lg:space-y-10">
             <section
               aria-labelledby="search-hero-title"
-              className="overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-[radial-gradient(circle_at_top_left,rgba(244,244,245,0.95),rgba(255,255,255,1)_40%,rgba(250,250,250,1)_72%)] p-8 shadow-[0_32px_90px_-56px_rgba(24,24,27,0.45)] sm:p-10 lg:p-12"
+              className="overflow-hidden rounded-[2rem] border border-border bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.12),transparent_38%),linear-gradient(135deg,#ffffff,#f8fbff)] p-6 shadow-[0_30px_90px_-62px_rgba(15,23,42,0.55)] sm:p-8 lg:p-10"
             >
               <div className="space-y-4">
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                  Search System
-                </p>
+                <Badge tone="primary">Search System</Badge>
                 <Heading level={1} className="max-w-3xl text-balance sm:text-6xl">
                   Search
                 </Heading>
-                <p className="max-w-2xl text-lg leading-8 text-zinc-600 sm:text-xl">
+                <p className="max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
                   Search courses, lessons, and paths from a single lightweight frontend-only index.
                 </p>
               </div>
@@ -66,16 +65,16 @@ function SearchResultsFallback({ items }: SearchResultsFallbackProps) {
   return (
     <div className="space-y-6">
       <SearchInput query="" disabled />
-      <section className="space-y-4 rounded-4xl border border-zinc-200 bg-white p-6 shadow-[0_24px_70px_-56px_rgba(24,24,27,0.25)] sm:p-8">
+      <section className="space-y-4 rounded-4xl border border-border bg-card p-6 shadow-[0_24px_70px_-56px_rgba(15,23,42,0.28)] sm:p-8">
         <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-zinc-500">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Unified search index
           </p>
-          <h2 className="text-2xl font-semibold tracking-normal text-zinc-950">
+          <h2 className="text-2xl font-semibold tracking-normal text-foreground">
             Preparing searchable content
           </h2>
         </div>
-        <p className="text-sm text-zinc-500">Indexing {items.length} searchable items.</p>
+        <p className="text-sm text-muted-foreground">Indexing {items.length} searchable items.</p>
       </section>
     </div>
   );

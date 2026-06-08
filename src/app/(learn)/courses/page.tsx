@@ -4,6 +4,7 @@ import { CourseCard } from "@/components/course/CourseCard";
 import { CourseGrid } from "@/components/course/CourseGrid";
 import { CourseStats } from "@/components/course/CourseStats";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { Badge } from "@/components/ui/Badge";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Heading";
 import { Section } from "@/components/ui/Section";
@@ -39,17 +40,15 @@ export default function CoursesPage() {
           <div className="space-y-8 lg:space-y-10">
             <section
               aria-labelledby="catalog-hero-title"
-              className="overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-[radial-gradient(circle_at_top_left,rgba(244,244,245,0.95),rgba(255,255,255,1)_40%,rgba(250,250,250,1)_72%)] p-8 shadow-[0_32px_90px_-56px_rgba(24,24,27,0.45)] sm:p-10 lg:p-12"
+              className="overflow-hidden rounded-[2rem] border border-border bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.12),transparent_38%),linear-gradient(135deg,#ffffff,#f8fbff)] p-6 shadow-[0_30px_90px_-62px_rgba(15,23,42,0.55)] sm:p-8 lg:p-10"
             >
               <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-end">
                 <div className="space-y-4">
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-zinc-500">
-                    Course Catalog
-                  </p>
+                  <Badge tone="primary">Course Catalog</Badge>
                   <Heading level={1} className="max-w-3xl text-balance sm:text-6xl">
                     Courses
                   </Heading>
-                  <p className="max-w-2xl text-lg leading-8 text-zinc-600 sm:text-xl">
+                  <p className="max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
                     Learn engineering, AI, and project-based skills through structured learning
                     paths.
                   </p>
@@ -83,19 +82,19 @@ type CourseGridFallbackProps = {
 function CourseGridFallback({ courses }: CourseGridFallbackProps) {
   return (
     <div className="space-y-6">
-      <div className="space-y-5 rounded-[1.75rem] border border-zinc-200 bg-white p-6 shadow-[0_24px_70px_-56px_rgba(24,24,27,0.25)] sm:p-8">
+      <div className="space-y-5 rounded-[1.75rem] border border-border bg-card p-6 shadow-[0_24px_70px_-56px_rgba(15,23,42,0.28)] sm:p-8">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-zinc-500">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Catalog controls
             </p>
-            <h3 className="text-2xl font-semibold tracking-normal text-zinc-950">
+            <h3 className="text-2xl font-semibold tracking-normal text-foreground">
               Explore courses
             </h3>
           </div>
-          <p className="text-sm font-medium text-zinc-500">Loading catalog controls...</p>
+          <p className="text-sm font-medium text-muted-foreground">Loading catalog controls...</p>
         </div>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-muted-foreground">
           Showing {courses.length} of {courses.length} courses.
         </p>
       </div>
