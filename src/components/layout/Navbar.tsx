@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import { Container } from "@/components/ui/Container";
 import { cn } from "@/lib/utils/cn";
+import { useAuth } from "@/hooks/use-auth";
 
 const navigationLinks = [
   { href: "/courses", label: "Courses" },
@@ -21,6 +22,7 @@ function isActiveLink(pathname: string, href: string) {
 export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated, isLoading, user, login } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-white/82 shadow-[0_10px_40px_-34px_rgba(15,23,42,0.55)] backdrop-blur-xl">
@@ -46,37 +48,61 @@ export function Navbar() {
             </span>
           </Link>
 
-          <nav aria-label="Primary navigation" className="hidden items-center gap-2 md:flex">
-            {navigationLinks.map((navigationLink) => {
-              const isActive = isActiveLink(pathname, navigationLink.href);
+          <div className="flex items-center gap-3">
+            <nav aria-label="Primary navigation" className="hidden items-center gap-2 md:flex">
+              {navigationLinks.map((navigationLink) => {
+                const isActive = isActiveLink(pathname, navigationLink.href);
 
-              return (
-                <Link
-                  key={navigationLink.href}
-                  href={navigationLink.href}
-                  aria-current={isActive ? "page" : undefined}
-                  className={cn(
-                    "rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-[0_16px_34px_-24px_rgba(29,78,216,0.65)]"
-                      : "text-muted-foreground hover:bg-primary/5 hover:text-primary",
-                  )}
+                return (
+                  <Link
+                    key={navigationLink.href}
+                    href={navigationLink.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={cn(
+                      "rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                      isActive
+                        ? "bg-primary text-primary-foreground shadow-[0_16px_34px_-24px_rgba(29,78,216,0.65)]"
+                        : "text-muted-foreground hover:bg-primary/5 hover:text-primary",
+                    )}
+                  >
+                    {navigationLink.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {!isLoading &&
+              (isAuthenticated ? (
+                <div className="flex items-center gap-3">
+                  <span className="hidden text-sm font-medium text-foreground md:block">
+                    {user?.email || user?.name || "User"}
+                  </span>
+                  <Link
+                    href="/logout"
+                    className="rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground transition hover:bg-secondary/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  >
+                    Logout
+                  </Link>
+                </div>
+              ) : (
+                <button
+                  onClick={() => login()}
+                  className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[0_16px_34px_-24px_rgba(29,78,216,0.65)] transition hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
-                  {navigationLink.label}
-                </Link>
-              );
-            })}
-          </nav>
+                  Login
+                </button>
+              ))}
 
-          <button
-            type="button"
-            aria-expanded={isOpen}
-            aria-controls="mobile-navigation"
-            onClick={() => setIsOpen((current) => !current)}
-            className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/30 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:hidden"
-          >
-            {isOpen ? "Close" : "Menu"}
-          </button>
+            <button
+              type="button"
+              aria-expanded={isOpen}
+              aria-controls="mobile-navigation"
+              onClick={() => setIsOpen((current) => !current)}
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-sm transition hover:border-primary/30 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:hidden"
+            >
+              {isOpen ? "Close" : "Menu"}
+            </button>
+          </div>
         </div>
 
         <div

@@ -12,6 +12,7 @@ const children = commands.map(([name, args]) => {
   const child = spawn(npmCommand, args, {
     stdio: "inherit",
     windowsHide: true,
+    shell: true,
   });
 
   child.on("exit", (code, signal) => {
