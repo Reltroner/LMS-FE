@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build --webpack",
+    "dev": "node scripts/dev.mjs",
+    "dev:next": "next dev --webpack",
+    "contentlayer:build": "contentlayer build",
+    "contentlayer:dev": "contentlayer dev",
+    "build": "npm run contentlayer:build && npm run typecheck && npm run lint && npm run validate:content && npm run validate:resources && npm run check:orphans && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -13,15 +16,13 @@
     "validate:content": "tsx scripts/validate-content.ts",
     "validate:resources": "tsx scripts/validate-resources.ts",
     "check:orphans": "tsx scripts/check-orphans.ts",
-    "prebuild": "npm run typecheck && npm run lint && npm run validate:content && npm run validate:resources && npm run check:orphans",
     "prepare": "husky"
   },
   "dependencies": {
     "contentlayer": "^0.3.4",
     "next": "16.2.6",
-    "next-contentlayer": "^0.3.4",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   },
   "overrides": {
     "postcss": "8.5.10"

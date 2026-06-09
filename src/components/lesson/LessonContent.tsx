@@ -1,15 +1,13 @@
-"use client";
-
 import { mdxComponents } from "@/components/mdx/MdxComponents";
-import { getMDXComponent } from "next-contentlayer/hooks";
-import { createElement, useMemo } from "react";
+import { getMDXComponent } from "@/lib/content/mdx";
+import { createElement } from "react";
 
 type LessonContentProps = {
   code: string;
 };
 
 export function LessonContent({ code }: LessonContentProps) {
-  const MDXContent = useMemo(() => getMDXComponent(code), [code]);
+  const MDXContent = getMDXComponent(code);
 
   return (
     <article className="rounded-[2rem] border border-border bg-card p-5 shadow-[0_24px_70px_-48px_rgba(15,23,42,0.35)] sm:p-8 lg:p-10">
