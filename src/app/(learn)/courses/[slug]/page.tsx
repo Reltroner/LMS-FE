@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { CourseHeader } from "@/components/course/CourseHeader";
 import { ModuleList } from "@/components/course/ModuleList";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -60,7 +61,7 @@ export default async function CourseDetailPage({ params }: CoursePageProps) {
   const firstLesson = lessons[0];
 
   return (
-    <>
+    <ProtectedRoute>
       <JsonLd id={`course-${course.slug}-jsonld`} data={createCourseStructuredData(course)} />
       <Section>
         <Container>
@@ -97,6 +98,6 @@ export default async function CourseDetailPage({ params }: CoursePageProps) {
           </div>
         </Container>
       </Section>
-    </>
+    </ProtectedRoute>
   );
 }

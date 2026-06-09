@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 import { CourseCard } from "@/components/course/CourseCard";
 import { CourseGrid } from "@/components/course/CourseGrid";
@@ -33,7 +34,7 @@ export default function CoursesPage() {
   );
 
   return (
-    <>
+    <ProtectedRoute>
       <JsonLd id="courses-collection-jsonld" data={createCollectionPageStructuredData(courses)} />
       <Section className="py-10 sm:py-14 lg:py-16">
         <Container>
@@ -71,7 +72,7 @@ export default function CoursesPage() {
           </div>
         </Container>
       </Section>
-    </>
+    </ProtectedRoute>
   );
 }
 

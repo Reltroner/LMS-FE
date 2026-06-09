@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { PathCourseList } from "@/components/path/PathCourseList";
 import { PathHero } from "@/components/path/PathHero";
 import { PathStats } from "@/components/path/PathStats";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
@@ -127,7 +128,7 @@ export default async function PathDetailPage({ params }: PathDetailPageProps) {
   } as const;
 
   return (
-    <>
+    <ProtectedRoute>
       <JsonLd id={`path-${path.slug}-breadcrumb-jsonld`} data={breadcrumbStructuredData} />
       <Section className="py-10 sm:py-14 lg:py-16">
         <Container>
@@ -187,6 +188,6 @@ export default async function PathDetailPage({ params }: PathDetailPageProps) {
           </div>
         </Container>
       </Section>
-    </>
+    </ProtectedRoute>
   );
 }

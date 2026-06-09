@@ -2,6 +2,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { PathCard } from "@/components/path/PathCard";
 import { PathHero } from "@/components/path/PathHero";
 import { PathStats } from "@/components/path/PathStats";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { getCourseBySlug } from "@/lib/content/course-registry";
@@ -82,7 +83,7 @@ export default function PathsPage() {
   }));
 
   return (
-    <>
+    <ProtectedRoute>
       <JsonLd id="paths-breadcrumb-jsonld" data={breadcrumbStructuredData} />
       <Section className="py-10 sm:py-14 lg:py-16">
         <Container>
@@ -131,6 +132,6 @@ export default function PathsPage() {
           </div>
         </Container>
       </Section>
-    </>
+    </ProtectedRoute>
   );
 }

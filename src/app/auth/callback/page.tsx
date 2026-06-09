@@ -17,7 +17,14 @@ export default function AuthCallbackPage() {
     async function processCallback() {
       try {
         await handleCallback();
-        router.replace("/");
+
+        const returnPath = sessionStorage.getItem("lms_return_path");
+        if (returnPath) {
+          sessionStorage.removeItem("lms_return_path");
+          router.replace(returnPath);
+        } else {
+          router.replace("/");
+        }
       } catch (err) {
         console.error("Auth callback failed:", err);
         setError("Failed to process authentication. Please try logging in again.");

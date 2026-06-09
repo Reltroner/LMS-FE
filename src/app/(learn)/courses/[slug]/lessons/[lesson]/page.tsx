@@ -5,6 +5,7 @@ import { CourseNavigation } from "@/components/lesson/CourseNavigation";
 import { LessonContent } from "@/components/lesson/LessonContent";
 import { LessonHeader } from "@/components/lesson/LessonHeader";
 import { LessonSidebar } from "@/components/lesson/LessonSidebar";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
@@ -59,7 +60,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const { previousLesson, nextLesson } = getNextPreviousLesson(course.slug, lesson.slug);
 
   return (
-    <>
+    <ProtectedRoute>
       <JsonLd
         id={`lesson-${lesson.slug}-jsonld`}
         data={createLessonStructuredData({ course, lesson })}
@@ -88,6 +89,6 @@ export default async function LessonPage({ params }: LessonPageProps) {
           </div>
         </Container>
       </Section>
-    </>
+    </ProtectedRoute>
   );
 }
