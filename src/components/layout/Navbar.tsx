@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { cn } from "@/lib/utils/cn";
 import { useAuth } from "@/hooks/use-auth";
+import { useAuthRoles } from "@/hooks/use-auth-roles";
 
 const navigationLinks = [
   { href: "/courses", label: "Courses" },
@@ -23,6 +24,7 @@ export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const { isAuthenticated, isLoading, user, login } = useAuth();
+  const { isAdmin, isInstructor } = useAuthRoles();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-white/82 shadow-[0_10px_40px_-34px_rgba(15,23,42,0.55)] backdrop-blur-xl">
@@ -74,6 +76,21 @@ export function Navbar() {
             {!isLoading &&
               (isAuthenticated ? (
                 <div className="flex items-center gap-3">
+                  {isAdmin ? (
+                    <Link
+                      href="/admin"
+                      className="hidden rounded-full bg-red-100 px-3 py-1.5 text-xs font-bold tracking-wide text-red-800 transition hover:bg-red-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:block"
+                    >
+                      Admin
+                    </Link>
+                  ) : isInstructor ? (
+                    <Link
+                      href="/instructor"
+                      className="hidden rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold tracking-wide text-amber-900 transition hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:block"
+                    >
+                      Instructor
+                    </Link>
+                  ) : null}
                   <span className="hidden text-sm font-medium text-foreground md:block">
                     {user?.email || user?.name || "User"}
                   </span>
