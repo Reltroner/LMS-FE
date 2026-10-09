@@ -64,7 +64,10 @@ export function scanPublicOutput(base, compiled, relative="out") {
   if (!fs.existsSync(target)) throw new Error("Missing build output: "+target);
   const drafts=compiled.allLessons.filter(x=>x.status!=="published");
   const bad = [];
-  const tokens=drafts.flatMap(x=>[x.route, x.lesson_id]); // exact strong markers; source titles may appear in legitimate editorial text
+  const publishedText=new Set(compiled.allLessons.filter(x=>x.status==="published").flatMap(x=>[x.title,x.summary]));
+  const tokens=[...new Set(drafts.flatMap(x=>[x.route,x.lesson_id,
+    ...[x.title,x.summary].filter(s=>s.length>=14&&!publishedText.has(s))
+  ]))]; // fail closed if draft metadata/route leaks into public static JS/HTML/JSON/XML
   const walk = p => { for (const x of fs.readdirSync(p,{withFileTypes:true})) {
     const abs=path.join(p,x.name);if(x.isDirectory()){walk(abs);continue;}
     const rel=path.relative(target,abs).replaceAll(path.sep,"/");
