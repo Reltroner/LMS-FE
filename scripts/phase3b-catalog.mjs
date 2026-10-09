@@ -3,7 +3,6 @@ import path from "node:path";
 import crypto from "node:crypto";
 
 const root = process.cwd();
-const registryPath = path.join(root, "contracts/catalog/lesson-id-registry.json");
 
 export function stableJSONString(value) {
   if (Array.isArray(value)) return "[" + value.map(stableJSONString).join(",") + "]";
@@ -93,6 +92,7 @@ export function scanPublicOutput(base, compiled, relative="out", contractRoot=ro
       if(variants.some(v=>v.length>0&&normalizedRel.includes(v.toLowerCase())))
         bad.push({artifact:rel,token:t,channel:"filename"});
     }
+    if (path.basename(rel)===".gitkeep" && fs.statSync(abs).size===0) continue;
     if (!textExtensions.has(ext) && !reviewedBinaries.has(ext)) {
       bad.push({artifact:rel,token:"UNREVIEWED_PUBLIC_ASSET_TYPE",channel:"unknown-extension"});
       continue;
