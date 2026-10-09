@@ -1,4 +1,4 @@
-import { resources } from "@/catalog/resources";
+import { publicResources as resources } from "@/catalog/resources/public";
 import type { Resource } from "@/types/resource";
 
 export const resourceById = Object.fromEntries(
