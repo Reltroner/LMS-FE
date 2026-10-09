@@ -64,6 +64,12 @@ test("B3-AC15 public artifacts block CSS SVG sourcemap filename and unknown exte
     fs.writeFileSync(path.join(out,"private"+ext),"/* "+draft.route+" */");
     assert.ok(scanPublicOutput(dir,result).some(x=>x.artifact==="private"+ext && x.token===draft.route));
   }
+  fs.mkdirSync(path.join(out,"brand"),{recursive:true});
+  fs.writeFileSync(path.join(out,"brand",".gitkeep"),"\n");
+  assert.ok(!scanPublicOutput(dir,result).some(x=>x.artifact==="brand/.gitkeep"),"Whitespace-only approved placeholder allowed");
+  fs.writeFileSync(path.join(out,"brand",".gitkeep"),"not a placeholder");
+  assert.ok(scanPublicOutput(dir,result).some(x=>x.artifact==="brand/.gitkeep"&&x.token==="UNREVIEWED_PUBLIC_ASSET_TYPE"));
+  fs.rmSync(path.join(out,"brand",".gitkeep"));
   fs.writeFileSync(path.join(out,"unreviewed.secret"),"benign");
   assert.ok(scanPublicOutput(dir,result).some(x=>x.token==="UNREVIEWED_PUBLIC_ASSET_TYPE"));
   fs.mkdirSync(path.join(out,"courses","in-world-living-lab"),{recursive:true});
