@@ -59,13 +59,14 @@ export function validateStudioAttestation(doc) {
     typeof doc.source_commit_sha==="string" && /^[a-f0-9]{40}$/.test(doc.source_commit_sha) &&
     typeof doc.digest_sha256==="string" && /^[a-f0-9]{64}$/.test(doc.digest_sha256);
 }
-export function scanPublicOutput(base, compiled, relative="out") {
+export function scanPublicOutput(base, compiled, relative="out", contractRoot=root) {
   const target = path.join(base,relative);
   if (!fs.existsSync(target)) throw new Error("Missing build output: "+target);
   const drafts=compiled.allLessons.filter(x=>x.status!=="published");
   const bad = [];
   const publishedText=new Set(compiled.allLessons.filter(x=>x.status==="published").flatMap(x=>[x.title,x.summary]));
-  const denyList = JSON.parse(fs.readFileSync(path.join(base,"contracts/catalog/unpublished-route-denylist.json"),"utf8")).denied;
+  // Public artifact directory may be a temporary fixture; policy stays anchored to the audited source checkout.
+  const denyList = JSON.parse(fs.readFileSync(path.join(contractRoot,"contracts/catalog/unpublished-route-denylist.json"),"utf8")).denied;
   const tokens=[...new Set([
     ...drafts.flatMap(x=>[x.route,x.lesson_id,
       ...[x.title,x.summary].filter(s=>s.length>=14&&!publishedText.has(s))
