@@ -65,9 +65,13 @@ export function scanPublicOutput(base, compiled, relative="out") {
   const drafts=compiled.allLessons.filter(x=>x.status!=="published");
   const bad = [];
   const publishedText=new Set(compiled.allLessons.filter(x=>x.status==="published").flatMap(x=>[x.title,x.summary]));
-  const tokens=[...new Set(drafts.flatMap(x=>[x.route,x.lesson_id,
-    ...[x.title,x.summary].filter(s=>s.length>=14&&!publishedText.has(s))
-  ]))]; // fail closed if draft metadata/route leaks into public static JS/HTML/JSON/XML
+  const denyList = JSON.parse(fs.readFileSync(path.join(base,"contracts/catalog/unpublished-route-denylist.json"),"utf8")).denied;
+  const tokens=[...new Set([
+    ...drafts.flatMap(x=>[x.route,x.lesson_id,
+      ...[x.title,x.summary].filter(s=>s.length>=14&&!publishedText.has(s))
+    ]),
+    ...denyList.flatMap(x=>[x.route,x.title])
+  ])]; // fail closed for unpublished lesson/course/path route and public metadata
   const walk = p => { for (const x of fs.readdirSync(p,{withFileTypes:true})) {
     const abs=path.join(p,x.name);if(x.isDirectory()){walk(abs);continue;}
     const rel=path.relative(target,abs).replaceAll(path.sep,"/");
