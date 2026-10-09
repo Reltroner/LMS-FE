@@ -92,12 +92,12 @@ function sortLessons(lessons: readonly LessonDocument[]): LessonDocument[] {
 }
 
 export function getAllLessons(): readonly LessonDocument[] {
-  return sortLessons(allLessons.map(enrichLesson));
+  return sortLessons(allLessons.filter((lesson) => lesson.status === "published").map(enrichLesson));
 }
 
 export function getLessonsByCourseSlug(courseSlug: string): readonly LessonDocument[] {
   return sortLessons(
-    allLessons.filter((lesson) => lesson.courseSlug === courseSlug).map(enrichLesson),
+    allLessons.filter((lesson) => lesson.courseSlug === courseSlug && lesson.status === "published").map(enrichLesson),
   );
 }
 
@@ -111,7 +111,7 @@ export function getLessonBySlug(
 ): LessonDocument | undefined {
   const lesson = allLessons.find(
     (lessonDocument) =>
-      lessonDocument.courseSlug === courseSlug && lessonDocument.slug === lessonSlug,
+      lessonDocument.courseSlug === courseSlug && lessonDocument.slug === lessonSlug && lessonDocument.status === "published",
   );
 
   return lesson ? enrichLesson(lesson) : undefined;
