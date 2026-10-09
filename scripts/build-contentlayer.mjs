@@ -1,6 +1,12 @@
 import "@contentlayer/utils/effect/Tracing/Enable";
 
-import { generateDotpkg, getConfig, logGenerateInfo, runMain, validateTsconfig } from "contentlayer/core";
+import {
+  generateDotpkg,
+  getConfig,
+  logGenerateInfo,
+  runMain,
+  validateTsconfig,
+} from "contentlayer/core";
 import { pipe, T } from "@contentlayer/utils/effect";
 
 import { compileManifest } from "./phase3b-catalog.mjs";
