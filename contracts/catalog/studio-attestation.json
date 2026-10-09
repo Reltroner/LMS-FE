@@ -1,0 +1,13 @@
+{
+  "authority": "Reltroner/reltroner-studio",
+  "separate_canon": true,
+  "rules": [
+    "LMS course manifest not authorized to declare editorial canon",
+    "Ingest only published, redistribution-allowed, hash-attested source commits",
+    "No learner private submissions/index without subject ACL and explicit scope",
+    "Reject absent/falsified attestation",
+    "Index release change requires checkpoint/rollback semantics"
+  ],
+  "enforced_by": "contract-only validateStudioAttestation; Knowledge backend provider enforcement deferred",
+  "public_release_now": false
+}
