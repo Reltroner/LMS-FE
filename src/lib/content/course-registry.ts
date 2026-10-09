@@ -1,4 +1,4 @@
-import { courses } from "@/catalog/courses";
+import { publicCourses as courses } from "@/catalog/courses/public";
 import type { Course } from "@/types/course";
 import { allLessons } from "@/lib/content/contentlayer";
 
