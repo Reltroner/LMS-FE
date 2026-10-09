@@ -53,11 +53,17 @@ export function compileManifest(base=root, sourceRegistry) {
   const manifest = {schema_version:1,source:"git-lms-catalog",public_only:true,lesson_count:publicLessons.length,course_revisions:courseRevisions,lessons:publicLessons};
   return {manifest,hash:digest(stableJSONString(manifest)),allLessons:lessons};
 }
-export function validateStudioAttestation(doc) {
-  return doc && doc.publisher==="reltroner-studio" && doc.published===true &&
-    doc.rights==="public-redistribution-allowed" &&
-    typeof doc.source_commit_sha==="string" && /^[a-f0-9]{40}$/.test(doc.source_commit_sha) &&
-    typeof doc.digest_sha256==="string" && /^[a-f0-9]{64}$/.test(doc.digest_sha256);
+/** Source-only synthetic trust comparison; real signed Studio rights checked in Phase 8. */
+export function validateStudioAttestation(doc, independentlyPinned) {
+  if (!doc || !independentlyPinned || doc.publisher !== "reltroner-studio" ||
+      doc.published !== true || doc.rights !== "public-redistribution-allowed") return false;
+  if (!/^[a-f0-9]{40}$/.test(doc.source_commit_sha ?? "") ||
+      !/^[a-f0-9]{64}$/.test(doc.digest_sha256 ?? "") ||
+      !/^[a-f0-9]{40}$/.test(independentlyPinned.source_commit_sha ?? "") ||
+      !/^[a-f0-9]{64}$/.test(independentlyPinned.digest_sha256 ?? "")) return false;
+  return doc.source_commit_sha === independentlyPinned.source_commit_sha &&
+    crypto.timingSafeEqual(Buffer.from(doc.digest_sha256, "hex"),
+                           Buffer.from(independentlyPinned.digest_sha256, "hex"));
 }
 export function scanPublicOutput(base, compiled, relative="out", contractRoot=root) {
   const target = path.join(base,relative);
@@ -76,9 +82,27 @@ export function scanPublicOutput(base, compiled, relative="out", contractRoot=ro
   const walk = p => { for (const x of fs.readdirSync(p,{withFileTypes:true})) {
     const abs=path.join(p,x.name);if(x.isDirectory()){walk(abs);continue;}
     const rel=path.relative(target,abs).replaceAll(path.sep,"/");
-    if (!/\.(?:html|xml|json|js|txt)$/.test(rel)) continue;
+    const ext=path.extname(rel).toLowerCase();
+    const textExtensions=new Set([".html",".xml",".json",".js",".mjs",".cjs",".txt",
+      ".css",".svg",".map",".webmanifest",".ndjson",".csv",".md",".yml",".yaml"]);
+    const reviewedBinaries=new Set([".ico",".png",".jpg",".jpeg",".webp",".avif",".gif",
+      ".woff",".woff2",".ttf",".otf",".eot",".mp4",".webm",".mp3",".ogg"]);
+    const normalizedRel=rel.toLowerCase();
+    for (const t of tokens) {
+      const variants=[t,t.startsWith("/")?t.slice(1):t,encodeURI(t)];
+      if(variants.some(v=>v.length>0&&normalizedRel.includes(v.toLowerCase())))
+        bad.push({artifact:rel,token:t,channel:"filename"});
+    }
+    if (!textExtensions.has(ext) && !reviewedBinaries.has(ext)) {
+      bad.push({artifact:rel,token:"UNREVIEWED_PUBLIC_ASSET_TYPE",channel:"unknown-extension"});
+      continue;
+    }
+    if (reviewedBinaries.has(ext)) continue; // binary rights / metadata deferred to release gate
     const content=fs.readFileSync(abs,"utf8");
-    for (const t of tokens) if(content.includes(t))bad.push({artifact:rel,token:t});
+    for (const t of tokens) {
+      const variants=[t,encodeURI(t)];
+      if(variants.some(v=>v&&content.includes(v)))bad.push({artifact:rel,token:t,channel:"body"});
+    }
   }};
   walk(target);
   return bad;
