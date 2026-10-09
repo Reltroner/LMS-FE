@@ -50,3 +50,5 @@ pnpm-debug.log*
 next-env.d.ts
 
 docs/*
+# Build-only deny-by-default public Contentlayer staging
+.public-content/
