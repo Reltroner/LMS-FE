@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "status": "CANDIDATE_FZ11_PUBLIC_ONLY",
+  "source_base_sha": "f2d40417d0eea71e2c3e329ec6e32933b3e6cbd7",
+  "denied": [
+    {
+      "kind": "course",
+      "slug": "in-world-living-lab",
+      "route": "/courses/in-world-living-lab",
+      "title": "In-World Living Lab"
+    },
+    {
+      "kind": "course",
+      "slug": "worldbuilding-operating-system",
+      "route": "/courses/worldbuilding-operating-system",
+      "title": "Worldbuilding Operating System"
+    },
+    {
+      "kind": "path",
+      "slug": "worldbuilding-creator",
+      "route": "/paths/worldbuilding-creator",
+      "title": "Worldbuilding Creator Path"
+    }
+  ],
+  "maintenance": "Every future course/path draft/publish transition must update this reviewed denylist and public import allowlist together; no auto-publish on status alone."
+}

@@ -1,7 +1,21 @@
-import { courses } from "@/catalog/courses";
+import { publicCourses as courses } from "@/catalog/courses/public";
 import type { Course } from "@/types/course";
+import { allLessons } from "@/lib/content/contentlayer";
 
-const courseList = courses as readonly Course[];
+const originalCourses = courses as readonly Course[];
+const publishedLessonKeys = new Set(
+  allLessons.filter((lesson) => lesson.status === "published")
+    .map((lesson) => `${lesson.courseSlug}/${lesson.slug}`),
+);
+const courseList: readonly Course[] = originalCourses.map((course) => ({
+  ...course,
+  modules: course.modules.map((module) => ({
+    ...module,
+    lessonSlugs: module.lessonSlugs.filter(
+      (slug) => publishedLessonKeys.has(`${course.slug}/${slug}`),
+    ),
+  })).filter((module) => module.lessonSlugs.length > 0),
+}));
 
 export function getAllCourses(): readonly Course[] {
   return courseList;

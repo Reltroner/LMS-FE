@@ -1,5 +1,5 @@
-import { courses } from "../src/catalog/courses";
-import { learningPaths } from "../src/catalog/paths";
+import { publicCourses as courses } from "../src/catalog/courses/public";
+import { publicLearningPaths as learningPaths } from "../src/catalog/paths/public";
 import { readLessonFiles } from "./_content-utils";
 
 const courseItems = courses.map((course) => ({
@@ -11,7 +11,7 @@ const courseItems = courses.map((course) => ({
   tags: [course.category, course.level],
 }));
 
-const lessonItems = readLessonFiles().map((lesson) => ({
+const lessonItems = readLessonFiles().filter((lesson) => lesson.frontmatter.status === "published").map((lesson) => ({
   id: `lesson:${lesson.courseSlug}:${lesson.lessonSlug}`,
   type: "lesson",
   title: lesson.frontmatter.title,

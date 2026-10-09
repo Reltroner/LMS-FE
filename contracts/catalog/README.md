@@ -1,0 +1,7 @@
+# Phase 3B-04 — Git Catalog, Publication and Privacy
+
+This changes **LMS-FE candidate branch only**. 31 source MDX lessons receive stable IDs via the versioned registry; original MDX files and the dirty original developer workspace are untouched. The canonical manifest compiler (Node built-ins only) emits deterministic public-only lessons and individual course-revision SHA256 values. Stable IDs do not change when slugs change; altering `source_path` requires explicit migration map update, not silent ID replacement.
+
+The frontend lesson registry now excludes non-`published` content from static route params, lesson lookup, sitemap and shared search index; course registry filters modules, and offline search index generator filters unpublished lessons. The output scanner can check `out/` HTML, JS, XML, JSON and txt for forbidden lesson route/ID strings, but **cannot establish no-leak until `npm ci`, build, and actual artifact scan run**. Source Contentlayer may still contain drafts; output scanning can legitimately fail closed. No production publish.
+
+Commands on a clean isolated 3B-04 worktree: `node --test tests/catalog-contract.test.mjs`; `node scripts/phase3b-catalog.mjs`; after a local build, `node scripts/phase3b-catalog.mjs --verify-out`. Tests create temporary fixture directories outside project and remove them. `contracts/catalog/studio-attestation.json` describes *design policy* only: no source rights are fabricated or declared attested. No CMS/editorial mutation, no learner journaling private uploads, no HRM changes.

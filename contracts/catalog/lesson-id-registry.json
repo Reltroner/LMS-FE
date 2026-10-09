@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "registry_authority": "LMS-FE_GIT_CONTENT_NOT_STUDIO_CANON",
+  "source_base_sha": "f2d40417d0eea71e2c3e329ec6e32933b3e6cbd7",
+  "lesson_count": 31,
+  "lesson_ids_immutable": "ID values never derived at runtime from changing slug; update source_path but preserve lesson_id during rename",
+  "records": [
+    {
+      "lesson_id": "lms-lesson-0001",
+      "source_path": "content/courses/backend-engineering/lessons/01-http-overview.mdx",
+      "legacy_route": "/courses/backend-engineering/lessons/01-http-overview",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0002",
+      "source_path": "content/courses/backend-engineering/lessons/02-http-methods.mdx",
+      "legacy_route": "/courses/backend-engineering/lessons/02-http-methods",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0003",
+      "source_path": "content/courses/backend-engineering/lessons/03-rest-introduction.mdx",
+      "legacy_route": "/courses/backend-engineering/lessons/03-rest-introduction",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0004",
+      "source_path": "content/courses/in-world-living-lab/lessons/00-course-orientation.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/00-course-orientation",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0005",
+      "source_path": "content/courses/in-world-living-lab/lessons/01-in-world-persona.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/01-in-world-persona",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0006",
+      "source_path": "content/courses/in-world-living-lab/lessons/02-simulation-zone.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/02-simulation-zone",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0007",
+      "source_path": "content/courses/in-world-living-lab/lessons/03-daily-routine-system.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/03-daily-routine-system",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0008",
+      "source_path": "content/courses/in-world-living-lab/lessons/04-constraint-based-living.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/04-constraint-based-living",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0009",
+      "source_path": "content/courses/in-world-living-lab/lessons/05-in-world-journaling-method.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/05-in-world-journaling-method",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0010",
+      "source_path": "content/courses/in-world-living-lab/lessons/06-social-interaction-simulation.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/06-social-interaction-simulation",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0011",
+      "source_path": "content/courses/in-world-living-lab/lessons/07-economy-of-daily-life.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/07-economy-of-daily-life",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0012",
+      "source_path": "content/courses/in-world-living-lab/lessons/08-law-risk-and-consequence.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/08-law-risk-and-consequence",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0013",
+      "source_path": "content/courses/in-world-living-lab/lessons/09-sensory-worldbuilding.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/09-sensory-worldbuilding",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0014",
+      "source_path": "content/courses/in-world-living-lab/lessons/10-journal-to-lore-extraction.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/10-journal-to-lore-extraction",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0015",
+      "source_path": "content/courses/in-world-living-lab/lessons/11-journal-to-artwork-pipeline.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/11-journal-to-artwork-pipeline",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0016",
+      "source_path": "content/courses/in-world-living-lab/lessons/12-final-in-world-life-journal.mdx",
+      "legacy_route": "/courses/in-world-living-lab/lessons/12-final-in-world-life-journal",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0017",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/00-course-orientation.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/00-course-orientation",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0018",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/01-project-seed.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/01-project-seed",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0019",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/02-creative-pillars.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/02-creative-pillars",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0020",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/03-scope-control.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/03-scope-control",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0021",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/04-world-premise-and-logic.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/04-world-premise-and-logic",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0022",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/05-civilization-system.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/05-civilization-system",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0023",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/06-culture-system.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/06-culture-system",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0024",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/07-history-and-timeline.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/07-history-and-timeline",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0025",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/08-geography-as-system.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/08-geography-as-system",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0026",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/09-factions-and-institutions.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/09-factions-and-institutions",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0027",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/10-character-as-product-of-world.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/10-character-as-product-of-world",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0028",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/11-canon-bible-system.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/11-canon-bible-system",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0029",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/12-continuity-management.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/12-continuity-management",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0030",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/13-sustainable-creative-workflow.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/13-sustainable-creative-workflow",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    },
+    {
+      "lesson_id": "lms-lesson-0031",
+      "source_path": "content/courses/worldbuilding-operating-system/lessons/14-final-world-pitch.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/14-final-world-pitch",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    }
+  ]
+}
