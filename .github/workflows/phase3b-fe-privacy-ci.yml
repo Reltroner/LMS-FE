@@ -1,0 +1,43 @@
+name: LMS Phase3B Frontend Catalog and Privacy CI
+on:
+  push:
+    branches: ['phase3b/**']
+  pull_request:
+    branches: ['main', 'phase3b/**']
+permissions:
+  contents: read
+concurrency:
+  group: lms-fe-3b-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  catalog-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Source catalog stable ID and privacy negative fixtures
+        run: node --test tests/catalog-contract.test.mjs
+      - name: Published-only catalog manifest deterministic checksum
+        run: node scripts/phase3b-catalog.mjs
+  frontend-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      HUSKY: '0'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install exact npm lockfile
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck, content validation, resources, orphans and static Next build
+        run: npm run build
+      - name: Enforce publication-only exported build
+        run: node scripts/phase3b-catalog.mjs --verify-out
