@@ -49,3 +49,17 @@ test("B3-AC16 refuse unattested Studio canon and unsupported content redistribut
  assert.equal(validateStudioAttestation({...approved,rights:"private"}),false);
  assert.equal(validateStudioAttestation({...approved,source_commit_sha:"unverified"}),false);
 });
+
+test("B3-AC15 public browser resource bundle imports only published course resource registries",()=>{
+ const source=fs.readFileSync(path.join(root,"src/catalog/resources/public.ts"),"utf8");
+ const targets=[...source.matchAll(/from "\.\.\/courses\/([a-z0-9-]+)\/resources"/g)].map(m=>m[1]);
+ assert.ok(targets.length>0,"Public resources must explicitly declare approved imports");
+ for(const slug of targets){
+   const sourceCourse=fs.readFileSync(path.join(root,"src/catalog/courses",slug,"course.ts"),"utf8");
+   assert.match(sourceCourse,/status:\s*"published"/,"Private course resources must never join public registry");
+ }
+ assert.ok(!source.includes("in-world-living-lab"));
+ assert.ok(!source.includes("worldbuilding-operating-system"));
+ const registry=fs.readFileSync(path.join(root,"src/lib/resource/resource-registry.ts"),"utf8");
+ assert.ok(registry.includes("@/catalog/resources/public"));
+});
