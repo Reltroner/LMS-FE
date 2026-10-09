@@ -92,7 +92,7 @@ export function scanPublicOutput(base, compiled, relative="out", contractRoot=ro
       if(variants.some(v=>v.length>0&&normalizedRel.includes(v.toLowerCase())))
         bad.push({artifact:rel,token:t,channel:"filename"});
     }
-    if (path.basename(rel)===".gitkeep" && fs.statSync(abs).size===0) continue;
+    if (path.basename(rel)===".gitkeep" && ["brand/","icons/","images/","og/"].some(prefix=>rel.startsWith(prefix)) && fs.statSync(abs).size<=4 && fs.readFileSync(abs,"utf8").trim()==="") continue;
     if (!textExtensions.has(ext) && !reviewedBinaries.has(ext)) {
       bad.push({artifact:rel,token:"UNREVIEWED_PUBLIC_ASSET_TYPE",channel:"unknown-extension"});
       continue;
