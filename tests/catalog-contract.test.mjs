@@ -42,12 +42,34 @@ test("B3-AC15 public output scanner rejects draft routes and does not report pub
   assert.ok(scanPublicOutput(dir,result).some(x=>x.token===draft.route));
  }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
-test("B3-AC16 refuse unattested Studio canon and unsupported content redistribution",()=>{
- const approved={publisher:"reltroner-studio",published:true,rights:"public-redistribution-allowed",source_commit_sha:"a".repeat(40),digest_sha256:"b".repeat(64)};
- assert.equal(validateStudioAttestation(approved),true);
- assert.equal(validateStudioAttestation({...approved,published:false}),false);
- assert.equal(validateStudioAttestation({...approved,rights:"private"}),false);
- assert.equal(validateStudioAttestation({...approved,source_commit_sha:"unverified"}),false);
+test("B3-AC16 deny a forged, correctly shaped Studio source digest",()=>{
+ const independentlyPinned={source_commit_sha:"a".repeat(40),digest_sha256:"b".repeat(64)};
+ const approved={publisher:"reltroner-studio",published:true,rights:"public-redistribution-allowed",...independentlyPinned};
+ assert.equal(validateStudioAttestation(approved,independentlyPinned),true);
+ assert.equal(validateStudioAttestation(approved),false,"Missing independent trusted source must deny");
+ assert.equal(validateStudioAttestation({...approved,published:false},independentlyPinned),false);
+ assert.equal(validateStudioAttestation({...approved,rights:"private"},independentlyPinned),false);
+ assert.equal(validateStudioAttestation({...approved,source_commit_sha:"c".repeat(40)},independentlyPinned),false);
+ assert.equal(validateStudioAttestation({...approved,digest_sha256:"d".repeat(64)},independentlyPinned),false);
+ assert.equal(validateStudioAttestation({...approved,source_commit_sha:"unverified"},independentlyPinned),false);
+});
+test("B3-AC15 public artifacts block CSS SVG sourcemap filename and unknown extensions",()=>{
+ const result=compileManifest(root);
+ const draft=result.allLessons.find(x=>x.status!=="published");
+ assert.ok(draft);
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),"reltroner-public-negative-"));
+ try{
+  const out=path.join(dir,"out");fs.mkdirSync(out);
+  for(const ext of [".css",".svg",".map"]){
+    fs.writeFileSync(path.join(out,"private"+ext),"/* "+draft.route+" */");
+    assert.ok(scanPublicOutput(dir,result).some(x=>x.artifact==="private"+ext && x.token===draft.route));
+  }
+  fs.writeFileSync(path.join(out,"unreviewed.secret"),"benign");
+  assert.ok(scanPublicOutput(dir,result).some(x=>x.token==="UNREVIEWED_PUBLIC_ASSET_TYPE"));
+  fs.mkdirSync(path.join(out,"courses","in-world-living-lab"),{recursive:true});
+  fs.writeFileSync(path.join(out,"courses","in-world-living-lab","index.html"),"blank");
+  assert.ok(scanPublicOutput(dir,result).some(x=>x.channel==="filename"));
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });
 
 test("B3-AC15 public browser resource bundle imports only published course resource registries",()=>{
