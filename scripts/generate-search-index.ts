@@ -11,7 +11,7 @@ const courseItems = courses.map((course) => ({
   tags: [course.category, course.level],
 }));
 
-const lessonItems = readLessonFiles().map((lesson) => ({
+const lessonItems = readLessonFiles().filter((lesson) => lesson.frontmatter.status === "published").map((lesson) => ({
   id: `lesson:${lesson.courseSlug}:${lesson.lessonSlug}`,
   type: "lesson",
   title: lesson.frontmatter.title,
