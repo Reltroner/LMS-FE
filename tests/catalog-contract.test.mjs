@@ -63,3 +63,29 @@ test("B3-AC15 public browser resource bundle imports only published course resou
  const registry=fs.readFileSync(path.join(root,"src/lib/resource/resource-registry.ts"),"utf8");
  assert.ok(registry.includes("@/catalog/resources/public"));
 });
+
+test("B3-AC15 public course/path catalog import allowlists reject draft metadata",()=>{
+ const sources=[
+  ["src/catalog/courses/public.ts", "src/catalog/courses", "course.ts"],
+  ["src/catalog/paths/public.ts", "src/catalog/paths", null]
+ ];
+ for(const [manifest,folder,courseFile] of sources){
+  const src=fs.readFileSync(path.join(root,manifest),"utf8");
+  assert.ok(!src.includes("worldbuilding-operating-system"));
+  assert.ok(!src.includes("in-world-living-lab"));
+  assert.ok(!src.includes("worldbuilding-creator"));
+  if(courseFile){
+   for(const [,slug] of src.matchAll(/from "\.\/([a-z0-9-]+)\/course"/g)){
+    const published=fs.readFileSync(path.join(root,folder,slug,courseFile),"utf8");
+    assert.match(published,/status:\s*"published"/);
+   }
+  }else{
+   for(const [,slug] of src.matchAll(/from "\.\/([a-z0-9-]+)"/g)){
+    const published=fs.readFileSync(path.join(root,folder,slug+".ts"),"utf8");
+    assert.match(published,/status:\s*"published"/);
+   }
+  }
+ }
+ const deny=JSON.parse(fs.readFileSync(path.join(root,"contracts/catalog/unpublished-route-denylist.json"),"utf8")).denied;
+ assert.equal(deny.length,3);
+});
