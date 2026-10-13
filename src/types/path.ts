@@ -1,6 +1,10 @@
-import type { CourseStatus } from "@/types/course";
+import type { CourseStatus } from "./course";
 
-export type PathLevel = "beginner" | "beginner-to-intermediate" | "intermediate" | "advanced";
+export type PathLevel =
+  | "beginner"
+  | "beginner-to-intermediate"
+  | "intermediate"
+  | "advanced";
 
 export type LearningPath = Readonly<{
   id: string;

@@ -1,153 +1,90 @@
 import Link from "next/link";
-
-import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { formatLevelLabel } from "@/lib/content/filters";
-import { courseUrl } from "@/lib/routes/route-builders";
 import type { Course } from "@/types/course";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { ClockIcon, LayersIcon, BookIcon } from "@/components/ui/icons";
+import { getLessonsByCourseSlug } from "@/lib/fixtures/lessons";
 
-type CourseCardProps = {
-  course: Course;
+const categoryLabels: Record<string, string> = {
+  "backend-engineering": "Backend Engineering",
+  worldbuilding: "Worldbuilding",
+  "creative-system": "Creative System",
 };
 
-function formatCategoryLabel(category: Course["category"]) {
-  return category
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
+const levelLabels: Record<string, string> = {
+  beginner: "Beginner",
+  "beginner-intermediate": "Beginner → Intermediate",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+};
 
-function BookIcon({ className = "h-5 w-5" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
-      <path d="M6 6h10" />
-      <path d="M6 10h10" />
-    </svg>
-  );
-}
-
-function LayersIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
-      <path d="m22 12.5-8.58 3.91a2 2 0 0 1-1.66 0L2 12.5" />
-      <path d="m22 17.5-8.58 3.91a2 2 0 0 1-1.66 0L2 17.5" />
-    </svg>
-  );
-}
-
-function ClockIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
-}
-
-export function CourseCard({ course }: CourseCardProps) {
-  const totalModules = course.modules.length;
-  const totalLessons = course.modules.reduce(
-    (total, courseModule) => total + courseModule.lessonSlugs.length,
-    0,
-  );
-  const isPublished = course.status === "published";
+export function CourseCard({ course }: { course: Course }) {
+  const lessons = getLessonsByCourseSlug(course.slug);
+  const totalMinutes = lessons.reduce((sum, l) => sum + l.durationMinutes, 0);
+  const hours = Math.round((totalMinutes / 60) * 10) / 10;
 
   return (
-    <Card className="group flex h-full flex-col overflow-hidden transition duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_30px_90px_-50px_rgba(29,78,216,0.55)]">
-      {/* Decorative brand header banner */}
-      <div className="relative flex h-28 items-center justify-center border-b border-border/70 bg-gradient-to-br from-primary/12 via-accent/8 to-transparent">
-        <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/50 bg-card/85 text-primary shadow-xs backdrop-blur">
-          <BookIcon className="h-6 w-6" />
-        </span>
-        <div className="absolute left-4 top-3.5">
-          <Badge tone="primary">{formatCategoryLabel(course.category)}</Badge>
+    <Card as="article" interactive className="flex flex-col overflow-hidden">
+      <div className="relative h-32 bg-gradient-to-br from-primary/15 via-accent/10 to-transparent">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-card/80 backdrop-blur">
+            <BookIcon width={28} height={28} className="text-primary" />
+          </span>
         </div>
-        <div className="absolute right-4 top-3.5">
-          <Badge tone={isPublished ? "success" : "warning"}>{course.status}</Badge>
+        <div className="absolute left-4 top-4">
+          <Badge tone="primary">{categoryLabels[course.category]}</Badge>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-6 sm:p-7">
+      <div className="flex flex-1 flex-col p-6">
         <div className="flex items-center gap-2">
-          <Badge tone="neutral">{formatLevelLabel(course.level)}</Badge>
+          <Badge tone="neutral">{levelLabels[course.level]}</Badge>
+          {course.isSynthetic ? (
+            <Badge tone="neutral">Prototype Mock</Badge>
+          ) : (
+            <Badge tone={course.status === "published" ? "success" : "warning"}>
+              {course.status}
+            </Badge>
+          )}
         </div>
 
-        <div className="mt-4 flex-1 space-y-3">
-          <h2 className="text-xl font-bold leading-snug text-foreground">
-            <Link
-              href={courseUrl(course.slug)}
-              className="rounded-sm transition hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-            >
-              {course.title}
-            </Link>
-          </h2>
-          <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{course.subtitle}</p>
+        <h3 className="mt-3 text-lg font-semibold text-foreground">
+          <Link
+            href={`/courses/${course.slug}`}
+            className="hover:text-primary"
+          >
+            {course.title}
+          </Link>
+        </h3>
+        <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
+          {course.summary}
+        </p>
 
-          <dl className="mt-5 grid grid-cols-3 gap-2 border-t border-border/70 pt-4 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5">
-              <LayersIcon className="h-4 w-4 shrink-0 text-primary/70" />
-              <dt className="sr-only">Modules</dt>
-              <dd className="font-medium text-foreground">{totalModules} mod</dd>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <BookIcon className="h-4 w-4 shrink-0 text-primary/70" />
-              <dt className="sr-only">Lessons</dt>
-              <dd className="font-medium text-foreground">{totalLessons} les</dd>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <ClockIcon className="h-4 w-4 shrink-0 text-primary/70" />
-              <dt className="sr-only">Hours</dt>
-              <dd className="font-medium text-foreground">{course.estimatedHours}h</dd>
-            </div>
-          </dl>
+        <dl className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <LayersIcon width={14} height={14} />
+            <dd>{course.modules.length} modules</dd>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <BookIcon width={14} height={14} />
+            <dd>{lessons.length} lessons</dd>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <ClockIcon width={14} height={14} />
+            <dd>{hours || course.estimatedHours}h</dd>
+          </div>
+        </dl>
 
-          {course.finalDeliverable ? (
-            <p className="rounded-xl border border-border/80 bg-primary/5 px-3.5 py-2.5 text-xs leading-5 text-muted-foreground">
-              <span className="font-semibold text-foreground">Final output:</span>{" "}
-              {course.finalDeliverable}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="mt-6 flex items-center justify-between border-t border-border/70 pt-4">
+        <div className="mt-5 flex items-center justify-between border-t border-border/70 pt-3">
           <span className="text-[11px] font-medium text-muted-foreground">
-            {totalLessons > 0 ? `${totalLessons} lessons ready` : "Syllabus ready"}
+            {lessons.length > 0 ? `${lessons.length} lessons ready` : "Syllabus ready"}
           </span>
           <Link
-            href={courseUrl(course.slug)}
-            className="inline-flex min-h-9 items-center gap-1.5 rounded-full text-sm font-semibold text-primary transition hover:gap-2.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+            href={`/courses/${course.slug}`}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
           >
-            Explore course
-            <span aria-hidden="true">&rarr;</span>
+            View course
+            <span aria-hidden>→</span>
           </Link>
         </div>
       </div>

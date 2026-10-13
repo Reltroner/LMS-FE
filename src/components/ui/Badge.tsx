@@ -1,29 +1,44 @@
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 
-type BadgeTone = "neutral" | "primary" | "accent" | "success" | "warning";
+export type BadgeTone =
+  | "primary"
+  | "accent"
+  | "success"
+  | "warning"
+  | "danger"
+  | "neutral";
+
+const toneClasses: Record<BadgeTone, string> = {
+  primary: "bg-primary-soft text-primary border-primary/20",
+  accent: "bg-accent-soft text-accent-foreground border-accent/20",
+  success: "bg-success-soft text-success border-success/20",
+  warning: "bg-warning-soft text-warning border-warning/20",
+  danger: "bg-danger-soft text-danger border-danger/20",
+  neutral: "bg-background-elevated text-muted-foreground border-border",
+};
 
 type BadgeProps = {
-  children: React.ReactNode;
-  className?: string;
+  children: ReactNode;
   tone?: BadgeTone;
+  className?: string;
+  "aria-label"?: string;
 };
 
-const toneClassNames: Record<BadgeTone, string> = {
-  neutral: "border-border bg-card text-muted-foreground",
-  primary: "border-primary/15 bg-primary/10 text-primary",
-  accent: "border-accent/20 bg-accent/10 text-accent-foreground",
-  success: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  warning: "border-amber-200 bg-amber-50 text-amber-800",
-};
-
-export function Badge({ children, className, tone = "neutral" }: BadgeProps) {
+export function Badge({
+  children,
+  tone = "neutral",
+  className,
+  ...rest
+}: BadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex w-fit items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em]",
-        toneClassNames[tone],
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold",
+        toneClasses[tone],
         className,
       )}
+      {...rest}
     >
       {children}
     </span>

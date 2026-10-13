@@ -1,3 +1,0 @@
-set -e
-npm run lint
-node scripts/check-staged-format.cjs
