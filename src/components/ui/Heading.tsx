@@ -1,27 +1,40 @@
+import { createElement, type ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 
+type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
 type HeadingProps = {
-  children: React.ReactNode;
+  level?: HeadingLevel;
+  children: ReactNode;
   className?: string;
-  level?: 1 | 2 | 3;
+  id?: string;
 };
 
-const baseClassName = "font-semibold tracking-normal text-foreground";
+const levelClasses: Record<HeadingLevel, string> = {
+  1: "text-4xl font-bold tracking-tight sm:text-5xl",
+  2: "text-3xl font-bold tracking-tight sm:text-4xl",
+  3: "text-2xl font-semibold tracking-tight sm:text-3xl",
+  4: "text-xl font-semibold tracking-tight",
+  5: "text-lg font-semibold",
+  6: "text-base font-semibold",
+};
 
-export function Heading({ children, className, level = 2 }: HeadingProps) {
-  const classNames = {
-    1: cn("text-4xl leading-tight sm:text-5xl lg:text-6xl", baseClassName, className),
-    2: cn("text-3xl leading-tight sm:text-4xl", baseClassName, className),
-    3: cn("text-2xl leading-snug", baseClassName, className),
-  };
-
-  if (level === 1) {
-    return <h1 className={classNames[1]}>{children}</h1>;
-  }
-
-  if (level === 3) {
-    return <h3 className={classNames[3]}>{children}</h3>;
-  }
-
-  return <h2 className={classNames[2]}>{children}</h2>;
+export function Heading({
+  level = 2,
+  children,
+  className,
+  ...rest
+}: HeadingProps) {
+  return createElement(
+    `h${level}`,
+    {
+      className: cn(
+        "text-foreground",
+        levelClasses[level],
+        className,
+      ),
+      ...rest,
+    },
+    children,
+  );
 }

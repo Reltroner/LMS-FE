@@ -1,92 +1,36 @@
-# Reltroner Learning Academy
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Frontend-only static LMS shell for `lms.reltroner.com`.
+## Getting Started
 
-This repository is the LMS application and MDX content engine. It does not store heavy learning media and it does not include backend runtime features.
-
-## Architecture
-
-- Next.js 16 App Router
-- Static export only with `output: "export"`
-- Contentlayer-powered MDX lessons
-- TypeScript catalog data for courses, paths, authors, and resources
-- Client-side static search
-- No backend, auth, API routes, SSR, middleware, database, server session, or runtime request dependency
-
-## Content Convention
-
-Lessons live under:
-
-```text
-content/courses/<course-slug>/lessons/<lesson-slug>.mdx
-```
-
-Lesson frontmatter contains lesson metadata only. Course slug, lesson slug, module placement, and order are derived from the folder path and `src/catalog`.
-
-Course resources and author notes can live beside lessons as lightweight markdown:
-
-```text
-content/courses/<course-slug>/resources/
-content/courses/<course-slug>/author/
-```
-
-## Catalog Convention
-
-Typed course and path metadata lives in `src/catalog`.
-
-- `src/catalog/courses/*/course.ts` defines course modules and ordered `lessonSlugs`.
-- `src/catalog/courses/*/resources.ts` defines resource manifests.
-- `src/catalog/paths/*.ts` defines learning paths.
-- `src/lib/content/*` exposes registries used by routes and components.
-
-## Resource Convention
-
-Heavy resources such as video, audio, large images, and PDFs belong in the external asset repository:
-
-```text
-reltroner/reltroner-lms-assets
-```
-
-The LMS references those assets through pinned jsDelivr URLs, currently based on:
-
-```text
-https://cdn.jsdelivr.net/gh/reltroner/reltroner-lms-assets@v0.1.0
-```
-
-Use resource ids in MDX instead of hardcoding media URLs whenever possible.
-
-## Local Development
+First, run the development server:
 
 ```bash
-npm ci
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Validation
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```bash
-npm run typecheck
-npm run lint
-npm run validate:content
-npm run validate:resources
-npm run check:orphans
-npm run build
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Format files:
+## Learn More
 
-```bash
-npm run format
-```
+To learn more about Next.js, take a look at the following resources:
 
-## Static Deployment
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-Cloudflare Pages:
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-- Install command: `npm ci`
-- Build command: `npm run build`
-- Output directory: `out`
+## Deploy on Vercel
 
-Generated folders such as `.next`, `out`, `.contentlayer`, and `node_modules` are ignored and should not be committed.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

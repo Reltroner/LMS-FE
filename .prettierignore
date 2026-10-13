@@ -1,7 +1,0 @@
-.next
-.contentlayer
-node_modules
-out
-build
-coverage
-package-lock.json

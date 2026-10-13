@@ -1,27 +1,91 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
+
+/* ==========================================================================
+   Reltroner Learning Academy — Design Tokens
+   Source: LMS-FE globals.css (frozen brand language), refined for prototype.
+   Light theme is the default; dark theme toggles via [data-theme="dark"].
+   ========================================================================== */
 
 :root {
+  /* Brand palette */
+  --primary: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --primary-soft: rgba(29, 78, 216, 0.1);
+  --accent: #06b6d4;
+  --accent-foreground: #0e7490;
+  --accent-soft: rgba(6, 182, 212, 0.1);
+
+  /* Surface */
   --background: #f6f8fb;
+  --background-elevated: #eef4fb;
   --foreground: #07111f;
   --muted-foreground: #64748b;
   --border: #dbe4ef;
   --card: #ffffff;
   --card-foreground: #0f172a;
-  --primary: #1d4ed8;
-  --primary-foreground: #ffffff;
-  --accent: #06b6d4;
-  --accent-foreground: #0e7490;
-  --ring: #2563eb;
+
+  /* Feedback */
   --success: #047857;
+  --success-soft: rgba(4, 120, 87, 0.1);
   --warning: #b45309;
-  --font-geist-sans:
-    Arial, Helvetica, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-geist-mono: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
+  --warning-soft: rgba(180, 83, 9, 0.1);
+  --danger: #b91c1c;
+  --danger-soft: rgba(185, 28, 28, 0.1);
+  --info: #1d4ed8;
+
+  /* Ring / focus */
+  --ring: #2563eb;
+
+  /* Typography */
+  --font-sans:
+    "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono",
+    "Courier New", monospace;
+
+  /* Radii */
+  --radius-sm: 0.5rem;
+  --radius: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.07), 0 1px 2px -1px rgba(15, 23, 42, 0.05);
+  --shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 12px 40px -8px rgba(15, 23, 42, 0.16), 0 4px 12px -4px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="dark"] {
+  --primary: #3b82f6;
+  --primary-foreground: #0b1220;
+  --primary-soft: rgba(59, 130, 246, 0.16);
+  --accent: #22d3ee;
+  --accent-foreground: #0e7490;
+  --accent-soft: rgba(34, 211, 238, 0.14);
+
+  --background: #07111f;
+  --background-elevated: #0c1a2e;
+  --foreground: #e8eef7;
+  --muted-foreground: #94a3b8;
+  --border: #1e2f4a;
+  --card: #0d1b30;
+  --card-foreground: #e8eef7;
+
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, 0.14);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.14);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.14);
+
+  --ring: #60a5fa;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-elevated: var(--background-elevated);
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
@@ -29,26 +93,56 @@
   --color-card-foreground: var(--card-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-ring: var(--ring);
+  --color-accent-soft: var(--accent-soft);
   --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
   --color-warning: var(--warning);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --radius-sm: var(--radius-sm);
+  --radius: var(--radius);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-lg: var(--shadow-lg);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   min-width: 320px;
-  background:
-    radial-gradient(circle at 8% 0%, rgba(37, 99, 235, 0.1), transparent 34rem),
-    radial-gradient(circle at 92% 12%, rgba(6, 182, 212, 0.1), transparent 30rem),
-    linear-gradient(180deg, #f8fbff 0%, var(--background) 32%, #eef4fb 100%);
+  background-color: var(--background);
+  background-image: radial-gradient(
+      circle at 8% 0%,
+      color-mix(in oklab, var(--primary) 10%, transparent),
+      transparent 34rem
+    ),
+    radial-gradient(
+      circle at 92% 12%,
+      color-mix(in oklab, var(--accent) 10%, transparent),
+      transparent 30rem
+    );
+  background-attachment: fixed;
   color: var(--foreground);
+  font-family: var(--font-sans);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -61,16 +155,33 @@ a {
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.18);
+  background: color-mix(in oklab, var(--primary) 18%, transparent);
   color: var(--foreground);
 }
 
 :focus-visible {
-  outline-color: var(--ring);
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
-html {
-  scroll-behavior: smooth;
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--muted-foreground) 30%, transparent);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
+  background-clip: padding-box;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -82,4 +193,90 @@ html {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+/* Prose / reading typography for lesson reader */
+.prose-reltroner {
+  color: var(--foreground);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+.prose-reltroner h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+.prose-reltroner h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.prose-reltroner p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  color: color-mix(in oklab, var(--foreground) 92%, transparent);
+}
+.prose-reltroner ul,
+.prose-reltroner ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+.prose-reltroner li {
+  margin: 0.4rem 0;
+}
+.prose-reltroner code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--background-elevated);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.prose-reltroner pre {
+  font-family: var(--font-mono);
+  background: var(--background-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+}
+.prose-reltroner pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.prose-reltroner blockquote {
+  border-left: 3px solid var(--primary);
+  padding: 0.25rem 1rem;
+  margin: 1.25rem 0;
+  color: var(--muted-foreground);
+  background: var(--primary-soft);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.prose-reltroner a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-reltroner strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* Visually hidden helper */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

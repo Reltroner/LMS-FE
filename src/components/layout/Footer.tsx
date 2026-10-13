@@ -1,49 +1,90 @@
 import Link from "next/link";
-import Image from "next/image";
-
 import { Container } from "@/components/ui/Container";
-import { site } from "@/lib/seo/site";
+import { GraduationIcon } from "@/components/ui/icons";
 
-const footerLinks = [
-  { href: "/courses", label: "Courses" },
-  { href: "/paths", label: "Paths" },
-  { href: "/search", label: "Search" },
-] as const;
+const footerLinks = {
+  Learn: [
+    { label: "Courses", href: "/courses" },
+    { label: "Learning Paths", href: "/paths" },
+    { label: "Search", href: "/search" },
+    { label: "Mentorship", href: "/mentorship" },
+  ],
+  Academy: [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "My Learning", href: "/my-learning" },
+    { label: "Account", href: "/account" },
+    { label: "Assistant", href: "/assistant" },
+  ],
+  Admin: [
+    { label: "Admin Overview", href: "/admin" },
+    { label: "Principals", href: "/admin/principals" },
+    { label: "Audit", href: "/admin/audit" },
+  ],
+};
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-white/80">
-      <Container className="py-10 sm:py-12">
-        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-          <div className="max-w-md space-y-4">
-            <div className="flex items-center gap-3">
-              <Image
-                src="/brand/reltroner-mark.svg"
-                alt=""
-                width={36}
-                height={36}
-                className="h-9 w-9 rounded-xl"
-              />
-              <div>
-                <p className="font-semibold text-foreground">{site.name}</p>
-                <p className="text-sm text-muted-foreground">Static, focused, learner-friendly.</p>
-              </div>
-            </div>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Engineering skills, AI skills, and project-based learning for long-term capability.
+    <footer className="mt-auto border-t border-border bg-card/50">
+      <Container>
+        <div className="grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-4">
+            <Link href="/" className="flex items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white">
+                <GraduationIcon width={20} height={20} />
+              </span>
+              <span className="flex flex-col leading-none">
+                <span className="text-sm font-bold text-foreground">
+                  Reltroner
+                </span>
+                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Learning Academy
+                </span>
+              </span>
+            </Link>
+            <p className="max-w-xs text-sm leading-6 text-muted-foreground">
+              Engineering skills, AI skills, and project-based learning for
+              long-term capability.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Identity is managed at{" "}
+              <code className="rounded bg-background px-1.5 py-0.5 font-mono">
+                auth.reltroner.com
+              </code>
+              .
             </p>
           </div>
-          <nav aria-label="Footer navigation" className="flex flex-wrap gap-3">
-            {footerLinks.map((footerLink) => (
-              <Link
-                key={footerLink.href}
-                href={footerLink.href}
-                className="rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:border-primary/30 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-              >
-                {footerLink.label}
-              </Link>
-            ))}
-          </nav>
+
+          {Object.entries(footerLinks).map(([title, links]) => (
+            <div key={title}>
+              <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+              <ul className="mt-4 space-y-2.5">
+                {links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-muted-foreground transition hover:text-primary"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col items-start justify-between gap-3 border-t border-border py-6 text-xs text-muted-foreground sm:flex-row sm:items-center">
+          <p>© 2026 Reltroner. Design prototype only.</p>
+          <p>
+            Backend API gateway:{" "}
+            <code className="rounded bg-background px-1.5 py-0.5 font-mono">
+              lms-api.reltroner.com
+            </code>{" "}
+            · Admin:{" "}
+            <code className="rounded bg-background px-1.5 py-0.5 font-mono">
+              lms-admin.reltroner.com
+            </code>
+          </p>
         </div>
       </Container>
     </footer>

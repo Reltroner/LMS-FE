@@ -1,19 +1,93 @@
-import { mdxComponents } from "@/components/mdx/MdxComponents";
-import { getMDXComponent } from "@/lib/content/mdx";
-import { createElement } from "react";
+import type { ContentBlock } from "@/lib/fixtures/lesson-content";
+import { Card } from "@/components/ui/Card";
+import {
+  AlertIcon,
+  CheckCircleIcon,
+  InfoIcon,
+  SparklesIcon,
+} from "@/components/ui/icons";
+import { cn } from "@/lib/utils/cn";
 
-type LessonContentProps = {
-  code: string;
-};
-
-export function LessonContent({ code }: LessonContentProps) {
-  const MDXContent = getMDXComponent(code);
-
+export function LessonContent({ blocks }: { blocks: readonly ContentBlock[] }) {
   return (
-    <article className="rounded-[2rem] border border-border bg-card p-5 shadow-[0_24px_70px_-48px_rgba(15,23,42,0.35)] sm:p-8 lg:p-10">
-      <div className="prose prose-slate mx-auto max-w-[76ch] text-slate-700 sm:prose-lg prose-headings:font-semibold prose-headings:tracking-normal prose-headings:text-foreground prose-h2:mt-14 prose-h2:scroll-mt-28 prose-h2:border-t prose-h2:border-border prose-h2:pt-8 prose-h3:mt-10 prose-h3:text-xl prose-p:leading-8 prose-a:font-semibold prose-a:text-primary prose-a:decoration-primary/30 prose-a:underline-offset-4 hover:prose-a:text-primary/80 prose-strong:text-foreground prose-code:rounded-md prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[0.95em] prose-code:font-medium prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none prose-pre:overflow-x-auto prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6 prose-li:marker:text-muted-foreground prose-blockquote:rounded-r-2xl prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:text-slate-700 prose-table:my-10 prose-table:block prose-table:w-full prose-table:overflow-x-auto prose-th:border prose-th:border-border prose-th:bg-primary/5 prose-th:px-4 prose-th:py-3 prose-th:text-left prose-th:font-semibold prose-th:text-foreground prose-td:border prose-td:border-border prose-td:px-4 prose-td:py-3 prose-img:rounded-2xl prose-img:border prose-img:border-border">
-        {createElement(MDXContent, { components: mdxComponents })}
-      </div>
-    </article>
+    <div className="prose-reltroner max-w-none">
+      {blocks.map((block, i) => {
+        switch (block.type) {
+          case "heading":
+            return block.level === 2 ? (
+              <h2 key={i} id={`section-${i}`}>
+                {block.text}
+              </h2>
+            ) : (
+              <h3 key={i}>{block.text}</h3>
+            );
+          case "paragraph":
+            return <p key={i}>{block.text}</p>;
+          case "list":
+            return block.ordered ? (
+              <ol key={i} className="list-decimal">
+                {block.items.map((it, j) => (
+                  <li key={j}>{it}</li>
+                ))}
+              </ol>
+            ) : (
+              <ul key={i} className="list-disc">
+                {block.items.map((it, j) => (
+                  <li key={j}>{it}</li>
+                ))}
+              </ul>
+            );
+          case "code":
+            return (
+              <pre key={i}>
+                <code className={`language-${block.language ?? "text"}`}>
+                  {block.code}
+                </code>
+              </pre>
+            );
+          case "callout": {
+            const config = {
+              info: { icon: InfoIcon, tone: "text-primary", bg: "bg-primary-soft border-primary/20" },
+              tip: { icon: SparklesIcon, tone: "text-accent-foreground", bg: "bg-accent-soft border-accent/20" },
+              warning: { icon: AlertIcon, tone: "text-warning", bg: "bg-warning-soft border-warning/20" },
+            }[block.tone];
+            const Icon = config.icon;
+            return (
+              <blockquote
+                key={i}
+                className={cn(
+                  "flex items-start gap-3 rounded-xl border px-4 py-3 not-italic",
+                  config.bg,
+                )}
+              >
+                <Icon width={18} height={18} className={cn("mt-0.5 shrink-0", config.tone)} />
+                <p className="m-0 text-sm">{block.text}</p>
+              </blockquote>
+            );
+          }
+          case "checkpoint":
+            return (
+              <Card key={i} className="my-6 border-primary/20 bg-primary-soft p-6">
+                <div className="flex items-center gap-2">
+                  <CheckCircleIcon width={20} height={20} className="text-primary" />
+                  <h3 className="m-0 text-lg font-semibold text-foreground">
+                    {block.title}
+                  </h3>
+                </div>
+                <ul className="mt-3 space-y-2">
+                  {block.items.map((it, j) => (
+                    <li key={j} className="flex gap-2 text-sm">
+                      <span className="mt-0.5 text-primary">•</span>
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            );
+          default:
+            return null;
+        }
+      })}
+    </div>
   );
 }
