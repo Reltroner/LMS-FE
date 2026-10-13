@@ -88,27 +88,39 @@ export default function Home() {
                 </ButtonLink>
               </div>
               <dl className="grid gap-4 sm:grid-cols-3">
-                <Card className="p-5">
-                  <dt className="text-sm font-medium text-muted-foreground">Courses</dt>
-                  <dd className="mt-2 text-3xl font-semibold text-foreground">{courses.length}</dd>
+                <Card className="p-5 transition duration-200 hover:border-primary/40 hover:shadow-sm">
+                  <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    Courses
+                  </dt>
+                  <dd className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+                    {courses.length}
+                  </dd>
                 </Card>
-                <Card className="p-5">
-                  <dt className="text-sm font-medium text-muted-foreground">Lessons</dt>
-                  <dd className="mt-2 text-3xl font-semibold text-foreground">{totalLessons}</dd>
+                <Card className="p-5 transition duration-200 hover:border-primary/40 hover:shadow-sm">
+                  <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    Lessons
+                  </dt>
+                  <dd className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+                    {totalLessons}
+                  </dd>
                 </Card>
-                <Card className="p-5">
-                  <dt className="text-sm font-medium text-muted-foreground">Paths</dt>
-                  <dd className="mt-2 text-3xl font-semibold text-foreground">{paths.length}</dd>
+                <Card className="p-5 transition duration-200 hover:border-primary/40 hover:shadow-sm">
+                  <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    Paths
+                  </dt>
+                  <dd className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+                    {paths.length}
+                  </dd>
                 </Card>
               </dl>
             </div>
 
             <div className="relative">
-              <div className="absolute inset-6 rounded-[2rem] bg-primary/10 blur-3xl" />
-              <Card className="relative overflow-hidden p-4">
+              <div className="absolute inset-6 rounded-[2rem] bg-gradient-to-tr from-primary/15 via-accent/10 to-transparent blur-3xl" />
+              <Card className="relative overflow-hidden p-4 shadow-[0_30px_90px_-50px_rgba(29,78,216,0.45)]">
                 <Image
                   src="/images/hero-grid.svg"
-                  alt=""
+                  alt="Reltroner Learning Academy preview"
                   width={720}
                   height={520}
                   className="aspect-[1.35] w-full rounded-[1.35rem] object-cover"
@@ -132,11 +144,14 @@ export default function Home() {
             </div>
             <div className="grid gap-5 md:grid-cols-3">
               {valueCards.map((valueCard, index) => (
-                <Card key={valueCard.title} className="p-6">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-sm font-bold text-primary">
+                <Card
+                  key={valueCard.title}
+                  className="group p-6 transition duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_24px_70px_-56px_rgba(29,78,216,0.35)]"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-sm font-bold text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
                     0{index + 1}
                   </div>
-                  <h2 className="mt-6 text-xl font-semibold text-foreground">{valueCard.title}</h2>
+                  <h2 className="mt-6 text-xl font-bold text-foreground">{valueCard.title}</h2>
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">
                     {valueCard.description}
                   </p>

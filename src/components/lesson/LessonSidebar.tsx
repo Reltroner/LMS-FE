@@ -23,13 +23,13 @@ function LessonSidebarContent({ course, modules, currentLessonSlug }: LessonSide
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Course
         </p>
         <Link
           href={courseUrl(course.slug)}
-          className="block rounded-sm text-lg font-semibold text-foreground hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+          className="block rounded-sm text-base font-bold text-foreground transition hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
         >
           {course.title}
         </Link>
@@ -46,16 +46,19 @@ function LessonSidebarContent({ course, modules, currentLessonSlug }: LessonSide
 
             return (
               <li key={courseModule.id} className="space-y-3">
-                <div className="space-y-1">
+                <div className="flex items-center justify-between">
                   <p
-                    className={`text-xs font-semibold uppercase tracking-[0.18em] ${isCurrentModule ? "text-primary" : "text-muted-foreground"}`}
+                    className={`text-xs font-semibold uppercase tracking-[0.16em] ${isCurrentModule ? "text-primary" : "text-muted-foreground"}`}
                   >
                     Module {courseModule.order}
                   </p>
-                  <h2 className="text-sm font-semibold text-foreground">{courseModule.title}</h2>
+                  <span className="text-[11px] font-medium text-muted-foreground">
+                    {moduleLessons.length} {moduleLessons.length === 1 ? "lesson" : "lessons"}
+                  </span>
                 </div>
+                <h2 className="text-sm font-semibold text-foreground">{courseModule.title}</h2>
                 {moduleLessons.length > 0 ? (
-                  <ol className="space-y-2 border-l border-border pl-4">
+                  <ol className="space-y-1.5 border-l-2 border-border/80 pl-3.5">
                     {moduleLessons.map((moduleLesson) => {
                       const isCurrentLesson = moduleLesson.slug === currentLessonSlug;
 
@@ -66,15 +69,23 @@ function LessonSidebarContent({ course, modules, currentLessonSlug }: LessonSide
                             aria-current={isCurrentLesson ? "page" : undefined}
                             className={
                               isCurrentLesson
-                                ? "block rounded-2xl border border-primary bg-primary px-3 py-3 text-primary-foreground shadow-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-                                : "block rounded-2xl border border-transparent px-3 py-3 text-muted-foreground transition hover:border-border hover:bg-card hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+                                ? "block rounded-xl border border-primary bg-primary px-3 py-2.5 text-primary-foreground shadow-xs focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+                                : "block rounded-xl border border-transparent px-3 py-2.5 text-muted-foreground transition hover:border-border hover:bg-card hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
                             }
                           >
-                            <span className="block text-sm font-semibold">
-                              {moduleLesson.title}
+                            <span className="flex items-center gap-2">
+                              {isCurrentLesson ? (
+                                <span
+                                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-white"
+                                  aria-hidden="true"
+                                />
+                              ) : null}
+                              <span className="block text-xs font-semibold leading-snug">
+                                {moduleLesson.title}
+                              </span>
                             </span>
                             <span
-                              className={`mt-1 block text-xs ${isCurrentLesson ? "text-blue-100" : "text-muted-foreground"}`}
+                              className={`mt-1 block text-[11px] ${isCurrentLesson ? "text-blue-100" : "text-muted-foreground"}`}
                             >
                               {moduleLesson.durationLabel}
                             </span>
@@ -84,7 +95,7 @@ function LessonSidebarContent({ course, modules, currentLessonSlug }: LessonSide
                     })}
                   </ol>
                 ) : (
-                  <p className="rounded-xl border border-dashed border-border px-3 py-2 text-sm text-muted-foreground">
+                  <p className="rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
                     Lessons coming soon.
                   </p>
                 )}
@@ -108,7 +119,7 @@ export function LessonSidebar({
       <details className="rounded-[1.75rem] border border-border bg-card p-5 shadow-[0_24px_70px_-48px_rgba(15,23,42,0.35)] lg:hidden">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-xl text-base font-semibold text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
           <span>Course outline</span>
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
             {course.modules.length} modules
           </span>
         </summary>
@@ -121,15 +132,15 @@ export function LessonSidebar({
         </div>
       </details>
       <aside className="hidden lg:block lg:sticky lg:top-24" aria-labelledby="lesson-sidebar-title">
-        <div className="rounded-[1.75rem] border border-border bg-white/84 p-6 shadow-[0_24px_70px_-48px_rgba(15,23,42,0.35)] backdrop-blur">
+        <div className="rounded-[1.75rem] border border-border bg-card/90 p-6 shadow-[0_24px_70px_-48px_rgba(15,23,42,0.35)] backdrop-blur">
           <div className="mb-6 flex items-center justify-between gap-4">
             <h2
               id="lesson-sidebar-title"
-              className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+              className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
             >
               Course outline
             </h2>
-            <span className="text-xs font-medium text-muted-foreground">
+            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
               {course.modules.length} modules
             </span>
           </div>
