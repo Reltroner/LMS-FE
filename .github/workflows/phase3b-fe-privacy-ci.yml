@@ -1,43 +1,50 @@
-name: LMS Phase3B Frontend Catalog and Privacy CI
+name: LMS Prototype Frontend Build and Scoped Privacy CI
+
 on:
   push:
-    branches: ['main', 'phase3b/**']
+    branches: ['main', 'fix/postmerge-prototype-ci-and-visibility-20261014']
   pull_request:
-    branches: ['main', 'phase3b/**']
+    branches: ['main']
+
 permissions:
   contents: read
+
 concurrency:
-  group: lms-fe-3b-${{ github.ref }}
+  group: lms-fe-prototype-${{ github.ref }}
   cancel-in-progress: true
+
+# This replaces the now-inapplicable Phase3B CI entrypoints following the
+# brute-force prototype replacement PR #7. It does not certify Phase3B
+# Contentlayer MDX, OIDC, backend authorization or real learner state.
 jobs:
-  catalog-contract:
+  prototype-contract:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-      - name: Source catalog stable ID and privacy negative fixtures
-        run: node --test tests/catalog-contract.test.mjs
-      - name: Published-only catalog manifest deterministic checksum
-        run: node scripts/phase3b-catalog.mjs
+      - name: Check bounded prototype source, catalog, and mock-auth contracts
+        run: node --test tests/prototype-contract.test.mjs
+
   frontend-build:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
-      HUSKY: '0'
       NEXT_TELEMETRY_DISABLED: '1'
+      HUSKY: '0'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-      - name: Install exact npm lockfile
+      - name: Install exact prototype dependency lockfile
         run: npm ci --no-audit --no-fund
-      - name: Typecheck, content validation, resources, orphans and static Next build
+      - name: Typecheck prototype
+        run: npx tsc --noEmit
+      - name: Compile exported prototype
         run: npm run build
-      - name: Enforce publication-only exported build
-        run: node scripts/phase3b-catalog.mjs --verify-out
+      - name: Verify bounded prototype public routes
+        run: node scripts/verify-prototype-export.mjs
