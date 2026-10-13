@@ -20,11 +20,7 @@ export const paths: readonly LearningPath[] = [
     level: "beginner",
     status: "published",
     estimatedHours: 72,
-    courseSlugs: [
-      "backend-engineering",
-      "api-design-patterns",
-      "deployment-and-operations",
-    ],
+    courseSlugs: ["backend-engineering"],
   },
   {
     id: "path-worldbuilding-creator",
