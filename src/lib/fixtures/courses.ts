@@ -184,7 +184,7 @@ export function getCourseBySlug(slug: string): Course | undefined {
 }
 
 export function getPublishedCourses(): readonly Course[] {
-  return courses.filter((c) => c.status === "published");
+  return courses.filter((c) => c.status === "published" && c.isSynthetic !== true);
 }
 
 export function getAllCourses(): readonly Course[] {
