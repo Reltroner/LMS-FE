@@ -103,14 +103,17 @@ export function PathCard({ path, courseCount, totalLessons, totalDurationHours }
           <dl className="grid grid-cols-3 gap-3 border-t border-border/70 pt-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5">
               <CompassIcon className="h-4 w-4 shrink-0 text-accent-foreground/80" />
+              <dt className="sr-only">Courses</dt>
               <dd className="font-medium text-foreground">{courseCount} courses</dd>
             </div>
             <div className="flex items-center gap-1.5">
               <BookIcon className="h-4 w-4 shrink-0 text-accent-foreground/80" />
+              <dt className="sr-only">Lessons</dt>
               <dd className="font-medium text-foreground">{totalLessons} lessons</dd>
             </div>
             <div className="flex items-center gap-1.5">
               <ClockIcon className="h-4 w-4 shrink-0 text-accent-foreground/80" />
+              <dt className="sr-only">Hours</dt>
               <dd className="font-medium text-foreground">~{totalDurationHours}h</dd>
             </div>
           </dl>

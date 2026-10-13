@@ -115,14 +115,17 @@ export function CourseCard({ course }: CourseCardProps) {
           <dl className="mt-5 grid grid-cols-3 gap-2 border-t border-border/70 pt-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5">
               <LayersIcon className="h-4 w-4 shrink-0 text-primary/70" />
+              <dt className="sr-only">Modules</dt>
               <dd className="font-medium text-foreground">{totalModules} mod</dd>
             </div>
             <div className="flex items-center gap-1.5">
               <BookIcon className="h-4 w-4 shrink-0 text-primary/70" />
+              <dt className="sr-only">Lessons</dt>
               <dd className="font-medium text-foreground">{totalLessons} les</dd>
             </div>
             <div className="flex items-center gap-1.5">
               <ClockIcon className="h-4 w-4 shrink-0 text-primary/70" />
+              <dt className="sr-only">Hours</dt>
               <dd className="font-medium text-foreground">{course.estimatedHours}h</dd>
             </div>
           </dl>
