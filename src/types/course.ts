@@ -55,6 +55,7 @@ export type Lesson = Readonly<{
 }>;
 
 export type ResourceType =
+  | "download"
   | "external-link"
   | "pdf"
   | "video"
@@ -68,4 +69,5 @@ export type Resource = Readonly<{
   title: string;
   summary: string;
   url: string;
+  filename?: string;
 }>;

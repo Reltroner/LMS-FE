@@ -9,8 +9,9 @@ import { Heading } from "@/components/ui/Heading";
 import { Section } from "@/components/ui/Section";
 import { LessonContent } from "@/components/lesson/LessonContent";
 import { getCourseBySlug } from "@/lib/fixtures/courses";
-import { getLessonBySlug, getLessonsByCourseSlug } from "@/lib/fixtures/lessons";
-import { getLessonContent } from "@/lib/fixtures/lesson-content";
+import { getLessonBySlug, getLessonNavigation } from "@/lib/fixtures/lessons";
+import { getLessonContent } from "@/lib/content/mdx";
+import { getLessonRouteParams } from "@/lib/content/course-registry";
 import { getResourcesByIds } from "@/lib/fixtures/resources";
 import {
   ChevronLeftIcon,
@@ -35,15 +36,8 @@ type Props = { params: Promise<{ slug: string; lesson: string }> };
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  const { getPublishedCourses } = await import("@/lib/fixtures/courses");
-  const { getLessonsByCourseSlug } = await import("@/lib/fixtures/lessons");
-  const params: { slug: string; lesson: string }[] = [];
-  for (const c of getPublishedCourses()) {
-    for (const l of getLessonsByCourseSlug(c.slug)) {
-      params.push({ slug: c.slug, lesson: l.slug });
-    }
-  }
-  return params;
+  const params = getLessonRouteParams();
+  return params.length > 0 ? params : [{ slug: "_empty", lesson: "_empty" }];
 }
 
 function LessonReaderSkeleton() {
@@ -109,15 +103,14 @@ async function LessonReaderContent({ params }: Props) {
   const course = getCourseBySlug(slug);
   if (!course || course.status !== "published") notFound();
 
-  const lessons = getLessonsByCourseSlug(course.slug);
-  const current = getLessonBySlug(lesson);
+  const current = getLessonBySlug(course.slug, lesson);
   if (!current) notFound();
 
-  const idx = lessons.findIndex((l) => l.slug === lesson);
-  const prev = idx > 0 ? lessons[idx - 1] : null;
-  const next = idx < lessons.length - 1 ? lessons[idx + 1] : null;
+  const navigation = getLessonNavigation(course.slug, lesson);
+  if (!navigation) notFound();
+  const { previous: prev, next } = navigation;
 
-  const blocks = getLessonContent(lesson);
+  const body = getLessonContent(course.slug, lesson);
   const resources = getResourcesByIds(current.resourceIds);
 
   // Build ordered lesson list across modules for sidebar
@@ -138,7 +131,7 @@ async function LessonReaderContent({ params }: Props) {
             <ol className="space-y-4">
               {course.modules.map((mod, mi) => {
                 const modLessons = mod.lessonSlugs
-                  .map((s) => getLessonBySlug(s))
+                  .map((s) => getLessonBySlug(course.slug, s))
                   .filter(Boolean);
                 return (
                   <li key={mod.id}>
@@ -243,7 +236,7 @@ async function LessonReaderContent({ params }: Props) {
             )}
 
             {/* Body */}
-            <LessonContent blocks={blocks} />
+            <LessonContent>{body}</LessonContent>
 
             {/* Outputs */}
             {current.outputs.length > 0 && (

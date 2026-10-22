@@ -34,10 +34,10 @@ type ResultItem = {
 };
 
 const suggestions = [
-  "HTTP",
-  "REST API",
-  "backend engineering",
+  "systems thinking",
   "worldbuilding",
+  "creative constraints",
+  "causal reasoning",
   "learning path",
 ];
 

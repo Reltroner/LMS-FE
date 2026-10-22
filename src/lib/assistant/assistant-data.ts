@@ -37,18 +37,18 @@ export const seedMessages: Message[] = [
     id: "m-welcome",
     role: "assistant",
     content:
-      "Hello! I am your Reltroner Learning Assistant. I can help guide your curriculum sequence, explain core concepts (like HTTP & REST), and locate course resources. Note that this is a simulated prototype companion.",
+      "Hello! I am your Reltroner Learning Assistant. I can help guide your curriculum sequence, explain core concepts (like systems thinking & worldbuilding), and locate course resources. Note that this is a simulated prototype companion.",
     state: "done",
   },
 ];
 
 export const suggestedPrompts: string[] = [
   "Help me choose a learning path",
-  "Explain HTTP methods and idempotency",
+  "Explain creative constraints and causal relationships",
   "What should I learn next?",
-  "Find backend engineering resources",
+  "Find worldbuilding resources",
   "Explain the mentorship process",
-  "Summarize REST API design",
+  "Summarize canon and continuity management",
 ];
 
 const mockKnowledgeBase: {
@@ -59,42 +59,34 @@ const mockKnowledgeBase: {
   {
     keywords: ["path", "choose", "recommend", "where to start"],
     content:
-      "If you're starting in backend engineering, we recommend the 'Full Stack Backend Engineer' learning path. It starts with the published 'Backend Engineering Fundamentals' course (HTTP & REST), followed by advanced API design patterns and deployment practices.",
+      "For systemic creative development, explore foundational world premise, civilization and culture logic, active power dynamics, and continuity management.",
     sources: [
       {
-        title: "Full Stack Backend Engineer Path",
-        href: "/paths/full-stack-backend-engineer",
+        title: "Learning Paths",
+        href: "/paths",
       },
       {
-        title: "Backend Engineering Fundamentals",
-        href: "/courses/backend-engineering",
+        title: "Course Catalog",
+        href: "/courses",
       },
     ],
   },
   {
-    keywords: ["http", "method", "get", "post", "put", "delete", "idempotent"],
+    keywords: ["constraint", "creative constraint", "causal", "cause", "logic", "rules"],
     content:
-      "HTTP methods define desired actions on resources: GET retrieves data without side effects; POST creates resources; PUT replaces or updates a resource idempotently; and DELETE removes resources. Idempotency guarantees that multiple identical requests yield the same resource state.",
+      "Creative constraints are productive boundaries that force specific choices, prevent creative paralysis, and establish rules that govern how causes produce consequences across your fictional world.",
     sources: [
       {
-        title: "Lesson: HTTP Methods & Semantics",
-        href: "/courses/backend-engineering/lessons/02-http-methods",
-      },
-      {
-        title: "MDN: HTTP request methods",
-        href: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods",
+        title: "Course Catalog",
+        href: "/courses",
       },
     ],
   },
   {
     keywords: ["what should i learn", "next", "continue", "resume"],
     content:
-      "Based on your simulated learner profile, you last visited '03-rest-introduction' in Backend Engineering Fundamentals. Your next recommended step is completing the REST architecture checkpoint before moving on to contract-first design.",
+      "Based on your simulated learner profile, there are currently no active course sessions. Explore the learning paths or browse available coursework to begin.",
     sources: [
-      {
-        title: "Lesson: Introduction to REST APIs",
-        href: "/courses/backend-engineering/lessons/03-rest-introduction",
-      },
       {
         title: "Learner Dashboard",
         href: "/dashboard",
@@ -102,47 +94,35 @@ const mockKnowledgeBase: {
     ],
   },
   {
-    keywords: ["resource", "docs", "documentation", "material"],
+    keywords: ["resource", "docs", "documentation", "material", "template"],
     content:
-      "Key references for backend foundations include MDN's HTTP documentation, RFC 9110 (HTTP Semantics), and the official course notes provided in each lesson's resource sidebar.",
+      "Core curriculum references include structured design templates, causal rule sheets, and continuity guides provided with enrolled coursework.",
     sources: [
       {
-        title: "RFC 9110 — HTTP Semantics",
-        href: "https://www.rfc-editor.org/rfc/rfc9110",
-      },
-      {
-        title: "Course Catalog Resources",
-        href: "/courses/backend-engineering",
+        title: "Course Catalog",
+        href: "/courses",
       },
     ],
   },
   {
     keywords: ["mentor", "mentorship", "booking", "session", "1-on-1"],
     content:
-      "Reltroner mentorship pairs learners with experienced engineers for 1-on-1 code reviews, architectural feedback, and career guidance. You can browse mentor specialties and simulate a session reservation in the Mentorship hub.",
+      "Reltroner mentorship pairs creators with experienced mentors for 1-on-1 world architecture reviews, creative constraint sprints, and canon guidance. You can browse offerings in the Mentorship hub.",
     sources: [
       {
         title: "Mentorship Directory",
         href: "/mentorship",
       },
-      {
-        title: "Book a Mentorship Session",
-        href: "/mentorship/book",
-      },
     ],
   },
   {
-    keywords: ["rest", "api", "design", "contract"],
+    keywords: ["canon", "continuity", "bible", "management"],
     content:
-      "Resource-oriented REST APIs use nouns in URI paths (e.g., /users, /courses), standard HTTP status codes (200, 201, 400, 404), and consistent error structures. Contract-first design ensures APIs are defined and reviewed prior to backend implementation.",
+      "Canon and continuity management establish single sources of truth for your fictional world, tracking decisions, world rules, and timeline anchors to prevent contradictions as the project expands.",
     sources: [
       {
-        title: "Lesson: Introduction to REST APIs",
-        href: "/courses/backend-engineering/lessons/03-rest-introduction",
-      },
-      {
-        title: "Course: API Design Patterns (Prototype Mock)",
-        href: "/courses/api-design-patterns",
+        title: "Course Catalog",
+        href: "/courses",
       },
     ],
   },
@@ -163,11 +143,11 @@ export function matchAssistantResponse(query: string): Omit<Message, "id" | "rol
 
   return {
     content:
-      "Here is a conceptual response based on Reltroner LMS published course material. For verified answers, please review the relevant lesson text directly. As a simulated prototype assistant, I cannot modify real database records or learner enrollments.",
+      "Here is a conceptual response based on Reltroner LMS curriculum material. For verified answers, please review the relevant course text directly. As a simulated prototype assistant, I cannot modify real database records or learner enrollments.",
     sources: [
       {
-        title: "Backend Engineering Fundamentals",
-        href: "/courses/backend-engineering",
+        title: "Course Catalog",
+        href: "/courses",
       },
       {
         title: "Learning Paths",

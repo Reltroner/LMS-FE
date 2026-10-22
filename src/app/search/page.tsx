@@ -13,9 +13,9 @@ export const metadata = {
 
 export default function SearchRoute() {
   return (
-    <>
-      <Section className="pb-6 pt-10">
-        <Container size="md">
+    <Section className="pb-16 pt-10 sm:pb-20 sm:pt-12">
+      <Container>
+        <div>
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <SearchIcon width={22} height={22} />
@@ -29,14 +29,12 @@ export default function SearchRoute() {
             Find published courses, learning paths, and lessons. Search runs
             locally against the static catalog index.
           </p>
-        </Container>
-      </Section>
+        </div>
 
-      <Section className="pt-0">
-        <Container size="md">
+        <div className="mt-7 sm:mt-8">
           <SearchPage />
-        </Container>
-      </Section>
-    </>
+        </div>
+      </Container>
+    </Section>
   );
 }

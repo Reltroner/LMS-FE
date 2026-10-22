@@ -58,7 +58,7 @@ export function CourseCurriculum({ course }: { course: Course }) {
       <ul className="divide-y divide-border">
         {course.modules.map((mod, idx) => {
           const lessons = mod.lessonSlugs
-            .map((slug) => getLessonBySlug(slug))
+            .map((slug) => getLessonBySlug(course.slug, slug))
             .filter(Boolean);
           const isOpen = openModules.has(mod.id);
           return (

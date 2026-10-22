@@ -95,7 +95,7 @@ export const mockBookings: MentorshipBooking[] = [
   {
     id: "BK-1001",
     learnerName: "Alex Rivera",
-    offeringTitle: "Backend Architecture Review",
+    offeringTitle: "Systemic World Architecture Review",
     mentor: "Jordan Patel",
     date: "2026-10-14 10:00 UTC",
     status: "pending",
@@ -113,7 +113,7 @@ export const mockBookings: MentorshipBooking[] = [
   {
     id: "BK-1003",
     learnerName: "Drew Hayes",
-    offeringTitle: "Code Review Clinic",
+    offeringTitle: "Creative Constraints Clinic",
     mentor: "Team (rotating)",
     date: "2026-10-12 14:00 UTC",
     status: "confirmed",
@@ -122,7 +122,7 @@ export const mockBookings: MentorshipBooking[] = [
   {
     id: "BK-1004",
     learnerName: "Quinn West",
-    offeringTitle: "Backend Architecture Review",
+    offeringTitle: "Systemic World Architecture Review",
     mentor: "Jordan Patel",
     date: "2026-10-10 13:00 UTC",
     status: "cancelled",
@@ -136,7 +136,7 @@ export const mockAuditEvents: AuditEvent[] = [
     timestamp: "2026-10-09T14:32:11.000Z",
     actor: "alex.rivera@example.com",
     action: "lesson.viewed",
-    resource: "course:backend-engineering/lesson:03-rest-introduction",
+    resource: "course:worldbuilding-operating-system/lesson:00-course-orientation",
     service: "learning",
     result: "success",
     details: "Learner opened lesson reader",
@@ -159,7 +159,7 @@ export const mockAuditEvents: AuditEvent[] = [
     resource: "booking:BK-1001",
     service: "mentorship",
     result: "success",
-    details: "Booking request submitted for Backend Architecture Review",
+    details: "Booking request submitted for Systemic World Architecture Review",
   },
   {
     id: "e4",

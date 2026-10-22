@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils/cn";
 
 const categories: { value: CourseCategory | "all"; label: string }[] = [
   { value: "all", label: "All categories" },
-  { value: "backend-engineering", label: "Backend Engineering" },
   { value: "worldbuilding", label: "Worldbuilding" },
   { value: "creative-system", label: "Creative System" },
 ];

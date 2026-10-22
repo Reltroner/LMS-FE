@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Reltroner LMS is a Next.js static-export frontend with course definitions and MDX authoring. See [Course architecture and onboarding](COURSE_ARCHITECTURE.md) and [verification report](COURSE_REFACTOR_REPORT.md).
 
 ## Getting Started
 
@@ -16,7 +16,7 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Course edits belong in `src/catalog` and `content/courses`, not presentation components. After authoring changes, run `npm run prepare:content` to update the running development server's public data, or restart `npm run dev`. Invalid content fails preparation. Adding files or setting a published status does not authorize public delivery.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

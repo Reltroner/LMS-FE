@@ -21,11 +21,11 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Reltroner Learning Academy",
+    default: "Reltroner — Systemic Creative Architect",
     template: "%s · Reltroner Learning Academy",
   },
   description:
-    "Engineering skills, AI skills, and project-based learning for long-term capability.",
+    "Learn to design coherent fictional worlds through systems thinking, creative constraints, causal relationships, and repeatable worldbuilding workflows.",
   metadataBase: new URL("https://lms.reltroner.com"),
 };
 

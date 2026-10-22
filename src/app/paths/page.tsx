@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Heading";
 import { Section } from "@/components/ui/Section";
@@ -16,9 +17,9 @@ export default function PathsPage() {
   const paths = getPublishedPaths();
 
   return (
-    <>
-      <Section className="pb-6 pt-10">
-        <Container>
+    <Section className="pb-16 pt-10 sm:pb-20 sm:pt-12">
+      <Container>
+        <div>
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent-foreground">
               <CompassIcon width={22} height={22} />
@@ -33,18 +34,31 @@ export default function PathsPage() {
             guesswork. Paths show prerequisites, progression, and expected
             outcomes.
           </p>
-        </Container>
-      </Section>
+        </div>
 
-      <Section className="pt-4">
-        <Container>
-          <div className="grid gap-6 xl:grid-cols-2">
-            {paths.map((path) => (
-              <PathCard key={path.id} path={path} />
-            ))}
-          </div>
-        </Container>
-      </Section>
-    </>
+        <div className="mt-7 sm:mt-8">
+          {paths.length > 0 ? (
+            <div className="grid gap-6 xl:grid-cols-2">
+              {paths.map((path) => (
+                <PathCard key={path.id} path={path} />
+              ))}
+            </div>
+          ) : (
+            <Card className="p-12 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-background-elevated">
+                <CompassIcon width={26} height={26} className="text-muted-foreground" />
+              </div>
+              <h2 className="mt-4 text-lg font-semibold text-foreground">
+                No published learning paths
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Learning paths under the Systemic Creative Architect domain are currently
+                withheld until approved through the publication gate.
+              </p>
+            </Card>
+          )}
+        </div>
+      </Container>
+    </Section>
   );
 }

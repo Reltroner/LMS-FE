@@ -41,7 +41,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white shadow-sm">
             <GraduationIcon width={20} height={20} />
@@ -164,7 +164,7 @@ export function Header() {
           className="border-t border-border bg-card lg:hidden"
           aria-label="Mobile"
         >
-          <ul className="mx-auto max-w-7xl space-y-1 px-4 py-3 sm:px-6">
+          <ul className="mx-auto max-w-6xl space-y-1 px-4 py-3 sm:px-6">
             {primaryNavItems.map((item) => {
               const Icon = item.icon;
               const active =

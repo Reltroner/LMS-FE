@@ -25,7 +25,8 @@ export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const { getPublishedPaths } = await import("@/lib/fixtures/paths");
-  return getPublishedPaths().map((p) => ({ slug: p.slug }));
+  const paths = getPublishedPaths();
+  return paths.length > 0 ? paths.map((p) => ({ slug: p.slug })) : [{ slug: "_empty" }];
 }
 
 function PathDetailSkeleton() {

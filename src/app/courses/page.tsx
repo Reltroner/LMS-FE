@@ -9,16 +9,16 @@ import { BookIcon } from "@/components/ui/icons";
 export const metadata = {
   title: "Course Catalog",
   description:
-    "Browse published Reltroner Learning Academy courses. Only approved published content appears publicly.",
+    "Browse published courses in systemic creative architecture and worldbuilding. Only approved published content appears publicly.",
 };
 
 export default function CoursesPage() {
   const courses = getPublishedCourses();
 
   return (
-    <>
-      <Section className="pb-6 pt-10">
-        <Container>
+    <Section className="pb-16 pt-10 sm:pb-20 sm:pt-12">
+      <Container>
+        <div>
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <BookIcon width={22} height={22} />
@@ -32,14 +32,12 @@ export default function CoursesPage() {
             Explore published courses. Draft and archived content is withheld
             from public view until approved for publication.
           </p>
-        </Container>
-      </Section>
+        </div>
 
-      <Section className="pt-4">
-        <Container>
+        <div className="mt-7 sm:mt-8">
           <CourseCatalog courses={courses} />
-        </Container>
-      </Section>
-    </>
+        </div>
+      </Container>
+    </Section>
   );
 }

@@ -22,9 +22,9 @@ const statusTone = {
 
 export default function MentorshipPage() {
   return (
-    <>
-      <Section className="pb-4 pt-10">
-        <Container size="md">
+    <Section className="pb-16 pt-10 sm:pb-20 sm:pt-12">
+      <Container>
+        <div>
           <Badge tone="accent">Conceptual offerings</Badge>
           <Heading level={1} className="mt-3">Mentorship</Heading>
           <p className="mt-2 max-w-2xl text-muted-foreground">
@@ -32,11 +32,9 @@ export default function MentorshipPage() {
             This is a prototype discovery surface — bookings are simulated and
             do not call backend services.
           </p>
-        </Container>
-      </Section>
+        </div>
 
-      <Section className="pt-4">
-        <Container size="md">
+        <div className="mt-7 sm:mt-8">
           <div className="grid gap-6 lg:grid-cols-2">
             {mentorshipOfferings.map((o) => (
               <Card key={o.id} className="flex flex-col p-6">
@@ -111,8 +109,8 @@ export default function MentorshipPage() {
             lifecycle actions are owned by the Mentorship Service behind the API
             gateway.
           </p>
-        </Container>
-      </Section>
-    </>
+        </div>
+      </Container>
+    </Section>
   );
 }

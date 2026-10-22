@@ -125,7 +125,22 @@ export default function MyLearningPage() {
       {activeTab !== "bookmarks" && (
         <Section className="py-4">
           <Container size="md">
-            {activeTab === "completed" && completedCourses.length === 0 ? (
+            {mockEnrollments.length === 0 ? (
+              <Card className="p-8 text-center">
+                <BookIcon width={32} height={32} className="mx-auto text-muted-foreground" />
+                <h3 className="mt-3 text-base font-semibold text-foreground">
+                  No course enrollments yet
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  You are not currently enrolled in any courses. Browse courses to get started.
+                </p>
+                <div className="mt-4">
+                  <ButtonLink href="/courses" size="sm">
+                    Browse courses
+                  </ButtonLink>
+                </div>
+              </Card>
+            ) : activeTab === "completed" && completedCourses.length === 0 ? (
               <Card className="p-8 text-center">
                 <CheckCircleIcon width={32} height={32} className="mx-auto text-muted-foreground" />
                 <h3 className="mt-3 text-base font-semibold text-foreground">
@@ -230,44 +245,50 @@ export default function MyLearningPage() {
               </span>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              {mockBookmarks.map((b) => (
-                <Card key={b.id} className="p-5 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <ClockIcon width={13} height={13} />
-                      Saved on {formatDate(b.createdAt)}
-                    </div>
-                    <h4 className="mt-2 font-bold text-foreground">
-                      <Link
-                        href={`/courses/${b.courseSlug}/lessons/${b.lessonSlug}`}
-                        className="hover:text-primary"
-                      >
-                        {b.lessonTitle}
-                      </Link>
-                    </h4>
-                    <p className="mt-0.5 text-xs font-medium text-muted-foreground">
-                      {b.courseTitle}
-                    </p>
-                    {b.note && (
-                      <p className="mt-2 text-xs italic text-muted-foreground/80 bg-muted/30 rounded-lg p-2 border border-border/50">
-                        &ldquo;{b.note}&rdquo;
+            {mockBookmarks.length === 0 ? (
+              <Card className="p-6 text-center">
+                <p className="text-sm text-muted-foreground">No saved bookmarks yet.</p>
+              </Card>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {mockBookmarks.map((b) => (
+                  <Card key={b.id} className="p-5 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <ClockIcon width={13} height={13} />
+                        Saved on {formatDate(b.createdAt)}
+                      </div>
+                      <h4 className="mt-2 font-bold text-foreground">
+                        <Link
+                          href={`/courses/${b.courseSlug}/lessons/${b.lessonSlug}`}
+                          className="hover:text-primary"
+                        >
+                          {b.lessonTitle}
+                        </Link>
+                      </h4>
+                      <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                        {b.courseTitle}
                       </p>
-                    )}
-                  </div>
+                      {b.note && (
+                        <p className="mt-2 text-xs italic text-muted-foreground/80 bg-muted/30 rounded-lg p-2 border border-border/50">
+                          &ldquo;{b.note}&rdquo;
+                        </p>
+                      )}
+                    </div>
 
-                  <div className="mt-4 pt-3 border-t border-border flex justify-end">
-                    <ButtonLink
-                      href={`/courses/${b.courseSlug}/lessons/${b.lessonSlug}`}
-                      size="sm"
-                      variant="secondary"
-                    >
-                      Go to lesson →
-                    </ButtonLink>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                    <div className="mt-4 pt-3 border-t border-border flex justify-end">
+                      <ButtonLink
+                        href={`/courses/${b.courseSlug}/lessons/${b.lessonSlug}`}
+                        size="sm"
+                        variant="secondary"
+                      >
+                        Go to lesson →
+                      </ButtonLink>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </Container>
         </Section>
       )}

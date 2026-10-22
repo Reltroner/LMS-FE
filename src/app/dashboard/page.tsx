@@ -12,7 +12,7 @@ import {
   PlayIcon,
 } from "@/components/ui/icons";
 import { mockEnrollments, mockLearner } from "@/lib/fixtures/learner";
-import { getPathBySlug } from "@/lib/fixtures/paths";
+import { getPublishedPaths } from "@/lib/fixtures/paths";
 
 export const metadata = {
   title: "Learner Dashboard",
@@ -37,7 +37,8 @@ export default function DashboardPage() {
   const overallProgress = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
 
   // Active path context
-  const activePath = getPathBySlug("full-stack-backend-engineer");
+  const publishedPaths = getPublishedPaths();
+  const activePath = publishedPaths[0];
 
   return (
     <>
@@ -77,8 +78,8 @@ export default function DashboardPage() {
               <p className="mt-0.5 text-[11px] text-muted-foreground">In progress</p>
             </Card>
             <Card className="p-4">
-              <p className="text-xs font-medium text-muted-foreground">Current Path</p>
-              <p className="mt-1 text-base font-bold text-foreground truncate">Backend Engineer</p>
+              <p className="text-xs font-medium text-muted-foreground">Current Domain</p>
+              <p className="mt-1 text-base font-bold text-foreground truncate">Creative Architect</p>
               <p className="mt-0.5 text-[11px] text-muted-foreground">Level: Beginner</p>
             </Card>
             <Card className="p-4">
@@ -86,7 +87,7 @@ export default function DashboardPage() {
               <Link href="/mentorship" className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
                 Find a mentor <ArrowRightIcon width={12} height={12} />
               </Link>
-              <p className="mt-0.5 text-[11px] text-muted-foreground">1-on-1 code reviews</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">1-on-1 creative reviews</p>
             </Card>
           </div>
         </Container>
@@ -179,76 +180,93 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            {mockEnrollments.map((course) => {
-              const isCurrent = course.id === primaryCourse?.id;
-              return (
-                <Card
-                  key={course.id}
-                  className={`flex flex-col justify-between p-5 ${
-                    isCurrent ? "border-primary/40 bg-primary/5" : ""
-                  }`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <Badge tone={course.status === "active" ? "success" : "neutral"}>
-                        {course.status}
-                      </Badge>
+            {mockEnrollments.length === 0 ? (
+              <Card className="col-span-2 p-8 text-center">
+                <BookIcon width={32} height={32} className="mx-auto text-muted-foreground" />
+                <h3 className="mt-3 text-base font-semibold text-foreground">
+                  No active enrollments
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Explore available learning paths and courses to begin your studies.
+                </p>
+                <div className="mt-4">
+                  <ButtonLink href="/courses" size="sm">
+                    Browse courses
+                  </ButtonLink>
+                </div>
+              </Card>
+            ) : (
+              mockEnrollments.map((course) => {
+                const isCurrent = course.id === primaryCourse?.id;
+                return (
+                  <Card
+                    key={course.id}
+                    className={`flex flex-col justify-between p-5 ${
+                      isCurrent ? "border-primary/40 bg-primary/5" : ""
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <Badge tone={course.status === "active" ? "success" : "neutral"}>
+                          {course.status}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {course.progressPercent}% complete
+                        </span>
+                      </div>
+
+                      <h3 className="mt-3 font-semibold text-foreground">
+                        <Link href={`/courses/${course.courseSlug}`} className="hover:text-primary">
+                          {course.courseTitle}
+                        </Link>
+                      </h3>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Next: {course.lastVisitedLessonTitle}
+                      </p>
+
+                      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-background-elevated">
+                        <div
+                          className="h-full rounded-full bg-primary"
+                          style={{ width: `${course.progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-5 flex items-center justify-between border-t border-border pt-3">
                       <span className="text-xs text-muted-foreground">
-                        {course.progressPercent}% complete
+                        {course.completedLessons}/{course.totalLessons} lessons
                       </span>
+                      <ButtonLink
+                        href={`/courses/${course.courseSlug}/lessons/${course.lastVisitedLessonSlug}`}
+                        size="sm"
+                        variant={isCurrent ? "primary" : "secondary"}
+                      >
+                        <PlayIcon width={14} height={14} />
+                        Resume
+                      </ButtonLink>
                     </div>
-
-                    <h3 className="mt-3 font-semibold text-foreground">
-                      <Link href={`/courses/${course.courseSlug}`} className="hover:text-primary">
-                        {course.courseTitle}
-                      </Link>
-                    </h3>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Next: {course.lastVisitedLessonTitle}
-                    </p>
-
-                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-background-elevated">
-                      <div
-                        className="h-full rounded-full bg-primary"
-                        style={{ width: `${course.progressPercent}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-5 flex items-center justify-between border-t border-border pt-3">
-                    <span className="text-xs text-muted-foreground">
-                      {course.completedLessons}/{course.totalLessons} lessons
-                    </span>
-                    <ButtonLink
-                      href={`/courses/${course.courseSlug}/lessons/${course.lastVisitedLessonSlug}`}
-                      size="sm"
-                      variant={isCurrent ? "primary" : "secondary"}
-                    >
-                      <PlayIcon width={14} height={14} />
-                      Resume
-                    </ButtonLink>
-                  </div>
-                </Card>
-              );
-            })}
+                  </Card>
+                );
+              })
+            )}
           </div>
         </Container>
       </Section>
 
       {/* Section 3: Learning Path Context */}
-      {activePath && (
-        <Section className="py-4">
-          <Container size="md">
-            <div className="flex items-center justify-between pb-4">
-              <Heading level={2} className="text-xl">Your Learning Path</Heading>
-              <Link
-                href={`/paths/${activePath.slug}`}
-                className="text-sm font-semibold text-primary hover:underline"
-              >
-                View full path →
-              </Link>
-            </div>
+      <Section className="py-4">
+        <Container size="md">
+          <div className="flex items-center justify-between pb-4">
+            <Heading level={2} className="text-xl">Your Learning Path</Heading>
+            <Link
+              href="/paths"
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              View paths →
+            </Link>
+          </div>
 
+          {activePath ? (
             <Card className="p-6">
               <div className="flex items-start gap-4">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white">
@@ -276,7 +294,7 @@ export default function DashboardPage() {
                         <span className="text-xs font-semibold text-primary">In Progress</span>
                       </div>
                       <p className="mt-1.5 text-xs font-medium text-foreground">
-                        Backend Engineering Fundamentals
+                        Foundation
                       </p>
                     </div>
 
@@ -285,10 +303,10 @@ export default function DashboardPage() {
                         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[10px] font-bold text-muted-foreground">
                           2
                         </span>
-                        <span className="text-xs font-semibold text-muted-foreground">Enrolled</span>
+                        <span className="text-xs font-semibold text-muted-foreground">Upcoming</span>
                       </div>
                       <p className="mt-1.5 text-xs font-medium text-foreground">
-                        API Design Patterns
+                        World System
                       </p>
                     </div>
 
@@ -300,16 +318,31 @@ export default function DashboardPage() {
                         <span className="text-xs font-semibold text-muted-foreground">Upcoming</span>
                       </div>
                       <p className="mt-1.5 text-xs font-medium text-foreground">
-                        Deployment & Operations
+                        Active World
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
             </Card>
-          </Container>
-        </Section>
-      )}
+          ) : (
+            <Card className="p-8 text-center">
+              <CompassIcon width={32} height={32} className="mx-auto text-muted-foreground" />
+              <h3 className="mt-3 text-base font-semibold text-foreground">
+                No active learning path
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Follow a structured curriculum sequence to build systemic creative capabilities.
+              </p>
+              <div className="mt-4">
+                <ButtonLink href="/paths" size="sm">
+                  Explore learning paths
+                </ButtonLink>
+              </div>
+            </Card>
+          )}
+        </Container>
+      </Section>
     </>
   );
 }

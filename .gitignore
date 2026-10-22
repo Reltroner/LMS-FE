@@ -21,6 +21,8 @@ node_modules/
 out/
 /.contentlayer/
 .contentlayer/
+/.public-content/
+/.course-baseline/
 
 # production
 /build

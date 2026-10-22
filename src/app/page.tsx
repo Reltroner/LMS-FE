@@ -24,21 +24,21 @@ import { getLessonsByCourseSlug } from "@/lib/fixtures/lessons";
 const valueCards = [
   {
     icon: BookIcon,
-    title: "Engineering Skills",
+    title: "Systems Thinking",
     description:
-      "Build foundations in backend systems, APIs, deployment thinking, and durable software practice.",
+      "Understand how creative ideas, rules, people, and institutions interact.",
   },
   {
     icon: SparklesIcon,
-    title: "AI Skills",
+    title: "Worldbuilding Architecture",
     description:
-      "Learn how to reason with AI tools, structure prompts, and integrate automation into real work.",
+      "Build fictional worlds with coherent foundations and meaningful causal relationships.",
   },
   {
     icon: TargetIcon,
-    title: "Project-Based Learning",
+    title: "Creative Compounding",
     description:
-      "Move through practical lessons, labs, checkpoints, and capstones that produce usable outputs.",
+      "Turn previous creative outcomes into new questions and future possibilities.",
   },
 ] as const;
 
@@ -67,14 +67,14 @@ export default function HomePage() {
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.82fr)] lg:items-center">
             <div className="space-y-8">
               <div className="space-y-5">
-                <Badge tone="primary">Static-first learning system</Badge>
+                <Badge tone="primary">Systemic Creative Architect</Badge>
                 <Heading level={1} className="max-w-4xl text-balance">
-                  Learn engineering and creative systems that compound over time.
+                  Build Fictional Worlds That Keep Generating Possibilities.
                 </Heading>
                 <p className="max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-                  Reltroner Learning Academy teaches backend engineering, AI
-                  literacy, and worldbuilding methodology through structured,
-                  project-based courses — designed for clarity, not noise.
+                  Learn to design coherent fictional worlds through systems thinking,
+                  creative constraints, causal relationships, and repeatable worldbuilding
+                  workflows.
                 </p>
               </div>
 
@@ -111,36 +111,68 @@ export default function HomePage() {
               <div className="absolute inset-6 rounded-[2rem] bg-primary/10 blur-3xl" />
               <Card className="relative overflow-hidden p-4">
                 <div className="aspect-[1.35] w-full rounded-[1.35rem] bg-gradient-to-br from-primary/15 via-accent/10 to-card p-6">
-                  <div className="flex h-full flex-col justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm">
-                        <TerminalIcon width={20} height={20} className="text-primary" />
-                      </span>
-                      <Badge tone="primary">Live lesson preview</Badge>
-                    </div>
-                    <div className="space-y-3">
-                      <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                        Backend Engineering Fundamentals
-                      </p>
-                      <h3 className="text-xl font-semibold text-foreground">
-                        HTTP Overview
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        The request and response model that powers backend
-                        engineering.
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <CheckCircleIcon width={14} height={14} className="text-success" />
-                        Readable, focused, and practical.
+                  {courses.length > 0 ? (
+                    <div className="flex h-full flex-col justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm">
+                          <TerminalIcon width={20} height={20} className="text-primary" />
+                        </span>
+                        <Badge tone="primary">Live lesson preview</Badge>
                       </div>
+                      <div className="space-y-3">
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                          {courses[0].title}
+                        </p>
+                        <h3 className="text-xl font-semibold text-foreground">
+                          {getLessonsByCourseSlug(courses[0].slug)[0]?.title ?? "Introduction"}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {courses[0].summary}
+                        </p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <CheckCircleIcon width={14} height={14} className="text-success" />
+                          Readable, focused, and practical.
+                        </div>
+                      </div>
+                      <Link
+                        href={`/courses/${courses[0].slug}`}
+                        className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                      >
+                        Start reading <ArrowRightIcon width={14} height={14} />
+                      </Link>
                     </div>
-                    <Link
-                      href="/courses/backend-engineering"
-                      className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                    >
-                      Start reading <ArrowRightIcon width={14} height={14} />
-                    </Link>
-                  </div>
+                  ) : (
+                    <div className="flex h-full flex-col justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm">
+                          <TerminalIcon width={20} height={20} className="text-primary" />
+                        </span>
+                        <Badge tone="primary">Curriculum Status</Badge>
+                      </div>
+                      <div className="space-y-3">
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                          Systemic Creative Architect
+                        </p>
+                        <h3 className="text-xl font-semibold text-foreground">
+                          Curriculum In Review
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          The systemic creative architecture and worldbuilding curriculum
+                          is undergoing formal publication and attestation review.
+                        </p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <CheckCircleIcon width={14} height={14} className="text-success" />
+                          Rigorous, deterministic, and fail-closed.
+                        </div>
+                      </div>
+                      <Link
+                        href="/courses"
+                        className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                      >
+                        Explore course catalog <ArrowRightIcon width={14} height={14} />
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </Card>
             </div>
@@ -230,11 +262,20 @@ export default function HomePage() {
                 View all courses
               </ButtonLink>
             </div>
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {courses.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
-            </div>
+            {courses.length > 0 ? (
+              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {courses.map((course) => (
+                  <CourseCard key={course.id} course={course} />
+                ))}
+              </div>
+            ) : (
+              <Card className="p-8 text-center">
+                <p className="text-sm text-muted-foreground">
+                  No courses are currently published. Curricula under the Systemic Creative Architect
+                  domain are undergoing publication and verification review.
+                </p>
+              </Card>
+            )}
           </div>
         </Container>
       </Section>
@@ -256,11 +297,19 @@ export default function HomePage() {
                 View all paths
               </ButtonLink>
             </div>
-            <div className="grid gap-6 xl:grid-cols-2">
-              {paths.map((path) => (
-                <PathCard key={path.id} path={path} />
-              ))}
-            </div>
+            {paths.length > 0 ? (
+              <div className="grid gap-6 xl:grid-cols-2">
+                {paths.map((path) => (
+                  <PathCard key={path.id} path={path} />
+                ))}
+              </div>
+            ) : (
+              <Card className="p-8 text-center">
+                <p className="text-sm text-muted-foreground">
+                  No learning paths are currently published. Candidate paths remain draft until authorized.
+                </p>
+              </Card>
+            )}
           </div>
         </Container>
       </Section>

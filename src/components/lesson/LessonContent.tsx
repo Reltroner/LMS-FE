@@ -1,4 +1,5 @@
 import type { ContentBlock } from "@/lib/fixtures/lesson-content";
+import type { ReactNode } from "react";
 import { Card } from "@/components/ui/Card";
 import {
   AlertIcon,
@@ -8,10 +9,14 @@ import {
 } from "@/components/ui/icons";
 import { cn } from "@/lib/utils/cn";
 
-export function LessonContent({ blocks }: { blocks: readonly ContentBlock[] }) {
+export function LessonContent({ blocks, children }: {
+  blocks?: readonly ContentBlock[];
+  children?: ReactNode;
+}) {
   return (
     <div className="prose-reltroner max-w-none">
-      {blocks.map((block, i) => {
+      {children}
+      {blocks?.map((block, i) => {
         switch (block.type) {
           case "heading":
             return block.level === 2 ? (

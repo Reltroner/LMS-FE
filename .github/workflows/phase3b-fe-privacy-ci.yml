@@ -1,4 +1,4 @@
-name: LMS Prototype Frontend Build and Scoped Privacy CI
+name: LMS Course Architecture and Public Export Privacy CI
 
 on:
   push:
@@ -13,9 +13,8 @@ concurrency:
   group: lms-fe-prototype-${{ github.ref }}
   cancel-in-progress: true
 
-# This replaces the now-inapplicable Phase3B CI entrypoints following the
-# brute-force prototype replacement PR #7. It does not certify Phase3B
-# Contentlayer MDX, OIDC, backend authorization or real learner state.
+# Validate MDX authoring and scan the actual public export. Authentication,
+# backend authorization, Studio attestations and learner state remain prototypes.
 jobs:
   prototype-contract:
     runs-on: ubuntu-24.04
@@ -25,8 +24,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check bounded prototype source, catalog, and mock-auth contracts
-        run: node --test tests/prototype-contract.test.mjs
+          cache: npm
+      - name: Install locked compiler and test dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Check course architecture, privacy negatives and prototype contracts
+        run: npm test
 
   frontend-build:
     runs-on: ubuntu-24.04
@@ -42,9 +44,11 @@ jobs:
           cache: npm
       - name: Install exact prototype dependency lockfile
         run: npm ci --no-audit --no-fund
-      - name: Typecheck prototype
-        run: npx tsc --noEmit
-      - name: Compile exported prototype
+      - name: Validate all source content and prepare public-only data before typecheck
+        run: npm run typecheck
+      - name: Lint maintained source
+        run: npm run lint
+      - name: Compile exported frontend and scan every public asset
         run: npm run build
       - name: Verify bounded prototype public routes
         run: node scripts/verify-prototype-export.mjs

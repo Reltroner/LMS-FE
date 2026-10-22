@@ -6,7 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prepare:content": "node --experimental-strip-types scripts/prepare-public-content.ts",
+    "validate:content": "node --experimental-strip-types scripts/prepare-public-content.ts --validate",
+    "validate:resources": "node --experimental-strip-types scripts/prepare-public-content.ts --validate",
+    "check:orphans": "node --experimental-strip-types scripts/prepare-public-content.ts --validate",
+    "prebuild": "npm run prepare:content",
+    "postbuild": "npm run verify:public",
+    "predev": "npm run prepare:content",
+    "typecheck": "npm run prepare:content && tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "verify:public": "node --experimental-strip-types scripts/verify-public-output.ts",
+    "verify:ui": "node scripts/verify-course-ui.mjs"
   },
   "dependencies": {
     "next": "16.4.0",
@@ -14,7 +25,9 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@mdx-js/mdx": "^3.1.1",
     "@tailwindcss/turbopack": "^4",
+    "@types/mdx": "^2.0.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -22,6 +35,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.7"
   }
 }

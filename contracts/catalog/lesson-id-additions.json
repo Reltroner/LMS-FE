@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "registry_authority": "LMS-FE_GIT_CONTENT_NOT_STUDIO_CANON",
+  "maintenance": "Append-only new identities. Never replace or renumber historical registry records. Renames require an explicit migration retaining the ID and alias decision.",
+  "records": []
+}

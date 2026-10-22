@@ -9,6 +9,7 @@ import { Heading } from "@/components/ui/Heading";
 import { Section } from "@/components/ui/Section";
 import { CourseCurriculum } from "@/components/course/CourseCurriculum";
 import { getCourseBySlug } from "@/lib/fixtures/courses";
+import { getCourseRouteParams } from "@/lib/content/course-registry";
 import { getLessonsByCourseSlug } from "@/lib/fixtures/lessons";
 import { getResourcesByCourseSlug } from "@/lib/fixtures/resources";
 import { getPathBySlug } from "@/lib/fixtures/paths";
@@ -42,8 +43,8 @@ export const dynamicParams = false;
 
 export async function generateStaticParams() {
   // Only published courses are publicly routable.
-  const { getPublishedCourses } = await import("@/lib/fixtures/courses");
-  return getPublishedCourses().map((c) => ({ slug: c.slug }));
+  const params = getCourseRouteParams();
+  return params.length > 0 ? params : [{ slug: "_empty" }];
 }
 
 function CourseDetailSkeleton() {

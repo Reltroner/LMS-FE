@@ -42,8 +42,8 @@ export function Footer() {
               </span>
             </Link>
             <p className="max-w-xs text-sm leading-6 text-muted-foreground">
-              Engineering skills, AI skills, and project-based learning for
-              long-term capability.
+              Systems thinking, worldbuilding methodology, and creative constraints
+              for independent creators.
             </p>
             <p className="text-xs text-muted-foreground">
               Identity is managed at{" "}
