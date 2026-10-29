@@ -15,7 +15,8 @@ import { validateSubscription } from "../src/lib/newsletter/schema.ts";
 import { createSubscriptionClient } from "../src/lib/newsletter/client.ts";
 import { newsletterIntegration } from "../src/lib/newsletter/config.ts";
 import { ecosystemLinks, isActiveRoute, primaryNav, studioLinks } from "../src/lib/site/links.ts";
-import { imageSlots, resolveSlot } from "../src/lib/media/image-slots.ts";
+import { courseCoverSlots, imageSlots, pathCoverSlots, resolveSlot } from "../src/lib/media/image-slots.ts";
+import { isPinnedApprovedCdnUrl, lessonImageSource } from "../src/lib/content/lesson-media.ts";
 
 const root = process.cwd();
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
@@ -39,6 +40,10 @@ registerHooks({
     return nextResolve(specifier, context);
   },
   load(url, context, nextLoad) {
+    // The course registry imports the compiled public catalog (written by pretest) without an import attribute.
+    if (url.endsWith("/.public-content/data.json")) {
+      return { format: "module", source: `export default ${fs.readFileSync(new URL(url), "utf8")};`, shortCircuit: true };
+    }
     if (!url.endsWith(".tsx")) return nextLoad(url, context);
     const { outputText } = ts.transpileModule(fs.readFileSync(new URL(url), "utf8"), {
       fileName: fileURLToPath(url),
@@ -55,6 +60,9 @@ const { ConceptImage } = await import("../src/components/marketing/ConceptImage.
 const { GroundedAnswer } = await import("../src/components/assistant/GroundedAnswer.tsx");
 const { CourseCurriculum } = await import("../src/components/course/CourseCurriculum.tsx");
 const { Footer } = await import("../src/components/layout/Footer.tsx");
+const { CourseCard } = await import("../src/components/course/CourseCard.tsx");
+const { PathCard } = await import("../src/components/path/PathCard.tsx");
+const { default: HomePage } = await import("../src/app/page.tsx");
 
 const { publicData, withheldResources } = await compileCatalog(root, catalogInputs(root));
 const queries = createCourseQueries(publicData);
@@ -305,23 +313,104 @@ test("newsletter client: no automatic retry; an uncertain outcome holds the next
 // Image slots and assistant presentation
 // ---------------------------------------------------------------------------------------------
 
-test("image slots: eight named slots, none approved yet, and approval fails closed", () => {
+// The reviewed revision of Reltroner/lms-reltroner-resource that holds the approved artwork.
+const resourceImage = (file) =>
+  `https://cdn.jsdelivr.net/gh/Reltroner/lms-reltroner-resource@c62944b7f7f55cb1f401bf2279a81e5868cd47a2/images/${file}`;
+const approvedSlotFiles = {
+  HOME_HERO: "reltroner-learning-profile-picture.webp", HOME_CAUSAL_MODEL: "lms-image-1.webp",
+  PATH_WOS_JOURNEY: "lms-image-2.webp", COURSE_WOS_COVER: "lms-image-3.webp", PATH_WOS_FEATURED_COVER: "lms-image-3.webp",
+  AI_KNOWLEDGE_NETWORK: "lms-image-4.webp", ABOUT_CREATIVE_SEED: "lms-image-5.webp", ABOUT_TWO_DESTINATIONS: "lms-image-6.webp",
+};
+const decode = (value) => value.replace(/&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+// Every rendered slot frame in document order: its slot, frame ratio and (when approved) the image it shows.
+const framesOf = (html) => [...html.matchAll(/<div (?:aria-hidden="true" )?data-image-slot="([A-Z_]+)"[^>]*style="aspect-ratio:([^"]+)"[^>]*>(<img [^>]*>)?/g)]
+  .map(([, slot, ratio, img]) => ({ slot, ratio, src: img ? decode(/ src="([^"]*)"/.exec(img)[1]) : null }));
+
+test("image slots: seven approved resource files fill eight slots, mentorship stays a placeholder, approval fails closed", () => {
   assert.deepEqual(Object.fromEntries(Object.values(imageSlots).map((s) => [s.id, s.aspectRatio])), {
-    HOME_HERO: "16 / 9", HOME_CAUSAL_MODEL: "3 / 2", COURSE_WOS_COVER: "16 / 9", PATH_WOS_JOURNEY: "3 / 2",
+    HOME_HERO: "16 / 9", HOME_CAUSAL_MODEL: "3 / 2", COURSE_WOS_COVER: "16 / 9", PATH_WOS_JOURNEY: "3 / 2", PATH_WOS_FEATURED_COVER: "3 / 2",
     AI_KNOWLEDGE_NETWORK: "16 / 9", ABOUT_CREATIVE_SEED: "16 / 9", ABOUT_TWO_DESTINATIONS: "3 / 2", MENTORSHIP_COLLABORATION: "4 / 3",
   });
-  for (const slot of Object.values(imageSlots)) {
-    assert.equal(resolveSlot(slot).approved, false);
-    const html = render(h(ConceptImage, { slot: slot.id }));
-    assert.match(html, new RegExp(`aria-hidden="true" data-image-slot="${slot.id}" data-placeholder="true"`));
-    assert.match(html, /Illustration pending/);
-    assert.doesNotMatch(html, /<img/);
+  assert.deepEqual(Object.values(imageSlots).filter((s) => s.src).map((s) => s.id).sort(), Object.keys(approvedSlotFiles).sort());
+  assert.equal(new Set(Object.values(imageSlots).map((s) => s.src).filter(Boolean)).size, 7, "eight approved slots, seven distinct files");
+
+  for (const [id, file] of Object.entries(approvedSlotFiles)) {
+    const slot = resolveSlot(imageSlots[id]);
+    assert.equal(slot.approved, true, id);
+    assert.equal(slot.src, resourceImage(file), `${id} is pinned to the reviewed resource commit`);
+    assert.ok(isPinnedApprovedCdnUrl(slot.src) && lessonImageSource(slot.src) === "cdn", `${id} passes the trusted-source check`);
+    assert.doesNotMatch(slot.src, /@(?:main|master)\/|\/blob\//);
+    assert.ok(slot.alt.trim().split(/\s+/).length >= 8, `${id} has descriptive alt text`);
+
+    const html = render(h(ConceptImage, { slot: id }));
+    assert.deepEqual(framesOf(html), [{ slot: id, ratio: slot.aspectRatio, src: slot.src }]);
+    const img = /<img [^>]*>/.exec(html)[0];
+    assert.equal(decode(/ alt="([^"]*)"/.exec(img)[1]), slot.alt);
+    assert.match(img, / loading="lazy"/);
+    // Only the square emblem is letterboxed (whole, on midnight); every other image fills its frame.
+    assert.match(img, id === "HOME_HERO" ? /class="h-full w-full object-contain"/ : /class="h-full w-full object-cover"/);
+    assert.equal(/bg-midnight/.test(html), id === "HOME_HERO", `${id} backing`);
+    assert.doesNotMatch(html, /Illustration pending|aria-hidden|data-placeholder/);
   }
+  assert.match(render(h(ConceptImage, { slot: "HOME_HERO", priority: true })), / loading="eager"/);
+  // The <img> comes from a client leaf, as next/image's does: a non-lazy <img> in a Server Component
+  // puts a preload hint in its route's RSC payload, so link prefetching would fetch other pages' heroes.
+  assert.match(read("src/components/marketing/SlotImage.tsx"), /^"use client";/);
+  assert.doesNotMatch(read("src/components/marketing/ConceptImage.tsx"), /<img\b/);
+
+  assert.equal(resolveSlot(imageSlots.MENTORSHIP_COLLABORATION).approved, false);
+  const placeholder = render(h(ConceptImage, { slot: "MENTORSHIP_COLLABORATION" }));
+  assert.match(placeholder, /aria-hidden="true" data-image-slot="MENTORSHIP_COLLABORATION" data-placeholder="true"/);
+  assert.match(placeholder, /Illustration pending/);
+  assert.doesNotMatch(placeholder, /<img/);
+
   const pinned = `https://cdn.jsdelivr.net/gh/Reltroner/lms-reltroner-resource@${"b".repeat(40)}/art/hero.webp`;
-  assert.throws(() => resolveSlot({ ...imageSlots.HOME_HERO, src: pinned }), /alt text/);
-  assert.throws(() => resolveSlot({ ...imageSlots.HOME_HERO, src: "https://images.example/stock.jpg", alt: "Stock" }), /pinned approved source/);
-  assert.throws(() => resolveSlot({ ...imageSlots.HOME_HERO, src: pinned.replace("b".repeat(40), "main"), alt: "Hero" }), /pinned approved source/);
+  assert.throws(() => resolveSlot({ ...imageSlots.HOME_HERO, src: pinned, alt: undefined }), /alt text/);
+  assert.throws(() => resolveSlot({ ...imageSlots.HOME_HERO, src: pinned, alt: "   " }), /alt text/);
+  for (const untrusted of ["https://images.example/stock.jpg", pinned.replace("b".repeat(40), "main"),
+    pinned.replace("b".repeat(40), "c62944b"), pinned.replace("Reltroner/lms-reltroner-resource", "someone/else"),
+    "https://github.com/Reltroner/lms-reltroner-resource/blob/main/images/lms-image-1.webp", pinned.replace("/art/", "/art/../")]) {
+    assert.throws(() => resolveSlot({ ...imageSlots.HOME_HERO, src: untrusted, alt: "Hero" }), /pinned approved source/, untrusted);
+  }
   assert.equal(resolveSlot({ ...imageSlots.HOME_HERO, src: pinned, alt: "An open book becoming a city" }).approved, true);
+});
+
+test("image slots: one WOS cover file serves the course card, course detail and path card; the homepage journey keeps Image #2", () => {
+  const cover = resourceImage("lms-image-3.webp");
+  const journey = resourceImage("lms-image-2.webp");
+  assert.equal(imageSlots.COURSE_WOS_COVER.src, cover);
+  assert.equal(imageSlots.PATH_WOS_FEATURED_COVER.src, cover);
+  assert.equal(imageSlots.PATH_WOS_JOURNEY.src, journey);
+  assert.equal(courseCoverSlots[wos.slug], "COURSE_WOS_COVER");
+  assert.equal(pathCoverSlots[wos.slug], "PATH_WOS_FEATURED_COVER");
+
+  // /courses/: the catalog card's cover.
+  const card = render(h(CourseCard, { course: wos, inventory: queries.getCourseInventory(wos.slug) }));
+  assert.deepEqual(framesOf(card), [{ slot: "COURSE_WOS_COVER", ratio: "16 / 9", src: cover }]);
+  // Course detail (an async server component): its hero renders the course's cover slot.
+  const detail = read("src/app/courses/[slug]/page.tsx");
+  assert.match(detail, /const cover = courseCoverSlots\[course\.slug\];/);
+  assert.match(detail, /aside=\{cover && <ConceptImage slot=\{cover\} priority \/>\}/);
+  // /paths/: the WOS path card shows the same file in its 3:2 frame, not the journey art.
+  const path = queries.getPathBySlug("worldbuilding-operating-system");
+  const pathCard = render(h(PathCard, { path }));
+  assert.deepEqual(framesOf(pathCard), [{ slot: "PATH_WOS_FEATURED_COVER", ratio: "3 / 2", src: cover }]);
+  assert.ok(!pathCard.includes(journey));
+  // A path without a mapped course keeps the generic journey art.
+  assert.deepEqual(framesOf(render(h(PathCard, { path: { ...path, courseSlugs: [] } }))),
+    [{ slot: "PATH_WOS_JOURNEY", ratio: "3 / 2", src: journey }]);
+
+  // Homepage: emblem hero, causal model, and the learning-journey section still on Image #2.
+  const home = render(h(HomePage));
+  assert.deepEqual(framesOf(home), [
+    { slot: "HOME_HERO", ratio: "16 / 9", src: resourceImage("reltroner-learning-profile-picture.webp") },
+    { slot: "HOME_CAUSAL_MODEL", ratio: "3 / 2", src: resourceImage("lms-image-1.webp") },
+    { slot: "PATH_WOS_JOURNEY", ratio: "3 / 2", src: journey },
+  ]);
+  const pathSection = home.slice(home.indexOf('aria-labelledby="path-heading"'));
+  assert.deepEqual(framesOf(pathSection.slice(0, pathSection.indexOf("</section>"))), [{ slot: "PATH_WOS_JOURNEY", ratio: "3 / 2", src: journey }]);
+  assert.ok(!home.includes(cover), "the homepage does not show the WOS cover");
+  assert.match(/<img [^>]*>/.exec(home)[0], / loading="eager"/, "hero image keeps priority loading");
 });
 
 test("assistant: every reply states whether AI wrote it; retrieval-only shows excerpts, not generated text", () => {

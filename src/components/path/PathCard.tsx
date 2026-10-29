@@ -6,6 +6,7 @@ import { ConceptImage } from "@/components/marketing/ConceptImage";
 import { AvailabilityBadge } from "@/components/course/AvailabilityBadge";
 import { ModuleRoadmap } from "@/components/course/ModuleRoadmap";
 import { getCourseBySlug, getCourseInventory } from "@/lib/fixtures/courses";
+import { pathCoverSlots } from "@/lib/media/image-slots";
 import { lessonRoute, pathRoute } from "@/lib/routes/route-builders";
 
 // A featured learning path: its courses' real module sequence with per-stage availability.
@@ -16,11 +17,12 @@ export function PathCard({ path }: { path: LearningPath }) {
   const modules = inventories.reduce((n, i) => n + i.moduleCount, 0);
   const first = inventories.find((i) => i.firstLesson);
   const firstCourse = courses[inventories.indexOf(first!)];
+  const cover = courses.map((course) => pathCoverSlots[course.slug]).find((slot) => slot !== undefined) ?? "PATH_WOS_JOURNEY";
 
   return (
     <Card as="article" className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[0.9fr_1.1fr]">
       <div className="min-w-0">
-        <ConceptImage slot="PATH_WOS_JOURNEY" />
+        <ConceptImage slot={cover} />
         <p className="eyebrow mt-6">Learning path</p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground">{path.title}</h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">{path.summary}</p>

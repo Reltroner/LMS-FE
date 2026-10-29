@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils/cn";
 import { resolveImageSlot, type ImageSlotId, type SlotMotif } from "@/lib/media/image-slots";
+import { SlotImage } from "./SlotImage";
 
 type ConceptImageProps = {
   slot: ImageSlotId;
@@ -18,13 +19,12 @@ export function ConceptImage({ slot: id, className, caption, priority = false, f
   const frame = cn("relative overflow-hidden", framed && "rounded-3xl border border-cobalt/40 shadow-lg", className);
 
   if (slot.approved) {
+    const contain = slot.fit === "contain";
     return (
       <figure className="space-y-2">
-        <div className={frame} style={{ aspectRatio: slot.aspectRatio }}>
-          {/* Static export: no image optimization; slot sources are validated pinned assets. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={slot.src} alt={slot.alt} loading={priority ? "eager" : "lazy"} decoding="async"
-            className="h-full w-full object-cover" />
+        <div data-image-slot={slot.id} className={cn(frame, contain && "bg-midnight")} style={{ aspectRatio: slot.aspectRatio }}>
+          <SlotImage src={slot.src} alt={slot.alt} loading={priority ? "eager" : "lazy"}
+            className={cn("h-full w-full", contain ? "object-contain" : "object-cover")} />
         </div>
         {caption && <figcaption className="text-sm text-muted-foreground">{caption}</figcaption>}
       </figure>
