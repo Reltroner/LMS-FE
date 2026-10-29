@@ -15,6 +15,7 @@
     "postbuild": "npm run verify:public",
     "predev": "npm run prepare:content",
     "typecheck": "npm run prepare:content && tsc --noEmit",
+    "pretest": "npm run prepare:content",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "verify:public": "node --experimental-strip-types scripts/verify-public-output.ts",
     "verify:ui": "node scripts/verify-course-ui.mjs",

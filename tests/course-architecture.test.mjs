@@ -86,9 +86,10 @@ test("real catalog resolves the active authoring graph, keeps identities traceab
   }
 });
 
-test("historical identity file remains byte-identical, independent of new capacity", () => {
-  const source = fs.readFileSync("contracts/catalog/lesson-id-registry.json");
-  assert.equal(createHash("sha256").update(source).digest("hex"),
+test("historical identity content remains unchanged across LF and CRLF checkouts", () => {
+  const source = fs.readFileSync("contracts/catalog/lesson-id-registry.json", "utf8");
+  const canonicalSource = source.replace(/\r\n?|\n/g, "\r\n");
+  assert.equal(createHash("sha256").update(canonicalSource, "utf8").digest("hex"),
     "644c0e353cd95febcdde0a4d4f2d293fce6efc71084082ab99467a0cb7376579");
 });
 
