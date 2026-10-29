@@ -2,6 +2,7 @@ import type { SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement>;
 
+// Icons are decorative by default; the surrounding control or text carries the accessible name.
 const base = (props: IconProps) => ({
   width: 20,
   height: 20,
@@ -11,6 +12,8 @@ const base = (props: IconProps) => ({
   strokeWidth: 1.75,
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
+  "aria-hidden": true,
+  focusable: false,
   ...props,
 });
 
@@ -158,6 +161,20 @@ export const VideoIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <polygon points="23 7 16 12 23 17 23 7" />
     <rect x="1" y="5" width="15" height="14" rx="2" />
+  </svg>
+);
+
+export const HeadphonesIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
+  </svg>
+);
+
+export const ImageIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <circle cx="9" cy="9" r="2" />
+    <path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21" />
   </svg>
 );
 
@@ -327,6 +344,13 @@ export const MailIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <rect x="2" y="4" width="20" height="16" rx="2" />
     <path d="m22 7-10 6L2 7" />
+  </svg>
+);
+
+export const ArrowUpRightIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M7 17 17 7" />
+    <path d="M8 7h9v9" />
   </svg>
 );
 

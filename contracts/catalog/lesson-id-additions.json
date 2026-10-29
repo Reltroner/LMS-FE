@@ -2,5 +2,13 @@
   "schema_version": 1,
   "registry_authority": "LMS-FE_GIT_CONTENT_NOT_STUDIO_CANON",
   "maintenance": "Append-only new identities. Never replace or renumber historical registry records. Renames require an explicit migration retaining the ID and alias decision.",
-  "records": []
+  "records": [
+    {
+      "lesson_id": "lms-lesson-0032",
+      "source_path": "content/courses/worldbuilding-operating-system/module-01-worldbuilding-fundamentals/01-01-what-is-worldbuilding.mdx",
+      "legacy_route": "/courses/worldbuilding-operating-system/lessons/01-01-what-is-worldbuilding",
+      "status": "SOURCE_STATUS_READ_AT_BUILD",
+      "approval": "STABLE_ID_REGISTRY_CANDIDATE"
+    }
+  ]
 }

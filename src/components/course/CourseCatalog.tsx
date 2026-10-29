@@ -1,260 +1,115 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import type { Course, CourseCategory, CourseLevel } from "@/types/course";
 import { Input } from "@/components/ui/Input";
-import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { SearchIcon, FilterIcon, XIcon } from "@/components/ui/icons";
-import { CourseCard } from "./CourseCard";
+import { SearchIcon } from "@/components/ui/icons";
 import { cn } from "@/lib/utils/cn";
+import { CourseCard, categoryLabels, levelLabels, type CourseInventory } from "./CourseCard";
 
-const categories: { value: CourseCategory | "all"; label: string }[] = [
-  { value: "all", label: "All categories" },
-  { value: "worldbuilding", label: "Worldbuilding" },
-  { value: "creative-system", label: "Creative System" },
-];
+type SortKey = "relevance" | "title" | "available";
+const selectClass = "h-11 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30";
 
-const levels: { value: CourseLevel | "all"; label: string }[] = [
-  { value: "all", label: "All levels" },
-  { value: "beginner", label: "Beginner" },
-  { value: "beginner-intermediate", label: "Beginner → Intermediate" },
-  { value: "intermediate", label: "Intermediate" },
-  { value: "advanced", label: "Advanced" },
-];
-
-type SortKey = "relevance" | "title" | "hours-asc" | "hours-desc";
-
-export function CourseCatalog({ courses }: { courses: readonly Course[] }) {
+// Filters run over the published catalog only; inventories are computed at build time.
+export function CourseCatalog({ courses, inventories }: {
+  courses: readonly Course[];
+  inventories: Readonly<Record<string, CourseInventory>>;
+}) {
+  const id = useId();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<CourseCategory | "all">("all");
   const [level, setLevel] = useState<CourseLevel | "all">("all");
+  const [availableOnly, setAvailableOnly] = useState(false);
   const [sort, setSort] = useState<SortKey>("relevance");
-  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const categories = [...new Set(courses.map((c) => c.category))];
+  const levels = [...new Set(courses.map((c) => c.level))];
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list = courses.filter((c) => {
-      if (category !== "all" && c.category !== category) return false;
-      if (level !== "all" && c.level !== level) return false;
-      if (q) {
-        const haystack = `${c.title} ${c.subtitle} ${c.summary}`.toLowerCase();
-        if (!haystack.includes(q)) return false;
-      }
-      return true;
-    });
-
-    list = [...list].sort((a, b) => {
-      switch (sort) {
-        case "title":
-          return a.title.localeCompare(b.title);
-        case "hours-asc":
-          return a.estimatedHours - b.estimatedHours;
-        case "hours-desc":
-          return b.estimatedHours - a.estimatedHours;
-        default:
-          return 0;
-      }
-    });
+    const list = courses.filter((c) =>
+      (category === "all" || c.category === category) &&
+      (level === "all" || c.level === level) &&
+      (!availableOnly || inventories[c.slug].availableLessonCount > 0) &&
+      (!q || `${c.title} ${c.subtitle} ${c.summary} ${c.modules.map((m) => m.title).join(" ")}`.toLowerCase().includes(q)));
+    if (sort === "title") return [...list].sort((a, b) => a.title.localeCompare(b.title));
+    if (sort === "available") {
+      return [...list].sort((a, b) => inventories[b.slug].availableLessonCount - inventories[a.slug].availableLessonCount);
+    }
     return list;
-  }, [courses, query, category, level, sort]);
+  }, [courses, inventories, query, category, level, availableOnly, sort]);
 
-  const hasActiveFilters =
-    query !== "" || category !== "all" || level !== "all";
+  const filtersActive = query !== "" || category !== "all" || level !== "all" || availableOnly;
+  const reset = () => { setQuery(""); setCategory("all"); setLevel("all"); setAvailableOnly(false); };
+
+  if (courses.length === 0) {
+    return (
+      <Card className="p-10 text-center">
+        <h2 className="text-lg font-semibold text-foreground">No courses are published yet</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Courses appear here once their first lesson is reviewed and published.</p>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Search + filter bar */}
-      <Card className="p-4 sm:p-5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="flex-1">
-            <Input
-              type="search"
-              placeholder="Search courses by title, summary, or tag…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              icon={<SearchIcon width={18} height={18} />}
-              aria-label="Search courses"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setFiltersOpen((v) => !v)}
-              className="inline-flex h-12 items-center gap-2 rounded-full border border-border bg-card px-5 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:bg-primary/5 lg:hidden"
-              aria-expanded={filtersOpen}
-            >
-              <FilterIcon width={16} height={16} />
-              Filters
-            </button>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="h-12 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
-              aria-label="Sort courses"
-            >
-              <option value="relevance">Sort: Relevance</option>
-              <option value="title">Sort: Title A–Z</option>
-              <option value="hours-asc">Sort: Shortest first</option>
-              <option value="hours-desc">Sort: Longest first</option>
-            </select>
-          </div>
+      <Card className="space-y-4 p-4 sm:p-5">
+        <Input type="search" placeholder="Search courses by topic or question…" value={query}
+          onChange={(e) => setQuery(e.target.value)} icon={<SearchIcon width={18} height={18} />}
+          aria-label="Search courses" maxLength={120} />
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="sr-only" htmlFor={`${id}-topic`}>Topic</label>
+          <select id={`${id}-topic`} value={category} onChange={(e) => setCategory(e.target.value as CourseCategory | "all")} className={selectClass}>
+            <option value="all">All topics</option>
+            {categories.map((c) => <option key={c} value={c}>{categoryLabels[c]}</option>)}
+          </select>
+          <label className="sr-only" htmlFor={`${id}-level`}>Level</label>
+          <select id={`${id}-level`} value={level} onChange={(e) => setLevel(e.target.value as CourseLevel | "all")} className={selectClass}>
+            <option value="all">All levels</option>
+            {levels.map((l) => <option key={l} value={l}>{levelLabels[l]}</option>)}
+          </select>
+          <button type="button" aria-pressed={availableOnly} onClick={() => setAvailableOnly((v) => !v)}
+            className={cn("h-11 rounded-full border px-4 text-sm font-semibold transition",
+              availableOnly ? "border-success bg-success-soft text-success" : "border-border bg-card text-muted-foreground hover:text-foreground")}>
+            Available now
+          </button>
+          <label className="sr-only" htmlFor={`${id}-sort`}>Sort</label>
+          <select id={`${id}-sort`} value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className={cn(selectClass, "sm:ml-auto")}>
+            <option value="relevance">Sort: Recommended</option>
+            <option value="title">Sort: Title A–Z</option>
+            <option value="available">Sort: Most lessons available</option>
+          </select>
         </div>
-
-        <div
-          className={cn(
-            "grid gap-3 pt-4 lg:grid-cols-2",
-            !filtersOpen && "hidden lg:grid",
-          )}
-        >
-          <FilterGroup
-            label="Category"
-            options={categories}
-            value={category}
-            onChange={(v) => setCategory(v as CourseCategory | "all")}
-          />
-          <FilterGroup
-            label="Level"
-            options={levels}
-            value={level}
-            onChange={(v) => setLevel(v as CourseLevel | "all")}
-          />
-        </div>
-
-        {hasActiveFilters && (
-          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-            <span className="text-xs text-muted-foreground">Active filters:</span>
-            {query && (
-              <ActiveChip label={`“${query}”`} onClear={() => setQuery("")} />
-            )}
-            {category !== "all" && (
-              <ActiveChip
-                label={categories.find((c) => c.value === category)?.label ?? ""}
-                onClear={() => setCategory("all")}
-              />
-            )}
-            {level !== "all" && (
-              <ActiveChip
-                label={levels.find((l) => l.value === level)?.label ?? ""}
-                onClear={() => setLevel("all")}
-              />
-            )}
-            <button
-              type="button"
-              onClick={() => {
-                setQuery("");
-                setCategory("all");
-                setLevel("all");
-              }}
-              className="text-xs font-semibold text-primary hover:underline"
-            >
-              Clear all
-            </button>
-          </div>
-        )}
       </Card>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing <span className="font-semibold text-foreground">{filtered.length}</span>{" "}
-          of {courses.length} published courses
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        <p role="status" className="text-muted-foreground">
+          Showing <span className="font-semibold text-foreground">{filtered.length}</span> of {courses.length} published{" "}
+          {courses.length === 1 ? "course" : "courses"}
         </p>
+        {filtersActive && (
+          <button type="button" onClick={reset} className="font-semibold text-primary underline-offset-2 hover:underline">
+            Clear filters
+          </button>
+        )}
       </div>
 
       {filtered.length === 0 ? (
-        <Card className="p-12 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-background-elevated">
-            <SearchIcon width={26} height={26} className="text-muted-foreground" />
-          </div>
-          <h3 className="mt-4 text-lg font-semibold text-foreground">
-            No courses match your filters
-          </h3>
+        <Card className="p-10 text-center">
+          <h2 className="text-lg font-semibold text-foreground">Nothing matches these filters</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Try clearing filters or searching for a different term.
+            The published course is still here — try another word, or clear the filters.
           </p>
-          <button
-            type="button"
-            onClick={() => {
-              setQuery("");
-              setCategory("all");
-              setLevel("all");
-            }}
-            className="mt-5 text-sm font-semibold text-primary hover:underline"
-          >
-            Reset filters
-          </button>
+          <button type="button" onClick={reset} className="mt-5 text-sm font-semibold text-primary hover:underline">Clear filters</button>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-6 md:grid-cols-2">
           {filtered.map((course) => (
-            <CourseCard key={course.id} course={course} />
+            <li key={course.id}><CourseCard course={course} inventory={inventories[course.slug]} /></li>
           ))}
-        </div>
+        </ul>
       )}
-
-      <p className="text-xs text-muted-foreground">
-        <Badge tone="neutral" className="mr-2">Prototype</Badge>
-        Search and filtering are local mock interactions. Draft courses are
-        intentionally excluded from this public view.
-      </p>
     </div>
-  );
-}
-
-function FilterGroup({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: readonly { value: string; label: string }[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={label}>
-      <span className="mr-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {label}
-      </span>
-      {options.map((opt) => (
-        <button
-          key={opt.value}
-          type="button"
-          onClick={() => onChange(opt.value)}
-          className={cn(
-            "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
-            value === opt.value
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground",
-          )}
-          aria-pressed={value === opt.value}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function ActiveChip({
-  label,
-  onClear,
-}: {
-  label: string;
-  onClear: () => void;
-}) {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary">
-      {label}
-      <button
-        type="button"
-        onClick={onClear}
-        aria-label={`Remove filter ${label}`}
-        className="ml-0.5 hover:text-foreground"
-      >
-        <XIcon width={12} height={12} />
-      </button>
-    </span>
   );
 }

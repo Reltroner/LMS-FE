@@ -72,7 +72,7 @@ export function LessonContent({ blocks, children }: {
           }
           case "checkpoint":
             return (
-              <Card key={i} className="my-6 border-primary/20 bg-primary-soft p-6">
+              <Card key={i} tone="primary" className="my-6 p-6">
                 <div className="flex items-center gap-2">
                   <CheckCircleIcon width={20} height={20} className="text-primary" />
                   <h3 className="m-0 text-lg font-semibold text-foreground">

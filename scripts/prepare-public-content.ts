@@ -2,10 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { compileCatalog, type CatalogInputs } from "../src/lib/content/compiler.ts";
+import { buildKnowledgeIndex } from "../src/lib/knowledge/ingest.ts";
 import { catalogInputs } from "./catalog-inputs.ts";
 
 export async function preparePublicContent(root: string, inputs = catalogInputs(root)) {
   const compiled = await compileCatalog(root, inputs);
+  const knowledgeIndex = buildKnowledgeIndex(compiled);
   const staging = path.resolve(root, ".public-content");
   if (path.dirname(staging) !== path.resolve(root) || path.basename(staging) !== ".public-content" ||
       (fs.existsSync(staging) && fs.lstatSync(staging).isSymbolicLink())) {
@@ -15,6 +17,7 @@ export async function preparePublicContent(root: string, inputs = catalogInputs(
   fs.rmSync(staging, { recursive: true, force: true });
   fs.mkdirSync(staging);
   fs.writeFileSync(path.join(staging, "data.json"), JSON.stringify(compiled.publicData, null, 2) + "\n");
+  fs.writeFileSync(path.join(staging, "knowledge-index.json"), JSON.stringify(knowledgeIndex, null, 2) + "\n");
   const imports: string[] = [];
   const bodies: string[] = [];
   for (const [index, lesson] of compiled.publicLessons.entries()) {
@@ -33,7 +36,7 @@ export async function preparePublicContent(root: string, inputs = catalogInputs(
     'import type { MDXContent } from "mdx/types";', ...imports,
     "export const lessonBodies: Readonly<Record<string, MDXContent>> = {", ...bodies, "};", "",
   ].join("\n"));
-  return compiled;
+  return { ...compiled, knowledgeIndex };
 }
 
 export async function validateContent(root: string, inputs?: CatalogInputs) {
@@ -45,6 +48,9 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const result = process.argv.includes("--validate")
       ? await validateContent(process.cwd()) : await preparePublicContent(process.cwd());
     console.log(`Validated ${result.entries.length} courses, ${result.allLessons.length} MDX lessons; public: ${result.publicData.courses.length} courses, ${result.publicLessons.length} lessons, ${result.publicData.paths.length} paths`);
+    if (result.withheldResources.length) {
+      console.warn(`Withheld ${result.withheldResources.length} resources not pinned to an approved repository commit: ${result.withheldResources.map((r) => r.id).join(", ")}`);
+    }
   } catch (error) {
     console.error(error);
     process.exitCode = 1;

@@ -1,22 +1,15 @@
-import { Badge } from "@/components/ui/Badge";
-import { Heading } from "@/components/ui/Heading";
-import { AuditExplorer } from "@/components/admin/AuditExplorer";
+import { AdminCapabilityPage } from "@/components/admin/AdminCapabilityPage";
 
-export const metadata = { title: "Audit Explorer" };
+export const metadata = { title: "Audit" };
 
 export default function AuditPage() {
   return (
-    <>
-      <div>
-        <Badge tone="accent">Audit Service</Badge>
-        <Heading level={1} className="mt-2">Audit Explorer</Heading>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Search and inspect append-only audit events with provenance.
-        </p>
-      </div>
-      <div className="mt-6">
-        <AuditExplorer />
-      </div>
-    </>
+    <AdminCapabilityPage eyebrow="Audit" title="Accountable changes"
+      summary="An audit trail is only meaningful when a server writes it. Nothing is logged or displayed here."
+      operations={[
+        "Read who changed what, when, and through which service.",
+        "Filter by person, action, or result.",
+        "Keep audit data out of public search and the AI Guide.",
+      ]} />
   );
 }

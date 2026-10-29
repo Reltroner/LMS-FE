@@ -20,8 +20,20 @@ export function createCourseQueries(data: PublicCatalog) {
     }));
   };
   const getResourceById = (id: string): Resource | undefined => data.resources.find((r) => r.id === id);
+  // Available = published lessons; planned = the syllabus size (or the published lessons when a course has no syllabus).
+  const getCourseInventory = (slug: string) => {
+    const course = getCourseBySlug(slug);
+    if (!course) return undefined;
+    const lessons = getLessonsByCourseSlug(course.slug);
+    return {
+      moduleCount: course.modules.length,
+      plannedLessonCount: course.modules.reduce((n, m) => n + (m.syllabus?.length ?? m.lessonSlugs.length), 0),
+      availableLessonCount: lessons.length,
+      firstLesson: lessons[0],
+    };
+  };
   return {
-    getCourseBySlug, getLessonBySlug, getLessonsByCourseSlug, getResourceById,
+    getCourseBySlug, getLessonBySlug, getLessonsByCourseSlug, getResourceById, getCourseInventory,
     getPublishedCourses: (): readonly Course[] => data.courses,
     getResourcesByCourseSlug: (slug: string): readonly Resource[] => {
       const course = getCourseBySlug(slug);

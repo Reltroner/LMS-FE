@@ -8,5 +8,5 @@ export const {
   getCourseBySlug, getPublishedCourses, getLessonBySlug, getLessonsByCourseSlug,
   getCourseDuration, getLessonNavigation, getCourseRouteParams, getLessonRouteParams,
   getResourceById, getResourcesByCourseSlug, getResourcesByIds,
-  getPathBySlug, getPublishedPaths,
+  getPathBySlug, getPublishedPaths, getCourseInventory,
 } = createCourseQueries(catalog);

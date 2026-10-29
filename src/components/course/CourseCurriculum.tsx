@@ -1,138 +1,67 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import type { Course } from "@/types/course";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { getLessonBySlug } from "@/lib/fixtures/lessons";
-import {
-  ChevronDownIcon,
-  ClockIcon,
-  PlayIcon,
-  CheckCircleIcon,
-} from "@/components/ui/icons";
-import { cn } from "@/lib/utils/cn";
+import type { Course, Lesson } from "@/types/course";
+import { ChevronDownIcon, ClockIcon } from "@/components/ui/icons";
+import { lessonRoute } from "@/lib/routes/route-builders";
+import { AvailabilityBadge } from "./AvailabilityBadge";
 
-const kindLabels: Record<string, string> = {
-  lesson: "Lesson",
-  lab: "Lab",
-  checkpoint: "Checkpoint",
-  capstone: "Capstone",
-};
-
-const kindTone: Record<string, "neutral" | "accent" | "warning" | "primary"> = {
-  lesson: "neutral",
-  lab: "accent",
-  checkpoint: "warning",
-  capstone: "primary",
-};
-
-export function CourseCurriculum({ course }: { course: Course }) {
-  const [openModules, setOpenModules] = useState<Set<string>>(
-    new Set([course.modules[0]?.id].filter(Boolean) as string[]),
-  );
-
-  const toggle = (id: string) => {
-    setOpenModules((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
+// Module accordion built on <details>/<summary>: keyboard and screen-reader support come from
+// the platform and it works before JavaScript loads. Published lessons link; planned ones never do.
+export function CourseCurriculum({ course, lessons }: { course: Course; lessons: readonly Lesson[] }) {
+  const bySlug = new Map(lessons.map((lesson) => [lesson.slug, lesson]));
   return (
-    <Card className="overflow-hidden">
-      <div className="border-b border-border bg-background-elevated/50 px-6 py-4">
-        <h2 className="text-lg font-semibold text-foreground">Curriculum</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {course.modules.length} modules ·{" "}
-          {course.modules.reduce(
-            (n, m) => n + m.lessonSlugs.length,
-            0,
-          )}{" "}
-          lessons
-        </p>
-      </div>
-      <ul className="divide-y divide-border">
-        {course.modules.map((mod, idx) => {
-          const lessons = mod.lessonSlugs
-            .map((slug) => getLessonBySlug(course.slug, slug))
-            .filter(Boolean);
-          const isOpen = openModules.has(mod.id);
-          return (
-            <li key={mod.id}>
-              <button
-                type="button"
-                onClick={() => toggle(mod.id)}
-                className="flex w-full items-center gap-3 px-6 py-4 text-left transition hover:bg-primary/5"
-                aria-expanded={isOpen}
-              >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">
-                  {idx + 1}
+    <div className="space-y-3">
+      {course.modules.map((module, index) => {
+        const entries = module.syllabus ??
+          module.lessonSlugs.map((slug) => ({ number: "", title: bySlug.get(slug)?.title ?? slug, lessonSlug: slug }));
+        const available = entries.filter((entry) => entry.lessonSlug).length;
+        return (
+          <details key={module.id} open={available > 0}
+            className="group rounded-2xl border border-border bg-card shadow-sm open:shadow">
+            <summary className="flex cursor-pointer list-none items-center gap-3 rounded-2xl px-5 py-4 transition hover:bg-background-elevated [&::-webkit-details-marker]:hidden">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-sm font-bold text-primary">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold text-foreground">{module.title}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {available ? `${available} of ${entries.length} lessons available` : `${entries.length} planned lessons`}
                 </span>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground">{mod.title}</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {lessons.length} lessons · {mod.summary}
-                  </p>
-                </div>
-                <ChevronDownIcon
-                  width={18}
-                  height={18}
-                  className={cn(
-                    "shrink-0 text-muted-foreground transition-transform",
-                    isOpen && "rotate-180",
-                  )}
-                />
-              </button>
-
-              {isOpen && (
-                <ul className="space-y-1 px-6 pb-4">
-                  {lessons.map((lesson) => (
-                    <li key={lesson!.id}>
-                      <Link
-                        href={`/courses/${course.slug}/lessons/${lesson!.slug}`}
-                        className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-primary/5"
-                      >
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-card text-muted-foreground ring-1 ring-border group-hover:text-primary">
-                          <PlayIcon width={14} height={14} />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-foreground">
-                            {lesson!.title}
-                          </p>
-                          <div className="mt-0.5 flex items-center gap-2">
-                            <Badge tone={kindTone[lesson!.kind]}>
-                              {kindLabels[lesson!.kind]}
-                            </Badge>
-                            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <ClockIcon width={12} height={12} />
-                              {lesson!.durationMinutes}m
-                            </span>
-                          </div>
-                        </div>
-                        <CheckCircleIcon
-                          width={16}
-                          height={16}
-                          className="text-muted-foreground/30"
-                          aria-hidden
-                        />
-                      </Link>
+              </span>
+              <AvailabilityBadge available={available > 0} label={available ? "Available now" : "Planned"} />
+              <ChevronDownIcon width={18} height={18} className="shrink-0 text-muted-foreground transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="border-t border-border px-5 pb-4 pt-3">
+              <p className="text-sm leading-6 text-muted-foreground">{module.summary}</p>
+              <ol className="mt-3 space-y-1">
+                {entries.map((entry) => {
+                  const lesson = entry.lessonSlug ? bySlug.get(entry.lessonSlug) : undefined;
+                  const label = <>{entry.number && <span className="tabular-nums text-muted-foreground">{entry.number}</span>} {entry.title}</>;
+                  return (
+                    <li key={`${entry.number}-${entry.title}`}
+                      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl px-3 py-2 text-sm odd:bg-background-elevated/60">
+                      {lesson ? (
+                        <Link href={lessonRoute(course.slug, lesson.slug)} className="font-semibold text-primary underline-offset-2 hover:underline">
+                          {label}
+                        </Link>
+                      ) : (
+                        <span className="text-foreground">{label}</span>
+                      )}
+                      <span className="flex items-center gap-2">
+                        {lesson && (
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <ClockIcon width={12} height={12} /> {lesson.durationMinutes} min
+                          </span>
+                        )}
+                        <AvailabilityBadge available={Boolean(lesson)} />
+                      </span>
                     </li>
-                  ))}
-                  {lessons.length === 0 && (
-                    <li className="px-3 py-3 text-sm text-muted-foreground">
-                      Lessons for this module are not yet published.
-                    </li>
-                  )}
-                </ul>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </Card>
+                  );
+                })}
+              </ol>
+            </div>
+          </details>
+        );
+      })}
+    </div>
   );
 }

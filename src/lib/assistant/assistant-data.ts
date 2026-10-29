@@ -1,159 +1,147 @@
-/**
- * RELTRONER LMS — SHARED ASSISTANT ENGINE & FIXTURES
- * ----------------------------------------------------------------------------
- * Shared deterministic mock logic and prompt responses for both the
- * full /assistant page and the floating chat widget.
- *
- * PROTOTYPE TRUST BOUNDARIES:
- * - No external API requests, keys, or live LLMs.
- * - Presentation simulation only.
- * - Cannot mutate learner progress, enrollments, or bookings.
- * ----------------------------------------------------------------------------
- */
+import { publicKnowledgeIndex } from "../knowledge/public-index.ts";
+import {
+  executeKnowledgeAnswer,
+  MAX_HISTORY_TURNS,
+  MAX_QUESTION_CHARS,
+} from "../knowledge/service.ts";
+import type {
+  ConversationTurn,
+  KnowledgeAnswerResponse,
+  KnowledgeModelAdapter,
+} from "../knowledge/types.ts";
+import type { Message, MessageSource } from "./conversation.ts";
 
-export type MessageRole = "user" | "assistant";
+export {
+  createMessageId, seedMessages, suggestedPrompts,
+  type Message, type MessageRole, type MessageSource,
+} from "./conversation.ts";
 
-export type MessageSource = {
-  title: string;
-  href: string;
-};
+export type AskAssistantOptions = Readonly<{
+  serviceUrl?: string;
+  modelAdapter?: KnowledgeModelAdapter | null;
+  requireLiveProvider?: boolean;
+  fetchImpl?: typeof fetch;
+}>;
 
-export type Message = {
-  id: string;
-  role: MessageRole;
-  content: string;
-  sources?: MessageSource[];
-  state?: "loading" | "error" | "done";
-};
+function toMessageFromResponse(response: KnowledgeAnswerResponse): Omit<Message, "id" | "role"> {
+  const sources: MessageSource[] = response.citations.map((c) => ({
+    title: c.title,
+    href: c.sourceUrl,
+    snippet: c.snippet,
+    ...(c.lessonId ? { lessonId: c.lessonId } : {}),
+  }));
 
-let messageCounter = 0;
-export function createMessageId(prefix: "user" | "assistant" | "u" | "a"): string {
-  messageCounter += 1;
-  return `${prefix}-${messageCounter}`;
+  return {
+    content: response.answer,
+    sources,
+    state: response.error === "MODEL_INVOCATION_FAILED" ? "error" : "done",
+    retrievalStatus: response.retrievalStatus,
+    generationStatus: response.generationStatus,
+  };
 }
 
-export const seedMessages: Message[] = [
-  {
-    id: "m-welcome",
-    role: "assistant",
-    content:
-      "Hello! I am your Reltroner Learning Assistant. I can help guide your curriculum sequence, explain core concepts (like systems thinking & worldbuilding), and locate course resources. Note that this is a simulated prototype companion.",
-    state: "done",
-  },
-];
+/**
+ * Shared RAG assistant client consumed by both `/assistant` and `FloatingChatWidget`.
+ * Uses the configured Knowledge Service endpoint when available, or executes the
+ * shared retrieval-grounded pipeline against the versioned public knowledge index.
+ */
+export async function askKnowledgeAssistant(
+  question: string,
+  priorMessages: readonly Message[] = [],
+  options: AskAssistantOptions = {},
+): Promise<Omit<Message, "id" | "role">> {
+  const trimmed = question.trim();
+  if (!trimmed) {
+    return {
+      content: "Please enter a question about published course content.",
+      sources: [],
+      state: "error",
+      retrievalStatus: "no_evidence",
+      generationStatus: "abstained",
+    };
+  }
+  if (trimmed.length > MAX_QUESTION_CHARS) {
+    return {
+      content: `Your question exceeds the maximum length of ${MAX_QUESTION_CHARS} characters. Please shorten your question and try again.`,
+      sources: [],
+      state: "error",
+      retrievalStatus: "no_evidence",
+      generationStatus: "abstained",
+      retryQuestion: trimmed.slice(0, MAX_QUESTION_CHARS),
+    };
+  }
 
-export const suggestedPrompts: string[] = [
-  "Help me choose a learning path",
-  "Explain creative constraints and causal relationships",
-  "What should I learn next?",
-  "Find worldbuilding resources",
-  "Explain the mentorship process",
-  "Summarize canon and continuity management",
-];
+  const history: ConversationTurn[] = priorMessages
+    .filter((m) => m.id !== "m-welcome" && m.state === "done" && (m.role === "user" || m.role === "assistant"))
+    .slice(-MAX_HISTORY_TURNS)
+    .map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
 
-const mockKnowledgeBase: {
-  keywords: string[];
-  content: string;
-  sources: MessageSource[];
-}[] = [
-  {
-    keywords: ["path", "choose", "recommend", "where to start"],
-    content:
-      "For systemic creative development, explore foundational world premise, civilization and culture logic, active power dynamics, and continuity management.",
-    sources: [
-      {
-        title: "Learning Paths",
-        href: "/paths",
-      },
-      {
-        title: "Course Catalog",
-        href: "/courses",
-      },
-    ],
-  },
-  {
-    keywords: ["constraint", "creative constraint", "causal", "cause", "logic", "rules"],
-    content:
-      "Creative constraints are productive boundaries that force specific choices, prevent creative paralysis, and establish rules that govern how causes produce consequences across your fictional world.",
-    sources: [
-      {
-        title: "Course Catalog",
-        href: "/courses",
-      },
-    ],
-  },
-  {
-    keywords: ["what should i learn", "next", "continue", "resume"],
-    content:
-      "Based on your simulated learner profile, there are currently no active course sessions. Explore the learning paths or browse available coursework to begin.",
-    sources: [
-      {
-        title: "Learner Dashboard",
-        href: "/dashboard",
-      },
-    ],
-  },
-  {
-    keywords: ["resource", "docs", "documentation", "material", "template"],
-    content:
-      "Core curriculum references include structured design templates, causal rule sheets, and continuity guides provided with enrolled coursework.",
-    sources: [
-      {
-        title: "Course Catalog",
-        href: "/courses",
-      },
-    ],
-  },
-  {
-    keywords: ["mentor", "mentorship", "booking", "session", "1-on-1"],
-    content:
-      "Reltroner mentorship pairs creators with experienced mentors for 1-on-1 world architecture reviews, creative constraint sprints, and canon guidance. You can browse offerings in the Mentorship hub.",
-    sources: [
-      {
-        title: "Mentorship Directory",
-        href: "/mentorship",
-      },
-    ],
-  },
-  {
-    keywords: ["canon", "continuity", "bible", "management"],
-    content:
-      "Canon and continuity management establish single sources of truth for your fictional world, tracking decisions, world rules, and timeline anchors to prevent contradictions as the project expands.",
-    sources: [
-      {
-        title: "Course Catalog",
-        href: "/courses",
-      },
-    ],
-  },
-];
+  const configuredServiceUrl =
+    options.serviceUrl ??
+    (typeof process !== "undefined" ? process.env.NEXT_PUBLIC_KNOWLEDGE_SERVICE_URL : undefined);
 
-export function matchAssistantResponse(query: string): Omit<Message, "id" | "role"> {
-  const normalized = query.trim().toLowerCase();
+  if (configuredServiceUrl) {
+    const fetchFn = options.fetchImpl ?? fetch;
+    try {
+      const endpoint = `${configuredServiceUrl.replace(/\/+$/, "")}/v1/knowledge/answer`;
+      const res = await fetchFn(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: trimmed, history }),
+      });
 
-  for (const entry of mockKnowledgeBase) {
-    if (entry.keywords.some((kw) => normalized.includes(kw))) {
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { message?: string };
+        return {
+          content: errData.message ?? `Knowledge Service returned HTTP ${res.status}.`,
+          sources: [],
+          state: "error",
+          generationStatus: "unavailable",
+          retryQuestion: trimmed,
+        };
+      }
+
+      const data = (await res.json()) as KnowledgeAnswerResponse;
       return {
-        content: entry.content,
-        sources: entry.sources,
-        state: "done",
+        ...toMessageFromResponse(data),
+        retryQuestion: trimmed,
+      };
+    } catch {
+      return {
+        content:
+          "Unable to reach the configured Knowledge Service endpoint. Check that the RAG service is running and try again.",
+        sources: [],
+        state: "error",
+        generationStatus: "unavailable",
+        retryQuestion: trimmed,
       };
     }
   }
 
-  return {
-    content:
-      "Here is a conceptual response based on Reltroner LMS curriculum material. For verified answers, please review the relevant course text directly. As a simulated prototype assistant, I cannot modify real database records or learner enrollments.",
-    sources: [
+  // Execute against the shared public knowledge index (retrieval-only when no modelAdapter is injected)
+  try {
+    const response = await executeKnowledgeAnswer(
+      { question: trimmed, history },
       {
-        title: "Course Catalog",
-        href: "/courses",
+        index: publicKnowledgeIndex,
+        modelAdapter: options.modelAdapter ?? null,
+        requireLiveProvider: options.requireLiveProvider ?? false,
       },
-      {
-        title: "Learning Paths",
-        href: "/paths",
-      },
-    ],
-    state: "done",
-  };
+    );
+    return {
+      ...toMessageFromResponse(response),
+      retryQuestion: trimmed,
+    };
+  } catch {
+    return {
+      content: "Knowledge retrieval failed unexpectedly. Please try again.",
+      sources: [],
+      state: "error",
+      generationStatus: "unavailable",
+      retryQuestion: trimmed,
+    };
+  }
 }

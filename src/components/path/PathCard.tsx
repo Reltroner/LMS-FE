@@ -1,83 +1,51 @@
-import Link from "next/link";
 import type { LearningPath } from "@/types/path";
+import { ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { CompassIcon, ClockIcon, ArrowRightIcon } from "@/components/ui/icons";
-import { getCourseBySlug } from "@/lib/fixtures/courses";
+import { ArrowRightIcon } from "@/components/ui/icons";
+import { ConceptImage } from "@/components/marketing/ConceptImage";
+import { AvailabilityBadge } from "@/components/course/AvailabilityBadge";
+import { ModuleRoadmap } from "@/components/course/ModuleRoadmap";
+import { getCourseBySlug, getCourseInventory } from "@/lib/fixtures/courses";
+import { lessonRoute, pathRoute } from "@/lib/routes/route-builders";
 
+// A featured learning path: its courses' real module sequence with per-stage availability.
 export function PathCard({ path }: { path: LearningPath }) {
-  const courses = path.courseSlugs
-    .map((slug) => getCourseBySlug(slug))
-    .filter(Boolean);
+  const courses = path.courseSlugs.map((slug) => getCourseBySlug(slug)).filter((c) => c !== undefined);
+  const inventories = courses.map((course) => getCourseInventory(course.slug)!);
+  const available = inventories.reduce((n, i) => n + i.availableLessonCount, 0);
+  const modules = inventories.reduce((n, i) => n + i.moduleCount, 0);
+  const first = inventories.find((i) => i.firstLesson);
+  const firstCourse = courses[inventories.indexOf(first!)];
 
   return (
-    <Card as="article" interactive className="flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between border-b border-border bg-background-elevated/50 px-6 py-4">
-        <div className="flex items-center gap-2">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <CompassIcon width={20} height={20} />
-          </span>
-          <Badge tone="accent">Learning path</Badge>
+    <Card as="article" className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="min-w-0">
+        <ConceptImage slot="PATH_WOS_JOURNEY" />
+        <p className="eyebrow mt-6">Learning path</p>
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-foreground">{path.title}</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">{path.summary}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <AvailabilityBadge available={available > 0} label={`${available} published ${available === 1 ? "lesson" : "lessons"}`} />
+          <AvailabilityBadge available={false} label={`${modules} planned modules`} />
         </div>
-        <Badge tone={path.status === "published" ? "success" : "warning"}>
-          {path.status}
-        </Badge>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <ButtonLink href={pathRoute(path.slug)}>
+            Explore learning path <ArrowRightIcon width={16} height={16} />
+          </ButtonLink>
+          {first?.firstLesson && firstCourse && (
+            <ButtonLink href={lessonRoute(firstCourse.slug, first.firstLesson.slug)} variant="secondary">
+              Start the first lesson
+            </ButtonLink>
+          )}
+        </div>
       </div>
-
-      <div className="flex flex-1 flex-col p-6">
-        <h3 className="text-xl font-semibold text-foreground">
-          <Link
-            href={`/paths/${path.slug}`}
-            className="hover:text-primary"
-          >
-            {path.title}
-          </Link>
-        </h3>
-        <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
-          {path.summary}
-        </p>
-
-        <div className="mt-5 space-y-1.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Curriculum Sequence ({courses.length} courses)
-          </p>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {courses.slice(0, 3).map((c, i) => (
-              <span
-                key={c!.id}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background-elevated/60 px-2.5 py-1 text-xs font-medium text-foreground"
-              >
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">
-                  {i + 1}
-                </span>
-                <span className="truncate max-w-[12rem]">{c!.title}</span>
-              </span>
-            ))}
-            {courses.length > 3 && (
-              <span className="rounded-lg border border-border bg-card px-2 py-1 text-xs text-muted-foreground">
-                +{courses.length - 3} more
-              </span>
-            )}
+      <div className="min-w-0">
+        {courses.map((course) => (
+          <div key={course.id}>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Stages · {course.title}</h3>
+            <ModuleRoadmap course={course} compact />
           </div>
-        </div>
-
-        <dl className="mt-5 flex items-center gap-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <ClockIcon width={14} height={14} />
-            <dd>~{path.estimatedHours}h</dd>
-          </div>
-          <dd>{courses.length} courses</dd>
-        </dl>
-
-        <div className="mt-5">
-          <Link
-            href={`/paths/${path.slug}`}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-          >
-            Explore path
-            <ArrowRightIcon width={14} height={14} />
-          </Link>
-        </div>
+        ))}
       </div>
     </Card>
   );

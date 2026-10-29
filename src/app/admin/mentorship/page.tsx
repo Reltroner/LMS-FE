@@ -1,22 +1,15 @@
-import { Badge } from "@/components/ui/Badge";
-import { Heading } from "@/components/ui/Heading";
-import { MentorshipAdministration } from "@/components/admin/MentorshipAdministration";
+import { AdminCapabilityPage } from "@/components/admin/AdminCapabilityPage";
 
-export const metadata = { title: "Mentorship Admin" };
+export const metadata = { title: "Mentorship administration" };
 
 export default function AdminMentorshipPage() {
   return (
-    <>
-      <div>
-        <Badge tone="accent">Mentorship Service</Badge>
-        <Heading level={1} className="mt-2">Mentorship Administration</Heading>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Review bookings and perform permitted lifecycle actions.
-        </p>
-      </div>
-      <div className="mt-6">
-        <MentorshipAdministration />
-      </div>
-    </>
+    <AdminCapabilityPage eyebrow="Mentorship" title="Mentorship requests"
+      summary="There is no booking service yet, so there are no requests, mentors, or time slots to manage."
+      operations={[
+        "Review incoming requests and the consent each one records.",
+        "Confirm or decline requests with a verifiable notification to the learner.",
+        "Publish real availability, without placeholder slots.",
+      ]} />
   );
 }

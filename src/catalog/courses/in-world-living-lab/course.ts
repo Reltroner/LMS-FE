@@ -20,6 +20,7 @@ export const course = {
       slug: "setup",
       title: "Setup",
       summary: "Prepare the persona, zone, and routine for a bounded simulation.",
+      directory: "lessons",
       lessonSlugs: [
         "00-course-orientation",
         "01-in-world-persona",
@@ -33,6 +34,7 @@ export const course = {
       title: "Realistic Living",
       summary:
         "Test daily life through constraints, social contact, economy, risk, and sensory detail.",
+      directory: "lessons",
       lessonSlugs: [
         "04-constraint-based-living",
         "05-in-world-journaling-method",
@@ -47,6 +49,7 @@ export const course = {
       slug: "extraction",
       title: "Extraction",
       summary: "Turn journal evidence into lore, visual direction, and a final life journal.",
+      directory: "lessons",
       lessonSlugs: [
         "10-journal-to-lore-extraction",
         "11-journal-to-artwork-pipeline",

@@ -7,26 +7,38 @@
    ========================================================================== */
 
 :root {
-  /* Brand palette */
-  --primary: #1d4ed8;
+  /* Fixed brand colors (Creative Learning Observatory); identical in both themes. Used for
+     the midnight art panels and the newsletter band, never as body text on light surfaces. */
+  --brand-midnight: #06142e;
+  --brand-deep: #0b2550;
+  --brand-cobalt: #17498c;
+  --brand-electric: #176bff;
+  --brand-cyan: #35d9f2;
+  --brand-violet: #9b7bff;
+
+  /* Brand palette. Primary is a deeper electric blue so link text keeps AA contrast
+     on the light background (5.6:1); #176bff itself only reaches 4.3:1 there. */
+  --primary: #1559e0;
   --primary-foreground: #ffffff;
-  --primary-soft: rgba(29, 78, 216, 0.1);
+  --primary-soft: rgba(21, 89, 224, 0.1);
   --accent: #06b6d4;
   --accent-foreground: #0e7490;
   --accent-soft: rgba(6, 182, 212, 0.1);
+  --eyebrow: #1768af;
 
   /* Surface */
-  --background: #f6f8fb;
-  --background-elevated: #eef4fb;
-  --foreground: #07111f;
-  --muted-foreground: #64748b;
-  --border: #dbe4ef;
+  --background: #f5f8fc;
+  --background-elevated: #eaf1f9;
+  --foreground: #122039;
+  --muted-foreground: #536680;
+  --border: #d8e4f0;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #122039;
 
   /* Feedback */
-  --success: #047857;
-  --success-soft: rgba(4, 120, 87, 0.1);
+  /* #046c4e keeps 5:1+ on tinted badges (#047857 measured 4.42:1 on #daeaeb). */
+  --success: #046c4e;
+  --success-soft: rgba(4, 108, 78, 0.1);
   --warning: #b45309;
   --warning-soft: rgba(180, 83, 9, 0.1);
   --danger: #b91c1c;
@@ -58,20 +70,22 @@
 }
 
 [data-theme="dark"] {
-  --primary: #3b82f6;
-  --primary-foreground: #0b1220;
-  --primary-soft: rgba(59, 130, 246, 0.16);
+  /* Light enough for small text on primary-soft chips (#5b9bff measured 4.4:1). */
+  --primary: #6aa8ff;
+  --primary-foreground: #06142e;
+  --primary-soft: rgba(106, 168, 255, 0.16);
   --accent: #22d3ee;
-  --accent-foreground: #0e7490;
+  --accent-foreground: #67e8f9;
   --accent-soft: rgba(34, 211, 238, 0.14);
+  --eyebrow: #8fe9f4;
 
-  --background: #07111f;
-  --background-elevated: #0c1a2e;
-  --foreground: #e8eef7;
-  --muted-foreground: #94a3b8;
-  --border: #1e2f4a;
-  --card: #0d1b30;
-  --card-foreground: #e8eef7;
+  --background: #071226;
+  --background-elevated: #0f2140;
+  --foreground: #eaf4ff;
+  --muted-foreground: #9eb4d4;
+  --border: #29415d;
+  --card: #0d1e39;
+  --card-foreground: #eaf4ff;
 
   --success: #34d399;
   --success-soft: rgba(52, 211, 153, 0.14);
@@ -84,6 +98,13 @@
 }
 
 @theme inline {
+  --color-midnight: var(--brand-midnight);
+  --color-deep: var(--brand-deep);
+  --color-cobalt: var(--brand-cobalt);
+  --color-electric: var(--brand-electric);
+  --color-cyan: var(--brand-cyan);
+  --color-violet: var(--brand-violet);
+  --color-eyebrow: var(--eyebrow);
   --color-background: var(--background);
   --color-background-elevated: var(--background-elevated);
   --color-foreground: var(--foreground);
@@ -119,50 +140,54 @@
   --shadow-lg: var(--shadow-lg);
 }
 
-* {
-  box-sizing: border-box;
-}
+/* Element defaults live in the base layer so Tailwind utilities (for example `underline` on a
+   link) can override them; unlayered rules would beat every utility regardless of specificity. */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-body {
-  min-width: 320px;
-  background-color: var(--background);
-  background-image: radial-gradient(
-      circle at 8% 0%,
-      color-mix(in oklab, var(--primary) 10%, transparent),
-      transparent 34rem
-    ),
-    radial-gradient(
-      circle at 92% 12%,
-      color-mix(in oklab, var(--accent) 10%, transparent),
-      transparent 30rem
-    );
-  background-attachment: fixed;
-  color: var(--foreground);
-  font-family: var(--font-sans);
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  body {
+    min-width: 320px;
+    background-color: var(--background);
+    background-image: radial-gradient(
+        circle at 8% 0%,
+        color-mix(in oklab, var(--primary) 10%, transparent),
+        transparent 34rem
+      ),
+      radial-gradient(
+        circle at 92% 12%,
+        color-mix(in oklab, var(--accent) 10%, transparent),
+        transparent 30rem
+      );
+    background-attachment: fixed;
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-::selection {
-  background: color-mix(in oklab, var(--primary) 18%, transparent);
-  color: var(--foreground);
-}
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
+    color: var(--foreground);
+  }
 
-:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
 }
 
 /* Scrollbar */
@@ -195,88 +220,100 @@ a {
   }
 }
 
-/* Prose / reading typography for lesson reader */
-.prose-reltroner {
-  color: var(--foreground);
-  font-size: 1.0625rem;
-  line-height: 1.75;
-}
-.prose-reltroner h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  color: var(--foreground);
-}
-.prose-reltroner h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
-}
-.prose-reltroner p {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  color: color-mix(in oklab, var(--foreground) 92%, transparent);
-}
-.prose-reltroner ul,
-.prose-reltroner ol {
-  margin: 1rem 0;
-  padding-left: 1.5rem;
-}
-.prose-reltroner li {
-  margin: 0.4rem 0;
-}
-.prose-reltroner code {
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-  background: var(--background-elevated);
-  padding: 0.15rem 0.4rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-}
-.prose-reltroner pre {
-  font-family: var(--font-mono);
-  background: var(--background-elevated);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  overflow-x: auto;
-  margin: 1.25rem 0;
-}
-.prose-reltroner pre code {
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-.prose-reltroner blockquote {
-  border-left: 3px solid var(--primary);
-  padding: 0.25rem 1rem;
-  margin: 1.25rem 0;
-  color: var(--muted-foreground);
-  background: var(--primary-soft);
-  border-radius: 0 var(--radius) var(--radius) 0;
-}
-.prose-reltroner a {
-  color: var(--primary);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.prose-reltroner strong {
-  color: var(--foreground);
-  font-weight: 600;
-}
+@layer components {
+  /* Prose / reading typography for lesson reader */
+  .prose-reltroner {
+    color: var(--foreground);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+  .prose-reltroner h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+  }
+  .prose-reltroner h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .prose-reltroner p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    color: color-mix(in oklab, var(--foreground) 92%, transparent);
+  }
+  .prose-reltroner ul,
+  .prose-reltroner ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+  .prose-reltroner li {
+    margin: 0.4rem 0;
+  }
+  .prose-reltroner code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--background-elevated);
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  .prose-reltroner pre {
+    font-family: var(--font-mono);
+    background: var(--background-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin: 1.25rem 0;
+  }
+  .prose-reltroner pre code {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+  .prose-reltroner blockquote {
+    border-left: 3px solid var(--primary);
+    padding: 0.25rem 1rem;
+    margin: 1.25rem 0;
+    color: var(--muted-foreground);
+    background: var(--primary-soft);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .prose-reltroner a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .prose-reltroner strong {
+    color: var(--foreground);
+    font-weight: 600;
+  }
 
-/* Visually hidden helper */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  /* Small uppercase label above a heading (blueprint "eyebrow"). */
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--eyebrow);
+  }
+
+  /* Midnight panel shared by concept art and the newsletter band; text on it uses the
+     light ink below in both themes. */
+  .surface-midnight {
+    background:
+      radial-gradient(circle at 78% 18%, color-mix(in oklab, var(--brand-cobalt) 70%, transparent), transparent 55%),
+      linear-gradient(135deg, var(--brand-midnight) 0%, var(--brand-deep) 62%, #0f3366 100%);
+    color: #eaf4ff;
+  }
+  /* The default blue ring is too dark against midnight (2.6:1); cyan keeps focus visible. */
+  .surface-midnight :focus-visible {
+    outline-color: var(--brand-cyan);
+  }
 }

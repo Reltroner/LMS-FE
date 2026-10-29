@@ -17,16 +17,17 @@ test("PX-01 static Pages export", () => {
   assert.match(config, /images:\s*\{\s*unoptimized:\s*true/);
 });
 test("PX-02 public courses exclude synthetic fixtures and retired IT offerings", () => {
-  assert.deepEqual(queries.getPublishedCourses().map((c) => c.slug), []);
+  assert.deepEqual(queries.getPublishedCourses().map((c) => c.slug), ["worldbuilding-operating-system"]);
   assert.ok(queries.getPublishedCourses().every((c) => c.status === "published" && c.isSynthetic !== true));
   assert.equal(queries.getCourseBySlug("backend-engineering"), undefined);
   assert.equal(queries.getCourseBySlug("api-design-patterns"), undefined);
   assert.equal(queries.getCourseBySlug("deployment-and-operations"), undefined);
+  assert.equal(queries.getCourseBySlug("in-world-living-lab"), undefined);
 });
 test("PX-03 public learning path excludes synthetic references and retired IT paths", () => {
   assert.equal(queries.getPathBySlug("full-stack-backend-engineer"), undefined);
   assert.equal(queries.getPathBySlug("worldbuilding-creator"), undefined);
-  assert.deepEqual(queries.getPublishedPaths().map((p) => p.slug), []);
+  assert.deepEqual(queries.getPublishedPaths().map((p) => p.slug), ["worldbuilding-operating-system"]);
 });
 test("PX-04 static route enumerators require publication filtering", () => {
   for (const [file, symbol] of [
@@ -54,7 +55,8 @@ test("PX-06 historical lesson IDs preserved (not a live MDX contract test)", () 
 test("PX-07 educational domain positioning reflects Systemic Creative Architect", () => {
   const home = read("src/app/page.tsx");
   assert.match(home, /Systemic Creative Architect/);
-  assert.match(home, /Build Fictional Worlds That Keep Generating Possibilities/);
+  // Hero headline set by the UI/UX blueprint v1.1 (section 5.1), replacing the earlier prototype line.
+  assert.match(home, /Turn an idea into a world of possibilities\./);
   assert.doesNotMatch(home, /Engineering Skills/);
   assert.doesNotMatch(home, /AI Skills/);
   assert.doesNotMatch(home, /Full Stack Backend Engineer/);

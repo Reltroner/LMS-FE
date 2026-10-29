@@ -1,147 +1,86 @@
-import { Badge } from "@/components/ui/Badge";
-import { ButtonLink } from "@/components/ui/Button";
+import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
-import { Heading } from "@/components/ui/Heading";
-import { Section } from "@/components/ui/Section";
-import {
-  ExternalLinkIcon,
-  LockIcon,
-  MailIcon,
-  ShieldIcon,
-  UserIcon,
-} from "@/components/ui/icons";
-import { mockLearner } from "@/lib/fixtures/learner";
+import { ExternalLink } from "@/components/ui/ExternalLink";
+import { StatusNotice } from "@/components/ui/StatusNotice";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { PageHero } from "@/components/marketing/PageHero";
+import { studioLinks } from "@/lib/site/links";
 
-export const metadata = { title: "Account" };
+export const metadata = {
+  title: "Account",
+  description: "Identity, preferences, and privacy for Reltroner Learning. Sign-in is not connected yet.",
+};
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
+// Sign-in is not implemented, so nothing here pretends to identify anyone. The only stored
+// preference is the colour theme, kept in this browser by ThemeProvider.
 export default function AccountPage() {
   return (
     <>
-      <Section className="pb-4 pt-10">
-        <Container size="md">
-          <Badge tone="accent">LMS-safe profile</Badge>
-          <Heading level={1} className="mt-3">Account</Heading>
-          <p className="mt-2 text-muted-foreground">
-            Only LMS-owned profile fields. Credential and credential management lives in the
-            identity provider.
-          </p>
-        </Container>
-      </Section>
+      <PageHero eyebrow="Identity & preferences" title="Account and learning preferences."
+        lede="Sign in through Reltroner's identity service, then manage real learning settings — once those capabilities are connected.">
+        <StatusNotice title="Sign-in is not connected yet" className="mt-6">
+          The &ldquo;Sign in&rdquo; button leads here because there is no working sign-in on this site yet. You are not
+          signed in, and no account information exists for you here.
+        </StatusNotice>
+      </PageHero>
 
-      <Section className="pt-4">
-        <Container size="md">
-          <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
-            {/* Profile card */}
-            <Card className="p-6">
-              <div className="flex items-center gap-4">
-                <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-2xl font-bold text-white">
-                  {mockLearner.displayName.split(" ").map((n) => n[0]).join("")}
-                </span>
-                <div>
-                  <h2 className="text-xl font-semibold text-foreground">
-                    {mockLearner.displayName}
-                  </h2>
-                  <p className="text-sm text-muted-foreground">@{mockLearner.username}</p>
-                  <Badge tone="success" className="mt-1">
-                    {mockLearner.role}
-                  </Badge>
-                </div>
-              </div>
+      <Container>
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="p-6">
+            <h2 className="text-base font-semibold text-foreground">Identity</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              When sign-in is connected, it will go through Reltroner&apos;s identity service at auth.reltroner.com.
+              This site will never ask for or store your password.
+            </p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              Signing out will then end your session both here and at the identity service.
+            </p>
+            <span className="mt-4 inline-flex rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+              Integration required
+            </span>
+          </Card>
 
-              <dl className="mt-6 space-y-4 text-sm">
-                <div className="flex items-center gap-3">
-                  <MailIcon width={16} height={16} className="text-muted-foreground" />
-                  <dt className="w-24 shrink-0 text-muted-foreground">Email</dt>
-                  <dd className="font-medium text-foreground">{mockLearner.email}</dd>
-                </div>
-                <div className="flex items-center gap-3">
-                  <UserIcon width={16} height={16} className="text-muted-foreground" />
-                  <dt className="w-24 shrink-0 text-muted-foreground">Username</dt>
-                  <dd className="font-medium text-foreground">{mockLearner.username}</dd>
-                </div>
-                <div className="flex items-center gap-3">
-                  <ShieldIcon width={16} height={16} className="text-muted-foreground" />
-                  <dt className="w-24 shrink-0 text-muted-foreground">Role</dt>
-                  <dd className="font-medium text-foreground">{mockLearner.role}</dd>
-                </div>
-                <div className="flex items-center gap-3">
-                  <LockIcon width={16} height={16} className="text-muted-foreground" />
-                  <dt className="w-24 shrink-0 text-muted-foreground">Joined</dt>
-                  <dd className="font-medium text-foreground">
-                    {formatDate(mockLearner.joinedAt)}
-                  </dd>
-                </div>
-              </dl>
+          <Card className="p-6">
+            <h2 className="text-base font-semibold text-foreground">Learning preferences</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Colour theme — saved in this browser only.
+            </p>
+            <ThemeToggle showLabel className="mt-4" />
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">
+              A preferred lesson format (reading, video, audio…) is not available yet. Each lesson opens in Reading.
+            </p>
+          </Card>
 
-              <p className="mt-6 rounded-xl border border-border bg-background-elevated/50 p-4 text-xs text-muted-foreground">
-                <strong className="text-foreground">No local credentials.</strong>{" "}
-                Reltroner does not store passwords. Authentication is managed by the
-                identity provider at{" "}
-                <code className="rounded bg-background px-1 py-0.5 font-mono">
-                  auth.reltroner.com/realms/reltroner
-                </code>{" "}
-                (Keycloak OIDC).
-              </p>
-            </Card>
+          <Card className="p-6">
+            <h2 className="text-base font-semibold text-foreground">Data and privacy</h2>
+            <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+              <li>This site keeps no account, progress, or exercise data about you.</li>
+              <li>Your theme choice is stored in your browser; clearing site data removes it.</li>
+              <li>
+                Newsletter subscriptions belong to Reltroner Studio.{" "}
+                <ExternalLink href={studioLinks.newsletterPreferences} className="inline-flex items-center gap-1 font-semibold text-primary underline underline-offset-2">
+                  Manage newsletter preferences
+                </ExternalLink>
+              </li>
+              <li>
+                <ExternalLink href={studioLinks.privacy} className="inline-flex items-center gap-1 font-semibold text-primary underline underline-offset-2">
+                  Reltroner Studio privacy policy
+                </ExternalLink>
+              </li>
+            </ul>
+          </Card>
 
-            {/* Identity actions */}
-            <div className="space-y-4">
-              <Card className="p-5">
-                <h3 className="flex items-center gap-2 font-semibold text-foreground">
-                  <ShieldIcon width={18} height={18} className="text-primary" />
-                  Identity & security
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Password, MFA, and sessions are managed in your identity account.
-                </p>
-                <ButtonLink
-                  href="https://auth.reltroner.com/realms/reltroner/account"
-                  variant="secondary"
-                  className="mt-4 w-full"
-                  target="_blank"
-                >
-                  Manage credentials
-                  <ExternalLinkIcon width={16} height={16} />
-                </ButtonLink>
-              </Card>
-
-              <Card className="p-5">
-                <h3 className="flex items-center gap-2 font-semibold text-foreground">
-                  <ExternalLinkIcon width={18} height={18} className="text-accent-foreground" />
-                  Sessions
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Review active sessions and sign out from all devices.
-                </p>
-                <ButtonLink
-                  href="https://auth.reltroner.com/realms/reltroner/account"
-                  variant="ghost"
-                  className="mt-4 w-full"
-                  target="_blank"
-                >
-                  Open identity console
-                  <ExternalLinkIcon width={16} height={16} />
-                </ButtonLink>
-              </Card>
-
-              <div className="rounded-xl border border-dashed border-border p-4 text-xs text-muted-foreground">
-                <strong className="text-foreground">Prototype note:</strong> Links
-                to the identity provider are illustrative. No local
-                password-management UI will be built.
-              </div>
-            </div>
-          </div>
-        </Container>
-      </Section>
+          <Card className="p-6">
+            <h2 className="text-base font-semibold text-foreground">Learner pages</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">Previews of what will hold your learning once records exist:</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              <li><Link href="/dashboard/" className="font-semibold text-primary hover:underline">Learner home</Link></li>
+              <li><Link href="/my-learning/" className="font-semibold text-primary hover:underline">My Learning</Link></li>
+            </ul>
+          </Card>
+        </div>
+      </Container>
     </>
   );
 }

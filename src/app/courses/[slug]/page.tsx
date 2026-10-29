@@ -1,45 +1,32 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Badge } from "@/components/ui/Badge";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
-import { Heading } from "@/components/ui/Heading";
-import { Section } from "@/components/ui/Section";
+import { ArrowRightIcon, BookIcon, CompassIcon, FileTextIcon, HeadphonesIcon, ImageIcon, VideoIcon } from "@/components/ui/icons";
+import { PageHero, SectionHeading } from "@/components/marketing/PageHero";
+import { ConceptImage } from "@/components/marketing/ConceptImage";
 import { CourseCurriculum } from "@/components/course/CourseCurriculum";
-import { getCourseBySlug } from "@/lib/fixtures/courses";
+import { AvailabilityBadge } from "@/components/course/AvailabilityBadge";
+import { categoryLabels, levelLabels } from "@/components/course/CourseCard";
+import { getCourseBySlug, getCourseInventory } from "@/lib/fixtures/courses";
 import { getCourseRouteParams } from "@/lib/content/course-registry";
 import { getLessonsByCourseSlug } from "@/lib/fixtures/lessons";
-import { getResourcesByCourseSlug } from "@/lib/fixtures/resources";
 import { getPathBySlug } from "@/lib/fixtures/paths";
-import {
-  BookIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  ExternalLinkIcon,
-  FileTextIcon,
-  LayersIcon,
-  TargetIcon,
-  TerminalIcon,
-} from "@/components/ui/icons";
-
-const categoryLabels: Record<string, string> = {
-  "backend-engineering": "Backend Engineering",
-  worldbuilding: "Worldbuilding",
-  "creative-system": "Creative System",
-};
-
-const levelLabels: Record<string, string> = {
-  beginner: "Beginner",
-  "beginner-intermediate": "Beginner → Intermediate",
-  intermediate: "Intermediate",
-  advanced: "Advanced",
-};
+import { courseCoverSlots } from "@/lib/media/image-slots";
+import { lessonRoute, pathRoute } from "@/lib/routes/route-builders";
+import { lessonNumber } from "@/components/search/result-meta";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export const dynamicParams = false;
+
+export async function generateMetadata({ params }: Props) {
+  const course = getCourseBySlug((await params).slug);
+  return course ? { title: course.title, description: course.subtitle } : {};
+}
 
 export async function generateStaticParams() {
   // Only published courses are publicly routable.
@@ -47,48 +34,20 @@ export async function generateStaticParams() {
   return params.length > 0 ? params : [{ slug: "_empty" }];
 }
 
+const outcomes = [
+  { title: "Imagine", text: "Form a small fictional idea you can actually examine." },
+  { title: "Connect", text: "See how one condition shapes the choices someone can make." },
+  { title: "Question", text: "Explain a possible consequence — and what it does not prove." },
+];
+
 function CourseDetailSkeleton() {
   return (
-    <>
-      <div className="border-b border-border bg-card/40">
-        <Container>
-          <div className="flex items-center gap-2 py-3 text-xs text-muted-foreground">
-            <span>Home</span>
-            <span>/</span>
-            <span>Courses</span>
-            <span>/</span>
-            <span className="h-3 w-32 animate-pulse rounded bg-muted-foreground/20" />
-          </div>
-        </Container>
-      </div>
-
-      <Section className="pb-6 pt-10">
-        <Container>
-          <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
-            <div className="space-y-5">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="h-6 w-28 animate-pulse rounded-full bg-muted-foreground/15" />
-                <span className="h-6 w-20 animate-pulse rounded-full bg-muted-foreground/15" />
-                <span className="h-6 w-20 animate-pulse rounded-full bg-muted-foreground/15" />
-              </div>
-              <div className="h-10 w-3/4 animate-pulse rounded-lg bg-muted-foreground/20" />
-              <div className="h-5 w-full max-w-2xl animate-pulse rounded bg-muted-foreground/15" />
-              <div className="flex gap-4 pt-4">
-                <span className="h-11 w-40 animate-pulse rounded-xl bg-muted-foreground/20" />
-                <span className="h-11 w-32 animate-pulse rounded-xl bg-muted-foreground/15" />
-              </div>
-            </div>
-            <Card className="h-72 p-6 animate-pulse bg-card">
-              <div className="space-y-4">
-                <div className="h-4 w-24 rounded bg-muted-foreground/15" />
-                <div className="h-4 w-full rounded bg-muted-foreground/15" />
-                <div className="h-4 w-3/4 rounded bg-muted-foreground/15" />
-              </div>
-            </Card>
-          </div>
-        </Container>
-      </Section>
-    </>
+    <Container className="py-14" aria-hidden="true">
+      <div className="h-4 w-48 animate-pulse rounded bg-muted-foreground/15" />
+      <div className="mt-8 h-12 w-3/4 animate-pulse rounded-lg bg-muted-foreground/20" />
+      <div className="mt-4 h-5 w-full max-w-2xl animate-pulse rounded bg-muted-foreground/15" />
+      <div className="mt-8 h-64 animate-pulse rounded-3xl bg-muted-foreground/10" />
+    </Container>
   );
 }
 
@@ -103,259 +62,142 @@ export default function CourseDetailPage({ params }: Props) {
 async function CourseDetailContent({ params }: Props) {
   const { slug } = await params;
   const course = getCourseBySlug(slug);
-
-  if (!course || course.status !== "published") {
-    notFound();
-  }
+  if (!course || course.status !== "published") notFound();
 
   const lessons = getLessonsByCourseSlug(course.slug);
-  const resources = getResourcesByCourseSlug(course.slug);
-  const totalMinutes = lessons.reduce((s, l) => s + l.durationMinutes, 0);
-  const paths = course.pathSlugs
-    .map((p) => getPathBySlug(p))
-    .filter(Boolean);
+  const inventory = getCourseInventory(course.slug)!;
+  const first = inventory.firstLesson;
+  const firstNumber = lessonNumber(first?.slug);
+  const path = course.pathSlugs.map((p) => getPathBySlug(p)).find(Boolean);
+  const cover = courseCoverSlots[course.slug];
+  const formats = [
+    { label: "Reading", icon: BookIcon, present: true },
+    { label: "Video", icon: VideoIcon, present: Boolean(first?.media?.video) },
+    { label: "Audio", icon: HeadphonesIcon, present: Boolean(first?.media?.audio) },
+    { label: "Slides", icon: FileTextIcon, present: Boolean(first?.media?.slides) },
+    { label: "Infographic", icon: ImageIcon, present: Boolean(first?.media?.infographic) },
+  ].filter((format) => format.present);
 
   return (
     <>
-      {/* Breadcrumb */}
-      <div className="border-b border-border bg-card/40">
-        <Container>
-          <nav className="flex items-center gap-2 py-3 text-xs text-muted-foreground" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-primary">Home</Link>
-            <span>/</span>
-            <Link href="/courses" className="hover:text-primary">Courses</Link>
-            <span>/</span>
-            <span className="text-foreground">{course.title}</span>
-          </nav>
-        </Container>
-      </div>
+      <PageHero
+        breadcrumb={<Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Courses", href: "/courses/" }, { label: course.title }]} />}
+        eyebrow={`${categoryLabels[course.category]} · ${levelLabels[course.level]}`}
+        title={course.title}
+        lede={course.subtitle}
+        actions={
+          <>
+            {first && (
+              <ButtonLink href={lessonRoute(course.slug, first.slug)} size="lg">
+                Start {firstNumber ? `Lesson ${firstNumber}` : first.title} <ArrowRightIcon width={18} height={18} />
+              </ButtonLink>
+            )}
+            {path && (
+              <ButtonLink href={pathRoute(path.slug)} variant="secondary" size="lg">
+                <CompassIcon width={18} height={18} /> View learning path
+              </ButtonLink>
+            )}
+          </>
+        }
+        aside={cover && <ConceptImage slot={cover} priority />}
+      >
+        <div className="mt-6 flex flex-wrap gap-2">
+          <AvailabilityBadge available={inventory.availableLessonCount > 0}
+            label={`${inventory.availableLessonCount} ${inventory.availableLessonCount === 1 ? "lesson" : "lessons"} available`} />
+          <AvailabilityBadge available={false} label={`${inventory.moduleCount}-module planned curriculum`} />
+          <AvailabilityBadge available={false} label="English" />
+        </div>
+      </PageHero>
 
-      {/* Hero */}
-      <Section className="pb-6 pt-10">
-        <Container>
-          <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
-            <div className="space-y-5">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge tone="primary">{categoryLabels[course.category]}</Badge>
-                <Badge tone="neutral">{levelLabels[course.level]}</Badge>
-                {course.isSynthetic ? (
-                  <Badge tone="neutral">Prototype Mock</Badge>
-                ) : (
-                  <Badge tone="success">{course.status}</Badge>
-                )}
-              </div>
-              <Heading level={1}>{course.title}</Heading>
-              <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
-                {course.subtitle}
-              </p>
-              {course.isSynthetic && (
-                <div className="rounded-xl border border-border bg-card/60 p-4 text-xs text-muted-foreground">
-                  <strong className="text-foreground">Prototype fixture:</strong> This course is a synthetic mock created to demonstrate catalog richness. It is not an active published Reltroner LMS course.
-                </div>
-              )}
-
-              <dl className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <ClockIcon width={16} height={16} />
-                  <dd>~{Math.round(totalMinutes / 60 * 10) / 10}h of lessons</dd>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <LayersIcon width={16} height={16} />
-                  <dd>{course.modules.length} modules</dd>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <BookIcon width={16} height={16} />
-                  <dd>{lessons.length} lessons</dd>
-                </div>
-                {course.finalDeliverable && (
-                  <div className="flex items-center gap-1.5">
-                    <FileTextIcon width={16} height={16} />
-                    <dd>Deliverable: {course.finalDeliverable}</dd>
-                  </div>
-                )}
-              </dl>
-
-              <div className="flex flex-wrap gap-3 pt-2">
-                <ButtonLink href={`/courses/${course.slug}/lessons/${lessons[0]?.slug ?? ""}`} size="lg">
-                  <TerminalIcon width={18} height={18} />
-                  Start first lesson
-                </ButtonLink>
-                <Button variant="secondary" size="lg">
-                  Enroll (prototype)
-                </Button>
-              </div>
-            </div>
-
-            {/* Sidebar summary card */}
-            <Card className="h-fit p-6">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                Course summary
-              </h2>
-              <dl className="mt-4 space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Level</dt>
-                  <dd className="font-medium text-foreground">{levelLabels[course.level]}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Category</dt>
-                  <dd className="font-medium text-foreground">{categoryLabels[course.category]}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Est. effort</dt>
-                  <dd className="font-medium text-foreground">{course.estimatedHours}h</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Status</dt>
-                  <dd>
-                    {course.isSynthetic ? (
-                      <Badge tone="neutral">Prototype Mock</Badge>
-                    ) : (
-                      <Badge tone="success">Published</Badge>
-                    )}
-                  </dd>
-                </div>
-              </dl>
-              {paths.length > 0 && (
-                <div className="mt-5 border-t border-border pt-4">
-                  <p className="text-xs text-muted-foreground">Part of</p>
-                  {paths.map((p) => (
-                    <Link
-                      key={p!.id}
-                      href={`/paths/${p!.slug}`}
-                      className="mt-1 block text-sm font-semibold text-primary hover:underline"
-                    >
-                      {p!.title}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </Card>
-          </div>
-        </Container>
-      </Section>
-
-      {/* Objectives + prerequisites */}
-      <Section className="pt-4">
-        <Container>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="p-6">
-              <div className="flex items-center gap-2">
-                <TargetIcon width={20} height={20} className="text-primary" />
-                <h2 className="text-lg font-semibold text-foreground">
-                  Learning objectives
-                </h2>
-              </div>
-              <ul className="mt-4 space-y-3">
-                {(course.objectives ?? []).map((obj, i) => (
-                  <li key={i} className="flex gap-3 text-sm text-muted-foreground">
-                    <CheckCircleIcon
-                      width={18}
-                      height={18}
-                      className="mt-0.5 shrink-0 text-success"
-                    />
-                    <span>{obj}</span>
+      <Container>
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
+          <div className="min-w-0 space-y-14">
+            <section aria-labelledby="outcomes-heading">
+              <SectionHeading eyebrow="Learning outcomes" id="outcomes-heading" title="What you'll start exploring" lede={course.summary} />
+              <ul className="mt-6 grid gap-4 sm:grid-cols-3">
+                {outcomes.map((outcome) => (
+                  <li key={outcome.title}>
+                    <Card className="h-full p-5">
+                      <h3 className="font-semibold text-foreground">{outcome.title}</h3>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{outcome.text}</p>
+                    </Card>
                   </li>
                 ))}
               </ul>
-            </Card>
+            </section>
 
-            <Card className="p-6">
-              <div className="flex items-center gap-2">
-                <LayersIcon width={20} height={20} className="text-accent" />
-                <h2 className="text-lg font-semibold text-foreground">
-                  Prerequisites
-                </h2>
-              </div>
-              {course.prerequisiteCourseSlugs && course.prerequisiteCourseSlugs.length > 0 ? (
-                <ul className="mt-4 space-y-3">
-                  {course.prerequisiteCourseSlugs.map((slug) => {
-                    const pre = getCourseBySlug(slug);
-                    return (
-                      <li key={slug} className="text-sm">
-                        {pre ? (
-                          <Link href={`/courses/${pre.slug}`} className="text-primary hover:underline">
-                            {pre.title}
-                          </Link>
-                        ) : (
-                          slug
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className="mt-4 text-sm text-muted-foreground">
-                  No formal prerequisites. This course is designed for beginners
-                  with basic computer literacy.
-                </p>
-              )}
-            </Card>
-          </div>
-        </Container>
-      </Section>
-
-      {/* Curriculum */}
-      <Section className="pt-4">
-        <Container>
-          <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
-            <div className="space-y-8">
-              <div>
-                <Heading level={2}>What you will learn</Heading>
-                <p className="mt-3 text-muted-foreground">{course.summary}</p>
-              </div>
-              <CourseCurriculum course={course} />
-            </div>
-
-            <div className="space-y-6">
-              {resources.length > 0 && (
-                <Card className="p-6">
-                  <h2 className="text-lg font-semibold text-foreground">
-                    Resources
-                  </h2>
-                  <ul className="mt-4 space-y-3">
-                    {resources.map((r) => (
-                      <li key={r.id}>
-                        <a
-                          href={r.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group flex items-start gap-3 rounded-xl p-2 transition hover:bg-primary/5"
-                        >
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <ExternalLinkIcon width={16} height={16} />
-                          </span>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-foreground group-hover:text-primary">
-                              {r.title}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {r.summary}
-                            </p>
-                          </div>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+            {first && (
+              <section aria-labelledby="activity-heading">
+                <SectionHeading eyebrow="Example activity" id="activity-heading" title="Your first piece of practice" />
+                <Card className="mt-6 p-6">
+                  <p className="text-sm leading-6 text-foreground">
+                    In <Link href={lessonRoute(course.slug, first.slug)} className="font-semibold text-primary underline-offset-2 hover:underline">{first.title}</Link>{" "}
+                    you produce: <strong>{first.outputs[0]}</strong>.
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    A notebook or a few lines in a text file are enough. Nothing you write is uploaded or saved by this site.
+                  </p>
                 </Card>
-              )}
+              </section>
+            )}
 
-              <Card className="border-primary/20 bg-primary/5 p-6">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-primary">
-                  Prototype note
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Enrollment and progress tracking are conceptual. Durable
-                  learner state is owned by the Learning Service at
-                  <code className="mx-1 rounded bg-card px-1 font-mono text-xs">
-                    lms-api.reltroner.com
-                  </code>
-                  , not this frontend.
+            {first && (
+              <section aria-labelledby="formats-heading">
+                <SectionHeading eyebrow="Formats" id="formats-heading" title="One lesson, several ways in"
+                  lede={`Reading is always available. ${firstNumber ? `Lesson ${firstNumber}` : first.title} also offers the formats below; formats vary by lesson.`} />
+                <ul className="mt-6 flex flex-wrap gap-3">
+                  {formats.map(({ label, icon: Icon }) => (
+                    <li key={label} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground">
+                      <Icon width={16} height={16} className="text-primary" /> {label}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            <section aria-labelledby="curriculum-heading">
+              <SectionHeading eyebrow="Curriculum" id="curriculum-heading" title="Course curriculum"
+                lede={`${inventory.moduleCount} modules and ${inventory.plannedLessonCount} planned lessons. ${inventory.availableLessonCount} ${inventory.availableLessonCount === 1 ? "is" : "are"} published; the rest are planned, not locked.`} />
+              <div className="mt-6"><CourseCurriculum course={course} lessons={lessons} /></div>
+            </section>
+          </div>
+
+          <aside className="space-y-5" aria-label="Course details">
+            <Card className="p-6">
+              <h2 className="text-base font-semibold text-foreground">How lessons are published</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Lessons are written, reviewed, and published one at a time. Planned lessons are part of the proposed
+                syllabus; they are not locked or paywalled — they have not been written yet.
+              </p>
+            </Card>
+            <Card className="p-6">
+              <h2 className="text-base font-semibold text-foreground">Before you start</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                No prerequisites. Designed for beginners; about {first?.durationMinutes ?? 20} minutes for the first lesson.
+              </p>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Progress is not saved on this site yet, so you can start, stop, and revisit freely.
+              </p>
+            </Card>
+            {course.finalDeliverable && (
+              <Card className="p-6">
+                <h2 className="text-base font-semibold text-foreground">Planned course outcome</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  When the full course is published, it builds toward a {course.finalDeliverable}.
                 </p>
               </Card>
-            </div>
-          </div>
-        </Container>
-      </Section>
+            )}
+            {path && (
+              <Card className="p-6">
+                <h2 className="text-base font-semibold text-foreground">Part of a learning path</h2>
+                <Link href={pathRoute(path.slug)} className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+                  {path.title} <ArrowRightIcon width={14} height={14} />
+                </Link>
+              </Card>
+            )}
+          </aside>
+        </div>
+      </Container>
     </>
   );
 }

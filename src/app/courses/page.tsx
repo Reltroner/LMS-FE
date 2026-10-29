@@ -1,43 +1,40 @@
 import { CourseCatalog } from "@/components/course/CourseCatalog";
-import { getPublishedCourses } from "@/lib/fixtures/courses";
-import { Badge } from "@/components/ui/Badge";
+import type { CourseInventory } from "@/components/course/CourseCard";
+import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
-import { Heading } from "@/components/ui/Heading";
-import { Section } from "@/components/ui/Section";
-import { BookIcon } from "@/components/ui/icons";
+import { PageHero } from "@/components/marketing/PageHero";
+import { getCourseInventory, getPublishedCourses } from "@/lib/fixtures/courses";
 
 export const metadata = {
-  title: "Course Catalog",
-  description:
-    "Browse published courses in systemic creative architecture and worldbuilding. Only approved published content appears publicly.",
+  title: "Courses",
+  description: "Find a starting point for building connected fictional worlds. Only published courses and lessons appear here.",
 };
 
 export default function CoursesPage() {
   const courses = getPublishedCourses();
+  const inventories: Record<string, CourseInventory> = Object.fromEntries(courses.map((course) => {
+    const { moduleCount, plannedLessonCount, availableLessonCount } = getCourseInventory(course.slug)!;
+    return [course.slug, { moduleCount, plannedLessonCount, availableLessonCount }];
+  }));
 
   return (
-    <Section className="pb-16 pt-10 sm:pb-20 sm:pt-12">
+    <>
+      <PageHero eyebrow="Course discovery" title="Find a starting point."
+        lede="Find a starting point for building connected fictional worlds. Every course listed here is published, and its lessons appear as they are written and reviewed." />
       <Container>
-        <div>
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <BookIcon width={22} height={22} />
-            </span>
-            <Badge tone="primary">Published catalog</Badge>
-          </div>
-          <Heading level={1} className="mt-4">
-            Course Catalog
-          </Heading>
-          <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-            Explore published courses. Draft and archived content is withheld
-            from public view until approved for publication.
-          </p>
-        </div>
-
-        <div className="mt-7 sm:mt-8">
-          <CourseCatalog courses={courses} />
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+          <CourseCatalog courses={courses} inventories={inventories} />
+          <aside aria-labelledby="library-heading">
+            <Card tone="muted" className="p-6">
+              <h2 id="library-heading" className="text-base font-semibold text-foreground">A growing library, not a padded catalog</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                A course lists its full planned syllabus, but only published lessons can be opened. Planned lessons
+                are not locked or paywalled — they have not been written yet.
+              </p>
+            </Card>
+          </aside>
         </div>
       </Container>
-    </Section>
+    </>
   );
 }

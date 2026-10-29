@@ -1,116 +1,83 @@
-import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
-import { Heading } from "@/components/ui/Heading";
-import { Section } from "@/components/ui/Section";
-import {
-  CalendarIcon,
-  ClockIcon,
-  UsersIcon,
-  VideoIcon,
-} from "@/components/ui/icons";
-import { mentorshipOfferings } from "@/lib/fixtures/mentorship";
+import { StatusNotice } from "@/components/ui/StatusNotice";
+import { PageHero, SectionHeading } from "@/components/marketing/PageHero";
+import { ConceptImage } from "@/components/marketing/ConceptImage";
 
-export const metadata = { title: "Mentorship" };
+export const metadata = {
+  title: "Mentorship",
+  description: "Where human feedback could help a creative project, and the current availability of mentorship (not bookable yet).",
+};
 
-const statusTone = {
-  available: "success",
-  limited: "warning",
-  "coming-soon": "neutral",
-} as const;
+const topics = [
+  { title: "Clarifying your world premise", text: "What is the one idea your world is really about?" },
+  { title: "Reviewing constraints and dependencies", text: "Which conditions shape everything else — and which are decoration?" },
+  { title: "Finding a realistic next step", text: "A next question or piece of work that fits the time you actually have." },
+];
+
+const approach = [
+  "Start from the question you bring, not a fixed syllabus.",
+  "Look closely at one mechanism in your world before suggesting anything new.",
+  "Name what the feedback rests on, and where it is only an opinion.",
+  "End with one concrete next step you choose.",
+];
+
+const notIncluded = [
+  "Grading, certification, or a judgement of talent.",
+  "Rewriting or finishing your work for you.",
+  "Feedback on Studio canon, or on anything you have not chosen to share.",
+];
 
 export default function MentorshipPage() {
   return (
-    <Section className="pb-16 pt-10 sm:pb-20 sm:pt-12">
-      <Container>
-        <div>
-          <Badge tone="accent">Conceptual offerings</Badge>
-          <Heading level={1} className="mt-3">Mentorship</Heading>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            Explore mentorship offerings that complement structured learning.
-            This is a prototype discovery surface — bookings are simulated and
-            do not call backend services.
-          </p>
-        </div>
+    <>
+      <PageHero eyebrow="Human guidance" title="Thoughtful feedback for creative work."
+        lede="Mentorship is meant to help you clarify a project, test your assumptions, and find a useful next question — alongside the lessons, not instead of them."
+        aside={<ConceptImage slot="MENTORSHIP_COLLABORATION" priority />}>
+        <StatusNotice title="Not bookable yet" className="mt-6">
+          No mentors, sessions, prices, or time slots are published, and no request can be sent from this site.
+          This page describes what mentorship would offer once a real booking service exists.
+        </StatusNotice>
+      </PageHero>
 
-        <div className="mt-7 sm:mt-8">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {mentorshipOfferings.map((o) => (
-              <Card key={o.id} className="flex flex-col p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-white">
-                      <UsersIcon width={20} height={20} />
-                    </span>
-                    <div>
-                      <h2 className="text-lg font-semibold text-foreground">{o.title}</h2>
-                      <p className="text-sm text-muted-foreground">with {o.mentor}</p>
-                    </div>
-                  </div>
-                  <Badge tone={statusTone[o.status]}>{o.status}</Badge>
-                </div>
-
-                <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                  {o.summary}
-                </p>
-
-                <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <VideoIcon width={15} height={15} />
-                    <dd>{o.format}</dd>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <ClockIcon width={15} height={15} />
-                    <dd>{o.duration}</dd>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <CalendarIcon width={15} height={15} />
-                    <dd>Next: {o.nextAvailable}</dd>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <UsersIcon width={15} height={15} />
-                    <dd>{o.capacity}</dd>
-                  </div>
-                </dl>
-
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {o.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-full bg-background-elevated px-2.5 py-1 text-xs text-muted-foreground"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
-                  <span className="text-xs text-muted-foreground">{o.priceLabel}</span>
-                  {o.status === "coming-soon" ? (
-                    <span className="text-sm font-semibold text-muted-foreground">
-                      Not yet bookable
-                    </span>
-                  ) : (
-                    <ButtonLink
-                      href={`/mentorship/book?offering=${o.id}`}
-                      size="sm"
-                    >
-                      Book a session
-                    </ButtonLink>
-                  )}
-                </div>
-              </Card>
+      <Container className="space-y-14">
+        <section aria-labelledby="topics-heading">
+          <SectionHeading eyebrow="Scope" id="topics-heading" title="What a session could cover" />
+          <ul className="mt-6 grid gap-4 md:grid-cols-3">
+            {topics.map((topic) => (
+              <li key={topic.title}>
+                <Card className="h-full p-6">
+                  <h3 className="font-semibold text-foreground">{topic.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{topic.text}</p>
+                </Card>
+              </li>
             ))}
-          </div>
+          </ul>
+        </section>
 
-          <p className="mt-8 text-center text-xs text-muted-foreground">
-            Mentorship availability and bookings are prototype-only. Real
-            lifecycle actions are owned by the Mentorship Service behind the API
-            gateway.
-          </p>
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold text-foreground">How feedback would work</h2>
+            <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+              {approach.map((item) => <li key={item}>{item}</li>)}
+            </ol>
+          </Card>
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold text-foreground">What it is not</h2>
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+              {notIncluded.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </Card>
         </div>
+
+        <Card tone="muted" className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm leading-6 text-muted-foreground">
+            Curious how a request would work? The preview shows each step — nothing can be submitted.
+          </p>
+          <ButtonLink href="/mentorship/book/" variant="secondary">Preview the request steps</ButtonLink>
+        </Card>
       </Container>
-    </Section>
+    </>
   );
 }

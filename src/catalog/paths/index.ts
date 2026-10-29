@@ -8,7 +8,7 @@ export const paths = [
     subtitle: "Learn to design coherent fictional worlds through systems thinking, creative constraints, causal relationships, and repeatable worldbuilding workflows.",
     summary: "Learn to transform creative ideas into interconnected fictional worlds by defining world rules, designing meaningful systems, modeling consequences, and building a reusable creative workflow.",
     level: "beginner",
-    status: "draft",
+    status: "published",
     estimatedHours: 12,
     courseSlugs: [
       "worldbuilding-operating-system"

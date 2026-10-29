@@ -5,9 +5,15 @@ export type CourseLevel =
   | "intermediate"
   | "advanced";
 export type CourseCategory =
-  | "backend-engineering"
   | "worldbuilding"
   | "creative-system";
+
+// One planned syllabus lesson. lessonSlug is present only when that lesson is published.
+export type SyllabusEntry = Readonly<{
+  number: string;
+  title: string;
+  lessonSlug?: string;
+}>;
 
 export type CourseModule = Readonly<{
   id: string;
@@ -15,6 +21,7 @@ export type CourseModule = Readonly<{
   title: string;
   summary: string;
   lessonSlugs: readonly string[];
+  syllabus?: readonly SyllabusEntry[];
 }>;
 
 export type Course = Readonly<{
@@ -39,6 +46,23 @@ export type Course = Readonly<{
 
 export type LessonKind = "lesson" | "lab" | "checkpoint" | "capstone";
 
+// Pinned file in an approved GitHub resource repository, delivered through jsDelivr.
+export type LessonMediaAsset = Readonly<{
+  provider: "github-cdn";
+  repository: string;
+  revision: string;
+  path: string;
+}>;
+
+// Optional alternative formats of one lesson; Reading is always the MDX body.
+export type LessonMedia = Readonly<{
+  video?: Readonly<{ provider: "youtube"; videoId: string }>;
+  audio?: Readonly<{ provider: "spotify"; episodeId: string }>;
+  slides?: LessonMediaAsset & Readonly<{ format: "pdf" }>;
+  infographic?: LessonMediaAsset &
+    Readonly<{ format: "png"; alt: string; width: number; height: number }>;
+}>;
+
 export type Lesson = Readonly<{
   id: string;
   slug: string;
@@ -52,6 +76,7 @@ export type Lesson = Readonly<{
   outputs: readonly string[];
   tags: readonly string[];
   resourceIds?: readonly string[];
+  media?: LessonMedia;
 }>;
 
 export type ResourceType =

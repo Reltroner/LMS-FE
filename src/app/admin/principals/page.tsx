@@ -1,24 +1,15 @@
-import { Badge } from "@/components/ui/Badge";
-import { Heading } from "@/components/ui/Heading";
-import { PrincipalManagement } from "@/components/admin/PrincipalManagement";
+import { AdminCapabilityPage } from "@/components/admin/AdminCapabilityPage";
 
 export const metadata = { title: "Principals" };
 
 export default function PrincipalsPage() {
   return (
-    <>
-      <div className="flex items-center justify-between">
-        <div>
-          <Badge tone="accent">Identity-managed principals</Badge>
-          <Heading level={1} className="mt-2">Principal Management</Heading>
-          <p className="mt-1 text-sm text-muted-foreground">
-            List, view, and prototype role changes. Identity lives in Keycloak.
-          </p>
-        </div>
-      </div>
-      <div className="mt-6">
-        <PrincipalManagement />
-      </div>
-    </>
+    <AdminCapabilityPage eyebrow="Principals" title="People and roles"
+      summary="Identities and credentials belong to the identity service. This console would only read and request role changes through it, never store passwords."
+      operations={[
+        "List people with administrative or mentor roles.",
+        "Request role changes, recorded in the audit trail.",
+        "Suspend access, enforced by the identity service.",
+      ]} />
   );
 }

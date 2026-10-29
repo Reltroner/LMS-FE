@@ -20,7 +20,7 @@ export async function verifyPublicOutput(root: string, inputs: CatalogInputs = c
   const lessonRoutes = q.getLessonRouteParams().map((p) => `/courses/${p.slug}/lessons/${p.lesson}`);
   const pathRoutes = q.getPublishedPaths().map((p) => `/paths/${p.slug}`);
   const required = new Set([
-    "/", "/courses", "/paths", "/search", "/my-learning",
+    "/", "/courses", "/paths", "/search", "/my-learning", "/ai", "/about",
     ...courseRoutes,
     ...lessonRoutes,
     ...pathRoutes,
@@ -39,11 +39,18 @@ export async function verifyPublicOutput(root: string, inputs: CatalogInputs = c
     [course.title, `/courses/${course.slug}`, ...(course.aliases ?? []).map((s) => `/courses/${s}`),
       ...resources.map((r) => r.id)].forEach((value) => needles.add(value));
   }
+  // Resources withheld from a public course (unpinned or unapproved CDN files) must not be linked.
+  for (const resource of compiled.withheldResources) needles.add(resource.url);
   for (const p of privatePaths) [p.title, `/paths/${p.slug}`].forEach((value) => needles.add(value));
   for (const lesson of privateLessons) {
     needles.add(lesson.id);
     needles.add(`/courses/${lesson.courseSlug}/lessons/${lesson.slug}`);
+    // Unreleased media identifiers and lesson image URLs are as private as the lesson body.
+    const { video, audio, slides, infographic } = lesson.media ?? {};
+    const media = [video?.videoId, audio?.episodeId, slides?.path, infographic?.path, infographic?.alt,
+      ...[...lesson.body.matchAll(/!\[[^\]]*\]\(([^)\s]+)\)/g)].map(([, url]) => url)];
     const snippets = [lesson.title, lesson.summary, ...lesson.objectives, ...lesson.outputs,
+      ...media.filter((value) => value !== undefined),
       ...lesson.body.split(/\n\s*\n/).filter((p) => p.length >= 48 && !/^[#<*\-]/.test(p))];
     for (const snippet of snippets) {
       if (snippet.length >= 10 && !publicText.includes(snippet)) needles.add(snippet);

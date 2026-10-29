@@ -1,350 +1,183 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
-import { Heading } from "@/components/ui/Heading";
-import { Section } from "@/components/ui/Section";
-import { CourseCard } from "@/components/course/CourseCard";
-import { PathCard } from "@/components/path/PathCard";
-import {
-  ArrowRightIcon,
-  BookIcon,
-  CheckCircleIcon,
-  CompassIcon,
-  LayersIcon,
-  SparklesIcon,
-  TargetIcon,
-  TerminalIcon,
-} from "@/components/ui/icons";
-import { getPublishedCourses } from "@/lib/fixtures/courses";
+import { ExternalLink } from "@/components/ui/ExternalLink";
+import { ArrowRightIcon, CompassIcon, SparklesIcon } from "@/components/ui/icons";
+import { PageHero, SectionHeading } from "@/components/marketing/PageHero";
+import { ConceptImage } from "@/components/marketing/ConceptImage";
+import { FlowSteps } from "@/components/learning/FlowSteps";
+import { AvailabilityBadge } from "@/components/course/AvailabilityBadge";
+import { ModuleRoadmap } from "@/components/course/ModuleRoadmap";
+import { getCourseInventory, getPublishedCourses } from "@/lib/fixtures/courses";
 import { getPublishedPaths } from "@/lib/fixtures/paths";
-import { getLessonsByCourseSlug } from "@/lib/fixtures/lessons";
+import { retrievePublicKnowledge } from "@/lib/knowledge/public-index";
+import { courseRoute, lessonRoute, pathRoute } from "@/lib/routes/route-builders";
+import { studioLinks } from "@/lib/site/links";
+import { lessonNumber } from "@/components/search/result-meta";
 
-const valueCards = [
-  {
-    icon: BookIcon,
-    title: "Systems Thinking",
-    description:
-      "Understand how creative ideas, rules, people, and institutions interact.",
-  },
-  {
-    icon: SparklesIcon,
-    title: "Worldbuilding Architecture",
-    description:
-      "Build fictional worlds with coherent foundations and meaningful causal relationships.",
-  },
-  {
-    icon: TargetIcon,
-    title: "Creative Compounding",
-    description:
-      "Turn previous creative outcomes into new questions and future possibilities.",
-  },
-] as const;
-
-const methodologySteps = [
-  { n: "01", title: "Clarity", desc: "Start from a clear, defined question or skill." },
-  { n: "02", title: "Discovery", desc: "Explore concepts, examples, and boundaries." },
-  { n: "03", title: "Understanding", desc: "Connect ideas into a coherent mental model." },
-  { n: "04", title: "Structured Learning", desc: "Follow a deliberate, sequenced curriculum." },
-  { n: "05", title: "Practice", desc: "Apply knowledge through labs and checkpoints." },
-  { n: "06", title: "Progress → Capability", desc: "Track growth toward real capability." },
-] as const;
-
+// Answers "Why learn worldbuilding here, and where do I start?" using only published data.
+// The Lumenhaven demonstrator and the AI Guide sample are retrieved from the public index at
+// build time, so they appear only while that lesson content is actually published.
 export default function HomePage() {
-  const courses = getPublishedCourses();
-  const paths = getPublishedPaths();
-  const totalLessons = courses.reduce(
-    (sum, c) => sum + getLessonsByCourseSlug(c.slug).length,
-    0,
-  );
+  const course = getPublishedCourses()[0];
+  const inventory = course && getCourseInventory(course.slug);
+  const firstLesson = inventory?.firstLesson;
+  const firstNumber = lessonNumber(firstLesson?.slug);
+  const path = getPublishedPaths()[0];
+  const lumenhaven = retrievePublicKnowledge({ query: "Lumenhaven condition choice possible effect", limit: 1 })[0];
+  // Prefer a lesson passage over the lesson's overview chunk: it shows what the Guide actually cites.
+  const sampleResults = retrievePublicKnowledge({ query: "What is worldbuilding?", limit: 5 });
+  const sample = sampleResults.find((r) => r.sourceType === "lesson" && r.sectionId !== "lesson-overview") ?? sampleResults[0];
 
   return (
     <>
-      {/* Hero */}
-      <Section className="relative overflow-hidden pb-12 pt-10 sm:pt-14 lg:pb-20 lg:pt-24">
+      <PageHero
+        eyebrow="Systemic Creative Architect"
+        title="Turn an idea into a world of possibilities."
+        lede="Explore how fictional conditions shape choices, consequences, and the next creative question."
+        actions={course ? (
+          <>
+            <ButtonLink href={courseRoute(course.slug)} size="lg">
+              Explore {course.title} <ArrowRightIcon width={18} height={18} />
+            </ButtonLink>
+            {firstLesson && (
+              <ButtonLink href={lessonRoute(course.slug, firstLesson.slug)} variant="secondary" size="lg">
+                Start Lesson {firstNumber ?? firstLesson.title}
+              </ButtonLink>
+            )}
+          </>
+        ) : (
+          <ButtonLink href="/courses/" size="lg">Browse courses</ButtonLink>
+        )}
+        aside={<ConceptImage slot="HOME_HERO" priority />}
+      >
+        <p className="mt-5 text-sm text-muted-foreground">Start small. Discover connections. Build at your own pace.</p>
+      </PageHero>
+
+      <section aria-labelledby="start-heading" className="py-12">
         <Container>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.82fr)] lg:items-center">
-            <div className="space-y-8">
-              <div className="space-y-5">
-                <Badge tone="primary">Systemic Creative Architect</Badge>
-                <Heading level={1} className="max-w-4xl text-balance">
-                  Build Fictional Worlds That Keep Generating Possibilities.
-                </Heading>
-                <p className="max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-                  Learn to design coherent fictional worlds through systems thinking,
-                  creative constraints, causal relationships, and repeatable worldbuilding
-                  workflows.
-                </p>
-              </div>
+          <SectionHeading eyebrow="Start here" id="start-heading" title="Your first meaningful connection"
+            action={firstLesson && <AvailabilityBadge available label={`${firstNumber ? `Lesson ${firstNumber}` : firstLesson.title} available`} />} />
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <Card className="p-6 sm:p-8">
+              {lumenhaven ? (
+                <>
+                  <FlowSteps label="Condition, choice, and possible effect in Lumenhaven" steps={[
+                    { title: "Condition", detail: "Sharing a memory needs its owner's permission." },
+                    { title: "Choice", detail: "The teacher changes the source used for class." },
+                    { title: "Possible effect", detail: "Students encounter a different account." },
+                  ]} />
+                  <p className="mt-5 text-sm leading-6 text-muted-foreground">
+                    In Lumenhaven, people keep memories inside glowing lanterns. Lumenhaven is an invented teaching
+                    example, not official Asthortera canon. “Possible” matters: the model explains one plausible
+                    connection — it does not promise a single predictable outcome.
+                  </p>
+                  <ButtonLink href={lumenhaven.sourceUrl} variant="secondary" className="mt-5">
+                    Learn the model in the lesson <ArrowRightIcon width={16} height={16} />
+                  </ButtonLink>
+                </>
+              ) : (
+                <>
+                  <FlowSteps label="Condition, choice, and possible effect" steps={[
+                    { title: "Condition" }, { title: "Choice" }, { title: "Possible effect" },
+                  ]} />
+                  <p className="mt-5 text-sm leading-6 text-muted-foreground">
+                    One imagined condition shapes the choices available to someone, and a choice can lead to a
+                    possible effect. The first lesson that teaches this model is not published yet.
+                  </p>
+                </>
+              )}
+            </Card>
+            <ConceptImage slot="HOME_CAUSAL_MODEL" />
+          </div>
+        </Container>
+      </section>
 
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/courses" size="lg">
-                  Explore courses
-                  <ArrowRightIcon width={18} height={18} />
+      {course && inventory && (
+        <section aria-labelledby="path-heading" className="py-12">
+          <Container>
+            <SectionHeading eyebrow="Follow a path" id="path-heading" title="Learn through a connected journey."
+              lede={`${inventory.moduleCount} planned modules, ${inventory.availableLessonCount} published ${inventory.availableLessonCount === 1 ? "lesson" : "lessons"} so far. New lessons appear here only after they are written, reviewed, and published.`}
+              action={path && (
+                <ButtonLink href={pathRoute(path.slug)} variant="secondary">
+                  <CompassIcon width={16} height={16} /> Explore the path
                 </ButtonLink>
-                <ButtonLink href="/paths" variant="secondary" size="lg">
-                  <CompassIcon width={18} height={18} />
-                  View learning paths
-                </ButtonLink>
-              </div>
-
-              <dl className="grid gap-4 sm:grid-cols-3">
-                {[
-                  { label: "Published courses", value: courses.length },
-                  { label: "Lessons", value: totalLessons },
-                  { label: "Learning paths", value: paths.length },
-                ].map((stat) => (
-                  <Card key={stat.label} className="p-5">
-                    <dt className="text-sm font-medium text-muted-foreground">
-                      {stat.label}
-                    </dt>
-                    <dd className="mt-2 text-3xl font-semibold text-foreground">
-                      {stat.value}
-                    </dd>
-                  </Card>
-                ))}
-              </dl>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-6 rounded-[2rem] bg-primary/10 blur-3xl" />
-              <Card className="relative overflow-hidden p-4">
-                <div className="aspect-[1.35] w-full rounded-[1.35rem] bg-gradient-to-br from-primary/15 via-accent/10 to-card p-6">
-                  {courses.length > 0 ? (
-                    <div className="flex h-full flex-col justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm">
-                          <TerminalIcon width={20} height={20} className="text-primary" />
-                        </span>
-                        <Badge tone="primary">Live lesson preview</Badge>
-                      </div>
-                      <div className="space-y-3">
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                          {courses[0].title}
-                        </p>
-                        <h3 className="text-xl font-semibold text-foreground">
-                          {getLessonsByCourseSlug(courses[0].slug)[0]?.title ?? "Introduction"}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {courses[0].summary}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <CheckCircleIcon width={14} height={14} className="text-success" />
-                          Readable, focused, and practical.
-                        </div>
-                      </div>
-                      <Link
-                        href={`/courses/${courses[0].slug}`}
-                        className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                      >
-                        Start reading <ArrowRightIcon width={14} height={14} />
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="flex h-full flex-col justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm">
-                          <TerminalIcon width={20} height={20} className="text-primary" />
-                        </span>
-                        <Badge tone="primary">Curriculum Status</Badge>
-                      </div>
-                      <div className="space-y-3">
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                          Systemic Creative Architect
-                        </p>
-                        <h3 className="text-xl font-semibold text-foreground">
-                          Curriculum In Review
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          The systemic creative architecture and worldbuilding curriculum
-                          is undergoing formal publication and attestation review.
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <CheckCircleIcon width={14} height={14} className="text-success" />
-                          Rigorous, deterministic, and fail-closed.
-                        </div>
-                      </div>
-                      <Link
-                        href="/courses"
-                        className="inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                      >
-                        Explore course catalog <ArrowRightIcon width={14} height={14} />
-                      </Link>
-                    </div>
-                  )}
+              )} />
+            <Card className="mt-8 grid gap-8 p-6 sm:p-8 lg:grid-cols-[0.9fr_1.1fr]">
+              <div>
+                <h3 className="text-xl font-semibold text-foreground">{course.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{course.subtitle}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <AvailabilityBadge available={inventory.availableLessonCount > 0}
+                    label={`${inventory.availableLessonCount} ${inventory.availableLessonCount === 1 ? "lesson" : "lessons"} available`} />
+                  <AvailabilityBadge available={false} label={`${inventory.moduleCount}-module plan`} />
                 </div>
-              </Card>
-            </div>
-          </div>
-        </Container>
-      </Section>
+                <div className="mt-6"><ConceptImage slot="PATH_WOS_JOURNEY" /></div>
+              </div>
+              <ModuleRoadmap course={course} compact />
+            </Card>
+          </Container>
+        </section>
+      )}
 
-      {/* Value proposition */}
-      <Section>
+      <section aria-labelledby="guide-heading" className="py-12">
         <Container>
-          <div className="space-y-8">
-            <div className="max-w-3xl space-y-3">
-              <Badge tone="accent">Why learn here</Badge>
-              <Heading>Designed for steady capability</Heading>
-              <p className="text-lg leading-8 text-muted-foreground">
-                Clear pathways, readable lessons, and practical outputs keep the
-                academy focused on skill growth instead of platform noise.
-              </p>
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
+            <div>
+              <SectionHeading eyebrow="AI Guide" id="guide-heading" title="Ask a question. Follow a source."
+                lede="Search and the AI Guide answer from published lessons only, and every reply links to the passage it came from. When no AI model is connected, you get the passages themselves — never invented text." />
+              <ButtonLink href="/ai/" className="mt-6">
+                <SparklesIcon width={16} height={16} /> Open the AI Guide
+              </ButtonLink>
             </div>
-            <div className="grid gap-5 md:grid-cols-3">
-              {valueCards.map((valueCard) => {
-                const Icon = valueCard.icon;
-                return (
-                  <Card key={valueCard.title} className="p-6">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                      <Icon width={22} height={22} />
-                    </div>
-                    <h2 className="mt-6 text-xl font-semibold text-foreground">
-                      {valueCard.title}
-                    </h2>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                      {valueCard.description}
-                    </p>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* Methodology */}
-      <Section className="bg-background-elevated/40">
-        <Container>
-          <div className="space-y-8">
-            <div className="max-w-3xl space-y-3">
-              <Badge tone="primary">Learning philosophy</Badge>
-              <Heading>Clarity → Discovery → Understanding → Capability</Heading>
-              <p className="text-lg leading-8 text-muted-foreground">
-                Every course follows a deliberate progression so beginners build
-                confidence while advanced learners keep momentum.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {methodologySteps.map((step) => (
-                <Card key={step.n} className="flex gap-4 p-5">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-accent/10 text-sm font-bold text-primary">
-                    {step.n}
+            {sample && (
+              <Card className="space-y-3 p-5">
+                <p className="ml-auto w-fit rounded-2xl bg-primary px-4 py-2 text-sm text-primary-foreground">What is worldbuilding?</p>
+                <div className="rounded-2xl border border-border bg-background-elevated p-4">
+                  <span className="rounded-full border border-primary/25 bg-primary-soft px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+                    Source excerpt · no AI-generated text
                   </span>
-                  <div>
-                    <h3 className="font-semibold text-foreground">{step.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {step.desc}
-                    </p>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* Featured courses */}
-      <Section>
-        <Container>
-          <div className="space-y-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div className="max-w-3xl space-y-3">
-                <Badge tone="primary">Featured published courses</Badge>
-                <Heading>Start with a focused course</Heading>
-                <p className="text-lg leading-8 text-muted-foreground">
-                  Browse available courses from the static catalog and pick the
-                  next useful skill. Only published content is shown publicly.
-                </p>
-              </div>
-              <ButtonLink href="/courses" variant="secondary">
-                View all courses
-              </ButtonLink>
-            </div>
-            {courses.length > 0 ? (
-              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {courses.map((course) => (
-                  <CourseCard key={course.id} course={course} />
-                ))}
-              </div>
-            ) : (
-              <Card className="p-8 text-center">
-                <p className="text-sm text-muted-foreground">
-                  No courses are currently published. Curricula under the Systemic Creative Architect
-                  domain are undergoing publication and verification review.
-                </p>
-              </Card>
-            )}
-          </div>
-        </Container>
-      </Section>
-
-      {/* Learning paths */}
-      <Section className="bg-background-elevated/40">
-        <Container>
-          <div className="space-y-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div className="max-w-3xl space-y-3">
-                <Badge tone="accent">Learning paths</Badge>
-                <Heading>Follow a guided sequence</Heading>
-                <p className="text-lg leading-8 text-muted-foreground">
-                  Paths connect courses into a practical roadmap, so learners
-                  can move with less guesswork.
-                </p>
-              </div>
-              <ButtonLink href="/paths" variant="secondary">
-                View all paths
-              </ButtonLink>
-            </div>
-            {paths.length > 0 ? (
-              <div className="grid gap-6 xl:grid-cols-2">
-                {paths.map((path) => (
-                  <PathCard key={path.id} path={path} />
-                ))}
-              </div>
-            ) : (
-              <Card className="p-8 text-center">
-                <p className="text-sm text-muted-foreground">
-                  No learning paths are currently published. Candidate paths remain draft until authorized.
-                </p>
-              </Card>
-            )}
-          </div>
-        </Container>
-      </Section>
-
-      {/* CTA */}
-      <Section>
-        <Container>
-          <Card className="overflow-hidden">
-            <div className="grid gap-8 p-8 sm:p-12 lg:grid-cols-[1fr_auto] lg:items-center">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <LayersIcon width={20} height={20} className="text-primary" />
-                  <Badge tone="primary">Structured learning</Badge>
+                  <p className="mt-3 text-sm leading-6 text-foreground">{sample.snippet}</p>
+                  <Link href={sample.sourceUrl} className="mt-2 inline-block text-xs font-semibold text-primary underline-offset-2 hover:underline">
+                    {sample.title}{sample.heading && sample.heading !== sample.title ? ` — ${sample.heading}` : ""}
+                  </Link>
                 </div>
-                <Heading level={2}>
-                  Ready to build durable skills?
-                </Heading>
-                <p className="max-w-2xl text-lg text-muted-foreground">
-                  Start with a published course or follow a learning path. All
-                  public content is statically delivered and free to explore.
-                </p>
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/courses" size="lg">
-                  Browse courses
-                </ButtonLink>
-                <ButtonLink href="/paths" variant="secondary" size="lg">
-                  <CompassIcon width={18} height={18} />
-                  Paths
-                </ButtonLink>
-              </div>
-            </div>
-          </Card>
+                <p className="text-xs text-muted-foreground">A real excerpt from the published index, retrieved when this page was built.</p>
+              </Card>
+            )}
+          </div>
         </Container>
-      </Section>
+      </section>
+
+      <section aria-labelledby="studio-heading" className="py-12">
+        <Container>
+          <h2 id="studio-heading" className="sr-only">Reltroner Learning and Reltroner Studio</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="p-6 sm:p-8">
+              <p className="eyebrow">Creative practice</p>
+              <h3 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Learn the method.</h3>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Worldbuilding can help you practise exploring how rules, constraints, and choices affect an imagined
+                world. Reltroner Learning teaches the methods, one lesson at a time.
+              </p>
+              <ButtonLink href="/about/" variant="secondary" className="mt-5">About Reltroner Learning</ButtonLink>
+            </Card>
+            <Card className="p-6 sm:p-8">
+              <p className="eyebrow">The Studio connection</p>
+              <h3 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Explore what it makes possible.</h3>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                Reltroner Studio develops stories, Asthortera, and creative experiments. You don&apos;t need to know
+                any Studio lore to start learning here.
+              </p>
+              <ExternalLink href={studioLinks.home}
+                className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-5 text-sm font-semibold text-foreground shadow-sm hover:border-primary/30 hover:text-primary">
+                Discover Reltroner Studio
+              </ExternalLink>
+            </Card>
+          </div>
+        </Container>
+      </section>
     </>
   );
 }

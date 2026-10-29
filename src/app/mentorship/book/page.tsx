@@ -1,28 +1,21 @@
-import { Suspense } from "react";
-import { Badge } from "@/components/ui/Badge";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Container } from "@/components/ui/Container";
-import { Heading } from "@/components/ui/Heading";
-import { Section } from "@/components/ui/Section";
+import { PageHero } from "@/components/marketing/PageHero";
 import { BookingJourney } from "@/components/mentorship/BookingJourney";
 
-export const metadata = { title: "Book a Session" };
+export const metadata = { title: "Mentorship request (preview)" };
 
 export default function BookingPage() {
   return (
     <>
-      <Section className="pb-4 pt-10">
-        <Container size="md">
-          <Badge tone="accent">Prototype booking flow</Badge>
-          <Heading level={1} className="mt-3">Book a mentorship session</Heading>
-          <p className="mt-2 text-muted-foreground">
-            Offering → Availability → Review → Confirmation → Status. This flow
-            is simulated and does not call backend services.
-          </p>
-        </Container>
-      </Section>
-      <Suspense fallback={null}>
+      <PageHero
+        breadcrumb={<Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Mentorship", href: "/mentorship/" }, { label: "Request preview" }]} />}
+        eyebrow="Mentorship request"
+        title="Describe what you'd like to work through."
+        lede="A real request flow should be clear about availability, consent, and whether anything was actually submitted. This preview shows the steps without pretending to book." />
+      <Container size="md">
         <BookingJourney />
-      </Suspense>
+      </Container>
     </>
   );
 }

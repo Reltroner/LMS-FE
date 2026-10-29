@@ -6,10 +6,11 @@ type ContainerProps = HTMLAttributes<HTMLDivElement> & {
   size?: "sm" | "md" | "lg" | "xl";
 };
 
+// lg (the default) is the site measure, ~1216px; sm suits a 680–760px reading column.
 const sizeClasses = {
   sm: "max-w-3xl",
   md: "max-w-5xl",
-  lg: "max-w-6xl",
+  lg: "max-w-[76rem]",
   xl: "max-w-7xl",
 };
 

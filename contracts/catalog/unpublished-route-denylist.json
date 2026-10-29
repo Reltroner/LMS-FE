@@ -10,12 +10,6 @@
       "title": "In-World Living Lab"
     },
     {
-      "kind": "course",
-      "slug": "worldbuilding-operating-system",
-      "route": "/courses/worldbuilding-operating-system",
-      "title": "Worldbuilding Operating System"
-    },
-    {
       "kind": "path",
       "slug": "worldbuilding-creator",
       "route": "/paths/worldbuilding-creator",

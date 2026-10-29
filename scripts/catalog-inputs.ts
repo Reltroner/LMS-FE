@@ -12,6 +12,7 @@ export function catalogInputs(root: string): CatalogInputs {
     catalog: authoringCatalog, paths, publicCourseSlugs, publicPathSlugs,
     legacyRegistry: read("lesson-id-registry.json"),
     additionsRegistry: read("lesson-id-additions.json"),
+    lifecycle: read("lesson-id-lifecycle.json"),
     denylist: read("unpublished-route-denylist.json"),
   };
 }

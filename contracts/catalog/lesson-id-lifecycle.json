@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "registry_authority": "LMS-FE_GIT_CONTENT_NOT_STUDIO_CANON",
+  "maintenance": "Lifecycle of registered identities. IDs are never deleted or reused: retired sources stay recoverable with git show <last_source_commit>:<source_path>; migrated sources keep course, slug and route.",
+  "records": [
+    {
+      "lesson_id": "lms-lesson-0001",
+      "disposition": "retired",
+      "reason": "Backend engineering course retired from the worldbuilding-focused LMS catalog.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0002",
+      "disposition": "retired",
+      "reason": "Backend engineering course retired from the worldbuilding-focused LMS catalog.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0003",
+      "disposition": "retired",
+      "reason": "Backend engineering course retired from the worldbuilding-focused LMS catalog.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0017",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0018",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0019",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0020",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0021",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0022",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0023",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0024",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0025",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0026",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0027",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0028",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0029",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0030",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    },
+    {
+      "lesson_id": "lms-lesson-0031",
+      "disposition": "retired",
+      "reason": "Superseded by the eight-module WOS syllabus (candidate v0.3); not mapped to a new lesson identity.",
+      "last_source_commit": "6ed03bdb7740dd6624a8fe66decda46a95aa36d5"
+    }
+  ]
+}

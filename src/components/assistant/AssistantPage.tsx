@@ -1,194 +1,89 @@
 "use client";
 
-import { useState } from "react";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Container } from "@/components/ui/Container";
-import { Input } from "@/components/ui/Input";
-import { Section } from "@/components/ui/Section";
-import {
-  AlertIcon,
-  InfoIcon,
-  LockIcon,
-  SparklesIcon,
-  SendIcon,
-} from "@/components/ui/icons";
-import { cn } from "@/lib/utils/cn";
-import {
-  type Message,
-  seedMessages,
-  suggestedPrompts,
-  matchAssistantResponse,
-  createMessageId,
-} from "@/lib/assistant/assistant-data";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { SendIcon, SparklesIcon } from "@/components/ui/icons";
+import { suggestedPrompts } from "@/lib/assistant/conversation";
+import { GroundedAnswer } from "./GroundedAnswer";
+import { useKnowledgeConversation } from "./useKnowledgeConversation";
 
-export function AssistantPage() {
-  const [messages, setMessages] = useState<Message[]>(seedMessages);
+// Set at build time when an authorized knowledge service exists; otherwise answers are
+// source excerpts from the published index, computed in the browser.
+const serviceConfigured = Boolean(process.env.NEXT_PUBLIC_KNOWLEDGE_SERVICE_URL);
+
+// Arriving from the search palette's "Continue in AI Guide" (/ai/?q=…) asks that question once.
+// Kept inside Suspense so the rest of the page is prerendered.
+export function AssistantPageFromUrl() {
+  return <AssistantPage initialQuestion={useSearchParams().get("q") ?? undefined} />;
+}
+
+// The AI Guide conversation. Shares useKnowledgeConversation (and so askKnowledgeAssistant)
+// with the floating assistant.
+export function AssistantPage({ initialQuestion }: { initialQuestion?: string }) {
+  const { messages, isLoading, send, reset } = useKnowledgeConversation(initialQuestion);
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const logRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const send = (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed || isLoading) return;
+  useEffect(() => {
+    const log = logRef.current;
+    if (log) log.scrollTop = log.scrollHeight;
+  }, [messages]);
 
-    const userMsg: Message = { id: createMessageId("u"), role: "user", content: trimmed, state: "done" };
-    setMessages((prev) => [...prev, userMsg]);
+  function submit(text: string) {
+    send(text);
     setInput("");
-    setIsLoading(true);
+  }
 
-    // Simulate streaming/loading then a deterministic response
-    const loadingId = createMessageId("a");
-    setMessages((prev) => [
-      ...prev,
-      { id: loadingId, role: "assistant", content: "Thinking…", state: "loading" },
-    ]);
-
-    setTimeout(() => {
-      const matched = matchAssistantResponse(trimmed);
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === loadingId
-            ? { ...m, ...matched, state: "done" }
-            : m,
-        ),
-      );
-      setIsLoading(false);
-    }, 700);
-  };
-
-  const suggestions = suggestedPrompts;
-
+  const last = messages[messages.length - 1];
   return (
-    <Section className="pt-4">
-      <Container size="md">
-        <div className="grid gap-6 lg:grid-cols-[1fr_18rem]">
-          {/* Chat */}
-          <div className="flex flex-col rounded-2xl border border-border bg-card shadow-sm">
-            <div className="border-b border-border p-4">
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white">
-                  <SparklesIcon width={18} height={18} />
-                </span>
-                <div>
-                  <h2 className="font-semibold text-foreground">Reltroner Assistant</h2>
-                  <p className="text-xs text-muted-foreground">Conceptual · learning support only</p>
-                </div>
-                <Badge tone="neutral" className="ml-auto">prototype</Badge>
-              </div>
-            </div>
-
-            <div className="flex h-[28rem] flex-col gap-4 overflow-y-auto p-5">
-              {messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={cn(
-                    "flex max-w-[85%] flex-col gap-2",
-                    m.role === "user" ? "ml-auto items-end" : "items-start",
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "rounded-2xl px-4 py-3 text-sm leading-6",
-                      m.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-background-elevated text-foreground",
-                    )}
-                  >
-                    {m.content}
-                  </div>
-                  {m.sources && m.sources.length > 0 && (
-                    <div className="rounded-xl border border-border p-3 text-xs">
-                      <p className="font-medium text-foreground">Sources</p>
-                      <ul className="mt-1 space-y-1">
-                        {m.sources.map((s) => (
-                          <li key={s.href}>
-                            <a
-                              href={s.href}
-                              target={s.href.startsWith("http") ? "_blank" : undefined}
-                              rel="noreferrer"
-                              className="text-primary hover:underline"
-                            >
-                              → {s.title}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t border-border p-4">
-              <div className="flex gap-2">
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && send(input)}
-                  placeholder="Ask about course content…"
-                  aria-label="Ask the assistant"
-                />
-                <Button onClick={() => send(input)} disabled={!input.trim() || isLoading}>
-                  <SendIcon width={16} height={16} />
-                </Button>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {suggestions.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => send(s)}
-                    className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition hover:border-primary/30 hover:text-primary"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar: limitations */}
-          <aside className="space-y-4">
-            <Card className="p-5">
-              <div className="flex items-center gap-2">
-                <InfoIcon width={18} height={18} className="text-primary" />
-                <h3 className="font-semibold text-foreground">What this assistant does</h3>
-              </div>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>· Explains published lesson concepts</li>
-                <li>· Points to lessons and external references</li>
-                <li>· Suggests next lessons within a course</li>
-              </ul>
-            </Card>
-
-            <Card className="p-5">
-              <div className="flex items-center gap-2">
-                <LockIcon width={18} height={18} className="text-accent-foreground" />
-                <h3 className="font-semibold text-foreground">What it cannot do</h3>
-              </div>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>· Mark lessons complete or change progress</li>
-                <li>· Enroll you or modify bookings</li>
-                <li>· Access draft or unpublished content</li>
-                <li>· Act as a grader or authority on grades</li>
-              </ul>
-            </Card>
-
-            <div className="rounded-xl border border-amber-400/30 bg-amber-500/5 p-4 text-xs text-amber-700 dark:text-amber-300">
-              <div className="flex items-center gap-2 font-semibold">
-                <AlertIcon width={15} height={15} />
-                Permission-aware
-              </div>
-              <p className="mt-1.5 leading-5">
-                The assistant is scoped by your permissions. Actions that
-                require authorization are handled by backend services, never by
-                this interface alone.
-              </p>
-            </div>
-          </aside>
+    <div id="guide-chat" className="flex min-w-0 flex-col rounded-3xl border border-border bg-card shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 border-b border-border p-4">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white">
+          <SparklesIcon width={18} height={18} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-semibold text-foreground">Reltroner Learning Guide</h2>
+          <p className="text-xs text-muted-foreground">
+            {serviceConfigured
+              ? "Connected to the knowledge service. Each reply says whether AI wrote it."
+              : "Source-excerpt mode: no AI model is connected to this site."}
+          </p>
         </div>
-      </Container>
-    </Section>
+        <button type="button" onClick={reset} disabled={isLoading || messages.length <= 1}
+          className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground disabled:opacity-50">
+          New conversation
+        </button>
+      </div>
+
+      <div ref={logRef} role="log" aria-label="Conversation" className="flex h-[26rem] flex-col gap-4 overflow-y-auto p-5">
+        {messages.map((message) => (
+          <GroundedAnswer key={message.id} message={message} onRetry={submit} retryDisabled={isLoading} />
+        ))}
+      </div>
+      <p role="status" className="sr-only">
+        {isLoading ? "Searching published lessons…" : last?.role === "assistant" && last.id !== "m-welcome" ? "Reply ready." : ""}
+      </p>
+
+      <form className="border-t border-border p-4" onSubmit={(event) => { event.preventDefault(); submit(input); inputRef.current?.focus(); }}>
+        <div className="flex gap-2">
+          <input ref={inputRef} value={input} onChange={(event) => setInput(event.target.value)} maxLength={1000}
+            placeholder="Ask about published lessons…" aria-label="Ask the assistant"
+            className="h-12 min-w-0 flex-1 rounded-full border border-border bg-background px-5 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30" />
+          <button type="submit" disabled={!input.trim() || isLoading} aria-label="Send question"
+            className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-50">
+            <SendIcon width={18} height={18} />
+          </button>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2" aria-label="Suggested questions" role="group">
+          {suggestedPrompts.map((prompt) => (
+            <button key={prompt} type="button" disabled={isLoading} onClick={() => submit(prompt)}
+              className="min-h-8 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition hover:border-primary/30 hover:text-primary disabled:opacity-50">
+              {prompt}
+            </button>
+          ))}
+        </div>
+      </form>
+    </div>
   );
 }

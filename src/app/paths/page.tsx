@@ -1,64 +1,59 @@
-import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
-import { Heading } from "@/components/ui/Heading";
-import { Section } from "@/components/ui/Section";
+import { PageHero } from "@/components/marketing/PageHero";
 import { PathCard } from "@/components/path/PathCard";
-import { CompassIcon } from "@/components/ui/icons";
 import { getPublishedPaths } from "@/lib/fixtures/paths";
 
 export const metadata = {
   title: "Learning Paths",
-  description:
-    "Structured learning paths that sequence courses into a guided journey.",
+  description: "A clear path from an idea to a connected world: guided sequences of published and planned lessons.",
 };
+
+const steps = [
+  { title: "Discover", text: "Start with a relevant idea or question." },
+  { title: "Practice", text: "Apply the mental model inside fiction." },
+  { title: "Reflect", text: "Ask what might transfer to real situations — and what does not." },
+];
 
 export default function PathsPage() {
   const paths = getPublishedPaths();
 
   return (
-    <Section className="pb-16 pt-10 sm:pb-20 sm:pt-12">
+    <>
+      <PageHero eyebrow="Guided learning" title="A clear path from an idea to a connected world."
+        lede="Follow a sequence designed to help your reasoning and creativity grow through meaningful practice. Each stage shows what you can open today and what is still planned." />
       <Container>
-        <div>
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent-foreground">
-              <CompassIcon width={22} height={22} />
-            </span>
-            <Badge tone="accent">Guided sequences</Badge>
-          </div>
-          <Heading level={1} className="mt-4">
-            Learning Paths
-          </Heading>
-          <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-            Follow a guided sequence of courses to build capability with less
-            guesswork. Paths show prerequisites, progression, and expected
-            outcomes.
-          </p>
-        </div>
-
-        <div className="mt-7 sm:mt-8">
+        <div className="space-y-8">
           {paths.length > 0 ? (
-            <div className="grid gap-6 xl:grid-cols-2">
-              {paths.map((path) => (
-                <PathCard key={path.id} path={path} />
-              ))}
-            </div>
+            paths.map((path) => <PathCard key={path.id} path={path} />)
           ) : (
-            <Card className="p-12 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-background-elevated">
-                <CompassIcon width={26} height={26} className="text-muted-foreground" />
-              </div>
-              <h2 className="mt-4 text-lg font-semibold text-foreground">
-                No published learning paths
-              </h2>
+            <Card className="p-10 text-center">
+              <h2 className="text-lg font-semibold text-foreground">No learning paths are published yet</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Learning paths under the Systemic Creative Architect domain are currently
-                withheld until approved through the publication gate.
+                Paths appear once the courses they follow have published lessons. This isn&apos;t about your
+                access — there is nothing to show yet.
               </p>
             </Card>
           )}
+
+          <Card tone="muted" className="p-6 sm:p-8">
+            <h2 className="text-xl font-semibold text-foreground">How paths work</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              A path puts related lessons in a meaningful order. It tells you where to start — not which
+              achievements you have earned. A path follows its course; it is not a set of separate courses.
+            </p>
+            <ol className="mt-6 grid gap-4 sm:grid-cols-3">
+              {steps.map((step, index) => (
+                <li key={step.title} className="rounded-2xl border border-border bg-card p-4">
+                  <p className="text-xs font-bold text-primary">{String(index + 1).padStart(2, "0")}</p>
+                  <p className="mt-1 font-semibold text-foreground">{step.title}</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{step.text}</p>
+                </li>
+              ))}
+            </ol>
+          </Card>
         </div>
       </Container>
-    </Section>
+    </>
   );
 }

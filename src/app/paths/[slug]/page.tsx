@@ -1,27 +1,28 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
-import { Heading } from "@/components/ui/Heading";
-import { Section } from "@/components/ui/Section";
+import { ArrowRightIcon, BookIcon } from "@/components/ui/icons";
+import { PageHero, SectionHeading } from "@/components/marketing/PageHero";
+import { ConceptImage } from "@/components/marketing/ConceptImage";
+import { ModuleRoadmap } from "@/components/course/ModuleRoadmap";
+import { AvailabilityBadge } from "@/components/course/AvailabilityBadge";
 import { getPathBySlug } from "@/lib/fixtures/paths";
-import { getCourseBySlug } from "@/lib/fixtures/courses";
-import { getLessonsByCourseSlug } from "@/lib/fixtures/lessons";
-import {
-  ArrowRightIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  CompassIcon,
-  LayersIcon,
-  LockIcon,
-} from "@/components/ui/icons";
+import { getCourseBySlug, getCourseInventory } from "@/lib/fixtures/courses";
+import { courseRoute, lessonRoute } from "@/lib/routes/route-builders";
+import { lessonNumber } from "@/components/search/result-meta";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export const dynamicParams = false;
+
+export async function generateMetadata({ params }: Props) {
+  const path = getPathBySlug((await params).slug);
+  return path ? { title: `${path.title} learning path`, description: path.subtitle } : {};
+}
 
 export async function generateStaticParams() {
   const { getPublishedPaths } = await import("@/lib/fixtures/paths");
@@ -31,47 +32,11 @@ export async function generateStaticParams() {
 
 function PathDetailSkeleton() {
   return (
-    <>
-      <div className="border-b border-border bg-card/40">
-        <Container>
-          <div className="flex items-center gap-2 py-3 text-xs text-muted-foreground">
-            <span>Home</span>
-            <span>/</span>
-            <span>Paths</span>
-            <span>/</span>
-            <span className="h-3 w-32 animate-pulse rounded bg-muted-foreground/20" />
-          </div>
-        </Container>
-      </div>
-
-      <Section className="pb-6 pt-10">
-        <Container>
-          <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
-            <div className="space-y-5">
-              <div className="flex items-center gap-2">
-                <span className="h-6 w-28 animate-pulse rounded-full bg-muted-foreground/15" />
-                <span className="h-6 w-20 animate-pulse rounded-full bg-muted-foreground/15" />
-              </div>
-              <div className="h-10 w-3/4 animate-pulse rounded-lg bg-muted-foreground/20" />
-              <div className="h-5 w-full max-w-2xl animate-pulse rounded bg-muted-foreground/15" />
-              <div className="flex gap-4 pt-4">
-                <span className="h-4 w-24 animate-pulse rounded bg-muted-foreground/15" />
-                <span className="h-4 w-20 animate-pulse rounded bg-muted-foreground/15" />
-                <span className="h-4 w-20 animate-pulse rounded bg-muted-foreground/15" />
-              </div>
-            </div>
-
-            <Card className="h-52 p-6 animate-pulse bg-card">
-              <div className="space-y-4">
-                <div className="h-6 w-28 rounded bg-muted-foreground/15" />
-                <div className="h-4 w-full rounded bg-muted-foreground/15" />
-                <div className="h-10 w-full rounded-xl bg-muted-foreground/20" />
-              </div>
-            </Card>
-          </div>
-        </Container>
-      </Section>
-    </>
+    <Container className="py-14" aria-hidden="true">
+      <div className="h-4 w-48 animate-pulse rounded bg-muted-foreground/15" />
+      <div className="mt-8 h-12 w-3/4 animate-pulse rounded-lg bg-muted-foreground/20" />
+      <div className="mt-8 h-64 animate-pulse rounded-3xl bg-muted-foreground/10" />
+    </Container>
   );
 }
 
@@ -88,148 +53,79 @@ async function PathDetailContent({ params }: Props) {
   const path = getPathBySlug(slug);
   if (!path || path.status !== "published") notFound();
 
-  const courses = path.courseSlugs
-    .map((s) => getCourseBySlug(s))
-    .filter(Boolean);
-
-  const totalLessons = courses.reduce(
-    (sum, c) => sum + getLessonsByCourseSlug(c!.slug).length,
-    0,
-  );
+  const courses = path.courseSlugs.map((s) => getCourseBySlug(s)).filter((c) => c !== undefined);
+  const inventories = courses.map((course) => getCourseInventory(course.slug)!);
+  const available = inventories.reduce((n, i) => n + i.availableLessonCount, 0);
+  const planned = inventories.reduce((n, i) => n + i.plannedLessonCount, 0);
+  const modules = inventories.reduce((n, i) => n + i.moduleCount, 0);
+  const startIndex = inventories.findIndex((i) => i.firstLesson);
+  const start = startIndex >= 0 ? { course: courses[startIndex], lesson: inventories[startIndex].firstLesson! } : null;
+  const startNumber = lessonNumber(start?.lesson.slug);
 
   return (
     <>
-      <div className="border-b border-border bg-card/40">
-        <Container>
-          <nav
-            className="flex items-center gap-2 py-3 text-xs text-muted-foreground"
-            aria-label="Breadcrumb"
-          >
-            <Link href="/" className="hover:text-primary">Home</Link>
-            <span>/</span>
-            <Link href="/paths" className="hover:text-primary">Paths</Link>
-            <span>/</span>
-            <span className="text-foreground">{path.title}</span>
-          </nav>
-        </Container>
-      </div>
+      <PageHero
+        breadcrumb={<Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Paths", href: "/paths/" }, { label: path.title }]} />}
+        eyebrow="Learning journey"
+        title={path.title}
+        lede={path.summary}
+        actions={
+          <>
+            {start && (
+              <ButtonLink href={lessonRoute(start.course.slug, start.lesson.slug)} size="lg">
+                Begin with {startNumber ? `Lesson ${startNumber}` : start.lesson.title} <ArrowRightIcon width={18} height={18} />
+              </ButtonLink>
+            )}
+            {courses[0] && (
+              <ButtonLink href={courseRoute(courses[0].slug)} variant="secondary" size="lg">
+                <BookIcon width={18} height={18} /> View course curriculum
+              </ButtonLink>
+            )}
+          </>
+        }
+        aside={<ConceptImage slot="PATH_WOS_JOURNEY" priority />}
+      >
+        <div className="mt-6 flex flex-wrap gap-2">
+          <AvailabilityBadge available={available > 0} label={`${available} of ${planned} lessons published`} />
+          <AvailabilityBadge available={false} label={`${modules} stages`} />
+          <AvailabilityBadge available={false} label={`About ${path.estimatedHours} hours when complete`} />
+        </div>
+      </PageHero>
 
-      <Section className="pb-6 pt-10">
-        <Container>
-          <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
-            <div className="space-y-5">
-              <div className="flex items-center gap-2">
-                <Badge tone="accent">Learning path</Badge>
-                <Badge tone="success">{path.status}</Badge>
-              </div>
-              <Heading level={1}>{path.title}</Heading>
-              <p className="max-w-3xl text-lg leading-8 text-muted-foreground">
-                {path.summary}
-              </p>
-              <dl className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <LayersIcon width={16} height={16} />
-                  <dd>{courses.length} courses</dd>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <ClockIcon width={16} height={16} />
-                  <dd>~{path.estimatedHours}h</dd>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircleIcon width={16} height={16} />
-                  <dd>{totalLessons} lessons</dd>
-                </div>
-              </dl>
-            </div>
+      <Container>
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
+          <section aria-labelledby="route-heading" className="min-w-0">
+            <SectionHeading eyebrow="Sequence" id="route-heading" title="Learning route"
+              lede="Each stage is a module of the course this path follows. Published lessons open in the reader; planned stages are listed so you can see where the path is going — without promising dates." />
+            {courses.map((course) => (
+              <Card key={course.id} className="mt-6 p-6 sm:p-8">
+                <p className="mb-5 text-sm text-muted-foreground">
+                  Lessons belong to <Link href={courseRoute(course.slug)} className="font-semibold text-primary hover:underline">{course.title}</Link>;
+                  this path sets their order.
+                </p>
+                <ModuleRoadmap course={course} showLessons />
+              </Card>
+            ))}
+          </section>
 
-            <Card className="h-fit p-6">
-              <CompassIcon width={28} height={28} className="text-accent-foreground" />
-              <h2 className="mt-3 text-lg font-semibold text-foreground">
-                Start the path
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Begin with the first course and progress through the sequence.
-              </p>
-              {courses[0] && (
-                <ButtonLink
-                  href={`/courses/${courses[0].slug}`}
-                  className="mt-4 w-full"
-                >
-                  Start with {courses[0].title}
-                  <ArrowRightIcon width={16} height={16} />
-                </ButtonLink>
-              )}
+          <aside className="space-y-5" aria-label="Getting started">
+            <Card className="p-6">
+              <h2 className="text-base font-semibold text-foreground">How to start</h2>
+              <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+                <li>{start ? <>Open {startNumber ? `Lesson ${startNumber}` : start.lesson.title} and read at your own pace.</> : "Wait for the first lesson to be published."}</li>
+                <li>Keep your exercise notes yourself — this site does not save them.</li>
+                <li>Come back to the course curriculum to see newly published lessons.</li>
+              </ol>
             </Card>
-          </div>
-        </Container>
-      </Section>
-
-      {/* Course sequence */}
-      <Section className="pt-4">
-        <Container size="md">
-          <Heading level={2}>Progression</Heading>
-          <p className="mt-3 text-muted-foreground">
-            Complete courses in order. Later courses build on earlier ones.
-          </p>
-
-          <ol className="mt-8 space-y-4">
-            {courses.map((course, i) => {
-              const isLocked = i > 0; // prototype-only: mark later as locked
-              return (
-                <li key={course!.id}>
-                  <Card className="overflow-hidden">
-                    <div className="flex items-center gap-4 p-5 sm:p-6">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-lg font-bold text-white">
-                        {i + 1}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="truncate text-lg font-semibold text-foreground">
-                            {course!.title}
-                          </h3>
-                          {isLocked && (
-                            <Badge tone="warning">
-                              <LockIcon width={12} height={12} />
-                              Prerequisite
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {course!.summary}
-                        </p>
-                        <dl className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <LayersIcon width={12} height={12} />
-                            <dd>{course!.modules.length} modules</dd>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <ClockIcon width={12} height={12} />
-                            <dd>{course!.estimatedHours}h</dd>
-                          </div>
-                        </dl>
-                      </div>
-                      <Link
-                        href={`/courses/${course!.slug}`}
-                        className="hidden shrink-0 text-sm font-semibold text-primary hover:underline sm:inline"
-                      >
-                        View course →
-                      </Link>
-                    </div>
-                  </Card>
-                </li>
-              );
-            })}
-          </ol>
-
-          <div className="mt-8">
-            <Badge tone="neutral">Prototype</Badge>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Progression and prerequisites are conceptual. Durable path
-              progress is owned by the Learning Service, not this frontend.
-            </p>
-          </div>
-        </Container>
-      </Section>
+            <Card tone="muted" className="p-6">
+              <h2 className="text-base font-semibold text-foreground">About progress</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Personal progress is not tracked yet. Nothing on this page reflects what you have read or completed.
+              </p>
+            </Card>
+          </aside>
+        </div>
+      </Container>
     </>
   );
 }
