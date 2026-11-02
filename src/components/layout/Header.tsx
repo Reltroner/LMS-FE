@@ -16,8 +16,9 @@ import { ThemeToggle } from "./ThemeToggle";
 // apply — each link picks exactly one display rule below.
 const navLink = "h-10 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-sm font-medium transition";
 
-// Logo → Home → Courses → Paths → Search [Ctrl K] → AI Guide → About → Contact ↗ → Ecosystem ▾ →
-// Theme → Sign in. Below lg the links move into MobileMenu; logo, search and menu stay visible.
+// Logo → Home → Courses → Paths → AI Guide → About → Contact ↗ → Ecosystem ▾ →
+// Search [Ctrl K] → Theme → Sign in. Below lg the nav moves into MobileMenu; the one
+// global search control stays visible beside the logo and menu.
 // Sign-in is not connected: the link leads to the Account page, which explains that honestly.
 export function Header() {
   const pathname = usePathname();
