@@ -127,6 +127,7 @@
   --color-ring: var(--ring);
 
   --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
   --font-mono: var(--font-mono);
 
   --radius-sm: var(--radius-sm);
@@ -151,20 +152,10 @@
     scroll-behavior: smooth;
   }
 
+  /* A plain canvas: the artwork and midnight panels carry the atmosphere, not a page-wide wash. */
   body {
     min-width: 320px;
     background-color: var(--background);
-    background-image: radial-gradient(
-        circle at 8% 0%,
-        color-mix(in oklab, var(--primary) 10%, transparent),
-        transparent 34rem
-      ),
-      radial-gradient(
-        circle at 92% 12%,
-        color-mix(in oklab, var(--accent) 10%, transparent),
-        transparent 30rem
-      );
-    background-attachment: fixed;
     color: var(--foreground);
     font-family: var(--font-sans);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -294,13 +285,12 @@
     font-weight: 600;
   }
 
-  /* Small uppercase label above a heading (blueprint "eyebrow"). */
+  /* Optional context line above a heading, in sentence case: used only where it tells the reader
+     something the heading does not (a category, a destination, a lesson number). */
   .eyebrow {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
+    font-size: 0.875rem;
+    font-weight: 600;
     line-height: 1.4;
-    text-transform: uppercase;
     color: var(--eyebrow);
   }
 

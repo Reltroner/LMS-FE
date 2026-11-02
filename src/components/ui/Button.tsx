@@ -6,14 +6,15 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const variantClasses: Record<ButtonVariant, string> = {
+  // Filled versus outlined tells primary from secondary; no glow or drop shadow is needed for that.
   primary:
-    "border-primary bg-primary text-primary-foreground shadow-[0_16px_36px_-18px_rgba(29,78,216,0.55)] hover:bg-primary/90",
+    "border-primary bg-primary text-primary-foreground hover:bg-primary/90",
   secondary:
-    "border-border bg-card text-foreground shadow-sm hover:border-primary/30 hover:bg-primary/5 hover:text-primary",
+    "border-border bg-card text-foreground hover:border-primary/30 hover:bg-primary/5 hover:text-primary",
   ghost:
     "border-transparent bg-transparent text-muted-foreground hover:bg-primary/5 hover:text-primary",
   danger:
-    "border-danger bg-danger text-white shadow-[0_16px_36px_-18px_rgba(185,28,28,0.5)] hover:bg-danger/90",
+    "border-danger bg-danger text-white hover:bg-danger/90",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

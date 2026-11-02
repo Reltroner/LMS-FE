@@ -54,7 +54,7 @@ export function FloatingChatWidget() {
       <button ref={triggerRef} type="button" onClick={() => setIsOpen((open) => !open)}
         aria-label={isOpen ? "Close learning guide" : "Open learning guide"} aria-expanded={isOpen} aria-controls="floating-guide-panel"
         className={cn("fixed bottom-5 right-5 z-40 flex h-13 w-13 items-center justify-center rounded-full shadow-lg transition sm:bottom-6 sm:right-6",
-          isOpen ? "border border-border bg-card text-foreground" : "bg-gradient-to-br from-primary to-accent text-white hover:scale-105")}>
+          isOpen ? "border border-border bg-card text-foreground" : "bg-primary text-primary-foreground hover:bg-primary/90")}>
         {isOpen ? <XIcon width={22} height={22} /> : <SparklesIcon width={22} height={22} />}
       </button>
 

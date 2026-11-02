@@ -42,7 +42,11 @@ test("PX-04 static route enumerators require publication filtering", () => {
   assert.ok(queries.getLessonRouteParams().every((p) => queries.getLessonBySlug(p.slug, p.lesson)?.status === "published"));
 });
 test("PX-05 mocked authentication is visibly labeled", () => {
-  assert.match(read("src/components/layout/Header.tsx"), /Sign in \(prototype only/);
+  // Sign-in is not connected, so the account entry is named for the preview page it opens.
+  for (const file of ["src/components/layout/Header.tsx", "src/components/layout/MobileMenu.tsx"]) {
+    assert.match(read(file), />\s*Account preview\s*</, file);
+    assert.doesNotMatch(read(file), /Sign in\b|Log in\b|Sign up\b/, file);
+  }
   assert.match(read("src/components/layout/PrototypeBanner.tsx"), /Design prototype/);
   assert.match(read("src/components/layout/PrototypeBanner.tsx"), /No real LMS API calls/);
 });

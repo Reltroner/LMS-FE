@@ -17,10 +17,10 @@ export const metadata = {
 export default function AccountPage() {
   return (
     <>
-      <PageHero eyebrow="Identity & preferences" title="Account and learning preferences."
+      <PageHero title="Account and learning preferences."
         lede="Sign in through Reltroner's identity service, then manage real learning settings — once those capabilities are connected.">
         <StatusNotice title="Sign-in is not connected yet" className="mt-6">
-          The &ldquo;Sign in&rdquo; button leads here because there is no working sign-in on this site yet. You are not
+          &ldquo;Account preview&rdquo; leads here because there is no working sign-in on this site yet. You are not
           signed in, and no account information exists for you here.
         </StatusNotice>
       </PageHero>

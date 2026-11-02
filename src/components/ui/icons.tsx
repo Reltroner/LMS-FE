@@ -95,13 +95,6 @@ export const PlayIcon = (p: IconProps) => (
   </svg>
 );
 
-export const GraduationIcon = (p: IconProps) => (
-  <svg {...base(p)}>
-    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-    <path d="M6 12v5c3 3 9 3 12 0v-5" />
-  </svg>
-);
-
 export const UserIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />

@@ -15,7 +15,7 @@ import { validateSubscription } from "../src/lib/newsletter/schema.ts";
 import { createSubscriptionClient } from "../src/lib/newsletter/client.ts";
 import { newsletterIntegration } from "../src/lib/newsletter/config.ts";
 import { ecosystemLinks, isActiveRoute, primaryNav, studioLinks } from "../src/lib/site/links.ts";
-import { courseCoverSlots, imageSlots, pathCoverSlots, resolveSlot } from "../src/lib/media/image-slots.ts";
+import { brandEmblemSrc, courseCoverSlots, imageSlots, pathCoverSlots, resolveSlot } from "../src/lib/media/image-slots.ts";
 import { isPinnedApprovedCdnUrl, lessonImageSource } from "../src/lib/content/lesson-media.ts";
 
 const root = process.cwd();
@@ -63,6 +63,17 @@ const { Footer } = await import("../src/components/layout/Footer.tsx");
 const { CourseCard } = await import("../src/components/course/CourseCard.tsx");
 const { PathCard } = await import("../src/components/path/PathCard.tsx");
 const { default: HomePage } = await import("../src/app/page.tsx");
+const { default: AboutPage } = await import("../src/app/about/page.tsx");
+const { default: PathsPage } = await import("../src/app/paths/page.tsx");
+const { default: CoursesPage } = await import("../src/app/courses/page.tsx");
+const { default: AccountPage } = await import("../src/app/account/page.tsx");
+const { Header } = await import("../src/components/layout/Header.tsx");
+const { ThemeProvider } = await import("../src/components/layout/ThemeProvider.tsx");
+const { SearchPaletteProvider } = await import("../src/components/search/SearchPaletteProvider.tsx");
+const { CourseCatalog, catalogControls, filterCourses } = await import("../src/components/course/CourseCatalog.tsx");
+const { PageHero, SectionHeading } = await import("../src/components/marketing/PageHero.tsx");
+const { Card } = await import("../src/components/ui/Card.tsx");
+const { buttonClassNames } = await import("../src/components/ui/Button.tsx");
 
 const { publicData, withheldResources } = await compileCatalog(root, catalogInputs(root));
 const queries = createCourseQueries(publicData);
@@ -90,7 +101,8 @@ test("shell: one newsletter immediately above one footer, rendered only by the r
 });
 
 test("navigation: canonical order, external Contact, Ecosystem is a disclosure not a route", () => {
-  assert.deepEqual(primaryNav.map((item) => item.label), ["Home", "Courses", "Paths", "Search", "AI Guide", "About"]);
+  assert.deepEqual(primaryNav.map((item) => item.label), ["Home", "Courses", "Paths", "AI Guide", "About"]);
+  assert.ok(!primaryNav.some((item) => item.href === "/search/"), "Search is a single header control, not a second nav link");
   assert.equal(studioLinks.contact, "https://www.reltroner.com/contact");
   assert.deepEqual(ecosystemLinks.map((link) => [link.label, link.href]), [
     ["Reltroner Studio", "https://www.reltroner.com/"],
@@ -101,6 +113,12 @@ test("navigation: canonical order, external Contact, Ecosystem is a disclosure n
   const header = read("src/components/layout/Header.tsx");
   assert.match(header, /<ExternalLink href=\{studioLinks\.contact\}/);
   assert.match(header, /<EcosystemMenu \/>/);
+  assert.match(header, /aria-label="Open search" aria-keyshortcuts="Control\+K Meta\+K"/);
+  assert.equal(header.match(/onClick=\{\(\) => openPalette\(\)\}/g)?.length, 1, "one header search trigger");
+  const mobile = read("src/components/layout/MobileMenu.tsx");
+  assert.doesNotMatch(mobile, /Quick search|<SearchIcon\b|openPalette\(/, "mobile menu cannot duplicate header search");
+  assert.ok(fs.existsSync(path.join(root, "src/app/search/page.tsx")), "full search route remains available");
+  assert.match(read("src/components/search/GlobalSearchPalette.tsx"), /href=\{trimmed \? searchHref\(trimmed\) : "\/search\/"\}/, "palette links to full Search");
   assert.doesNotMatch(header, /href="\/admin|Admin/, "no public Admin demo link");
   assert.match(read("src/components/layout/EcosystemMenu.tsx"), /aria-expanded=\{open\}[\s\S]*aria-controls=/);
   const link = render(h(ExternalLink, { href: studioLinks.contact, className: "x" }, "Contact"));
@@ -317,22 +335,33 @@ test("newsletter client: no automatic retry; an uncertain outcome holds the next
 const resourceImage = (file) =>
   `https://cdn.jsdelivr.net/gh/Reltroner/lms-reltroner-resource@c62944b7f7f55cb1f401bf2279a81e5868cd47a2/images/${file}`;
 const approvedSlotFiles = {
-  HOME_HERO: "reltroner-learning-profile-picture.webp", HOME_CAUSAL_MODEL: "lms-image-1.webp",
-  PATH_WOS_JOURNEY: "lms-image-2.webp", COURSE_WOS_COVER: "lms-image-3.webp", PATH_WOS_FEATURED_COVER: "lms-image-3.webp",
+  HOME_CAUSAL_MODEL: "lms-image-1.webp", PATH_WOS_JOURNEY: "lms-image-2.webp",
+  COURSE_WOS_COVER: "lms-image-3.webp", PATH_WOS_FEATURED_COVER: "lms-image-3.webp",
   AI_KNOWLEDGE_NETWORK: "lms-image-4.webp", ABOUT_CREATIVE_SEED: "lms-image-5.webp", ABOUT_TWO_DESTINATIONS: "lms-image-6.webp",
 };
 const decode = (value) => value.replace(/&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
 // Every rendered slot frame in document order: its slot, frame ratio and (when approved) the image it shows.
 const framesOf = (html) => [...html.matchAll(/<div (?:aria-hidden="true" )?data-image-slot="([A-Z_]+)"[^>]*style="aspect-ratio:([^"]+)"[^>]*>(<img [^>]*>)?/g)]
   .map(([, slot, ratio, img]) => ({ slot, ratio, src: img ? decode(/ src="([^"]*)"/.exec(img)[1]) : null }));
+// The markup of the <section> labelled by the given heading id.
+const sectionOf = (html, labelledBy) => {
+  const from = html.indexOf(`aria-labelledby="${labelledBy}"`);
+  assert.ok(from > 0, labelledBy);
+  return html.slice(from, html.indexOf("</section>", from));
+};
 
-test("image slots: seven approved resource files fill eight slots, mentorship stays a placeholder, approval fails closed", () => {
+test("image slots: six approved resource files fill seven slots, the emblem is the logo, approval fails closed", () => {
   assert.deepEqual(Object.fromEntries(Object.values(imageSlots).map((s) => [s.id, s.aspectRatio])), {
-    HOME_HERO: "16 / 9", HOME_CAUSAL_MODEL: "3 / 2", COURSE_WOS_COVER: "16 / 9", PATH_WOS_JOURNEY: "3 / 2", PATH_WOS_FEATURED_COVER: "3 / 2",
+    HOME_CAUSAL_MODEL: "3 / 2", COURSE_WOS_COVER: "16 / 9", PATH_WOS_JOURNEY: "3 / 2", PATH_WOS_FEATURED_COVER: "3 / 2",
     AI_KNOWLEDGE_NETWORK: "16 / 9", ABOUT_CREATIVE_SEED: "16 / 9", ABOUT_TWO_DESTINATIONS: "3 / 2", MENTORSHIP_COLLABORATION: "4 / 3",
   });
   assert.deepEqual(Object.values(imageSlots).filter((s) => s.src).map((s) => s.id).sort(), Object.keys(approvedSlotFiles).sort());
-  assert.equal(new Set(Object.values(imageSlots).map((s) => s.src).filter(Boolean)).size, 7, "eight approved slots, seven distinct files");
+  const slotFiles = new Set(Object.values(imageSlots).map((s) => s.src).filter(Boolean));
+  assert.equal(slotFiles.size, 6, "seven approved slots, six distinct files");
+  // The seventh approved file is the Reltroner Learning emblem, now the header and footer logo.
+  assert.equal(brandEmblemSrc, resourceImage("reltroner-learning-profile-picture.webp"));
+  assert.ok(isPinnedApprovedCdnUrl(brandEmblemSrc) && lessonImageSource(brandEmblemSrc) === "cdn");
+  assert.ok(!slotFiles.has(brandEmblemSrc), "the logo is not repeated as page art");
 
   for (const [id, file] of Object.entries(approvedSlotFiles)) {
     const slot = resolveSlot(imageSlots[id]);
@@ -347,12 +376,10 @@ test("image slots: seven approved resource files fill eight slots, mentorship st
     const img = /<img [^>]*>/.exec(html)[0];
     assert.equal(decode(/ alt="([^"]*)"/.exec(img)[1]), slot.alt);
     assert.match(img, / loading="lazy"/);
-    // Only the square emblem is letterboxed (whole, on midnight); every other image fills its frame.
-    assert.match(img, id === "HOME_HERO" ? /class="h-full w-full object-contain"/ : /class="h-full w-full object-cover"/);
-    assert.equal(/bg-midnight/.test(html), id === "HOME_HERO", `${id} backing`);
+    assert.match(img, /class="h-full w-full object-cover"/);
     assert.doesNotMatch(html, /Illustration pending|aria-hidden|data-placeholder/);
   }
-  assert.match(render(h(ConceptImage, { slot: "HOME_HERO", priority: true })), / loading="eager"/);
+  assert.match(render(h(ConceptImage, { slot: "HOME_CAUSAL_MODEL", priority: true })), / loading="eager"/);
   // The <img> comes from a client leaf, as next/image's does: a non-lazy <img> in a Server Component
   // puts a preload hint in its route's RSC payload, so link prefetching would fetch other pages' heroes.
   assert.match(read("src/components/marketing/SlotImage.tsx"), /^"use client";/);
@@ -364,15 +391,16 @@ test("image slots: seven approved resource files fill eight slots, mentorship st
   assert.match(placeholder, /Illustration pending/);
   assert.doesNotMatch(placeholder, /<img/);
 
+  const base = imageSlots.HOME_CAUSAL_MODEL;
   const pinned = `https://cdn.jsdelivr.net/gh/Reltroner/lms-reltroner-resource@${"b".repeat(40)}/art/hero.webp`;
-  assert.throws(() => resolveSlot({ ...imageSlots.HOME_HERO, src: pinned, alt: undefined }), /alt text/);
-  assert.throws(() => resolveSlot({ ...imageSlots.HOME_HERO, src: pinned, alt: "   " }), /alt text/);
+  assert.throws(() => resolveSlot({ ...base, src: pinned, alt: undefined }), /alt text/);
+  assert.throws(() => resolveSlot({ ...base, src: pinned, alt: "   " }), /alt text/);
   for (const untrusted of ["https://images.example/stock.jpg", pinned.replace("b".repeat(40), "main"),
     pinned.replace("b".repeat(40), "c62944b"), pinned.replace("Reltroner/lms-reltroner-resource", "someone/else"),
     "https://github.com/Reltroner/lms-reltroner-resource/blob/main/images/lms-image-1.webp", pinned.replace("/art/", "/art/../")]) {
-    assert.throws(() => resolveSlot({ ...imageSlots.HOME_HERO, src: untrusted, alt: "Hero" }), /pinned approved source/, untrusted);
+    assert.throws(() => resolveSlot({ ...base, src: untrusted, alt: "Hero" }), /pinned approved source/, untrusted);
   }
-  assert.equal(resolveSlot({ ...imageSlots.HOME_HERO, src: pinned, alt: "An open book becoming a city" }).approved, true);
+  assert.equal(resolveSlot({ ...base, src: pinned, alt: "An open book becoming a city" }).approved, true);
 });
 
 test("image slots: one WOS cover file serves the course card, course detail and path card; the homepage journey keeps Image #2", () => {
@@ -384,9 +412,12 @@ test("image slots: one WOS cover file serves the course card, course detail and 
   assert.equal(courseCoverSlots[wos.slug], "COURSE_WOS_COVER");
   assert.equal(pathCoverSlots[wos.slug], "PATH_WOS_FEATURED_COVER");
 
-  // /courses/: the catalog card's cover.
-  const card = render(h(CourseCard, { course: wos, inventory: queries.getCourseInventory(wos.slug) }));
-  assert.deepEqual(framesOf(card), [{ slot: "COURSE_WOS_COVER", ratio: "16 / 9", src: cover }]);
+  // /courses/: the catalog card's cover, in both card layouts.
+  const inventory = queries.getCourseInventory(wos.slug);
+  for (const layout of ["stack", "row"]) {
+    const card = render(h(CourseCard, { course: wos, inventory, layout }));
+    assert.deepEqual(framesOf(card), [{ slot: "COURSE_WOS_COVER", ratio: "16 / 9", src: cover }], layout);
+  }
   // Course detail (an async server component): its hero renders the course's cover slot.
   const detail = read("src/app/courses/[slug]/page.tsx");
   assert.match(detail, /const cover = courseCoverSlots\[course\.slug\];/);
@@ -400,17 +431,225 @@ test("image slots: one WOS cover file serves the course card, course detail and 
   assert.deepEqual(framesOf(render(h(PathCard, { path: { ...path, courseSlugs: [] } }))),
     [{ slot: "PATH_WOS_JOURNEY", ratio: "3 / 2", src: journey }]);
 
-  // Homepage: emblem hero, causal model, and the learning-journey section still on Image #2.
+  // Homepage: Lumenhaven hero, then the learning-journey section still on Image #2. No art repeats.
   const home = render(h(HomePage));
   assert.deepEqual(framesOf(home), [
-    { slot: "HOME_HERO", ratio: "16 / 9", src: resourceImage("reltroner-learning-profile-picture.webp") },
     { slot: "HOME_CAUSAL_MODEL", ratio: "3 / 2", src: resourceImage("lms-image-1.webp") },
     { slot: "PATH_WOS_JOURNEY", ratio: "3 / 2", src: journey },
   ]);
-  const pathSection = home.slice(home.indexOf('aria-labelledby="path-heading"'));
-  assert.deepEqual(framesOf(pathSection.slice(0, pathSection.indexOf("</section>"))), [{ slot: "PATH_WOS_JOURNEY", ratio: "3 / 2", src: journey }]);
+  assert.deepEqual(framesOf(sectionOf(home, "path-heading")), [{ slot: "PATH_WOS_JOURNEY", ratio: "3 / 2", src: journey }]);
+  assert.deepEqual(framesOf(sectionOf(home, "start-heading")), [], "the hero art is not shown twice");
   assert.ok(!home.includes(cover), "the homepage does not show the WOS cover");
+  assert.ok(!home.includes(brandEmblemSrc), "the emblem is the logo, not page art");
   assert.match(/<img [^>]*>/.exec(home)[0], / loading="eager"/, "hero image keeps priority loading");
+});
+
+// ---------------------------------------------------------------------------------------------
+// Frontend design remediation FD-01 – FD-08
+// ---------------------------------------------------------------------------------------------
+
+// Heading levels in document order, e.g. [1, 2, 3, 2].
+const headingLevels = (html) => [...html.matchAll(/<h([1-6])\b/g)].map(([, level]) => Number(level));
+const assertHeadingOutline = (html, name) => {
+  const levels = headingLevels(html);
+  assert.equal(levels.filter((level) => level === 1).length, 1, `${name}: exactly one h1`);
+  assert.equal(levels[0], 1, `${name}: the h1 comes first`);
+  levels.forEach((level, i) => i > 0 && assert.ok(level <= levels[i - 1] + 1, `${name}: no skipped level before h${level}`));
+};
+const textOf = (html) => decode(html.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+const shell = (child) => render(h(ThemeProvider, null, h(SearchPaletteProvider, null, child)));
+
+test("FD-01/02/07 header: one global search trigger, the approved emblem as the logo, an honest account preview", () => {
+  const header = shell(h(Header));
+  // FD-01: exactly one global search control, with both shortcuts; no Search link in the primary nav.
+  assert.equal(header.match(/aria-label="Open search"/g)?.length, 1);
+  assert.match(header, /aria-label="Open search" aria-keyshortcuts="Control\+K Meta\+K"/);
+  assert.doesNotMatch(header, /href="\/search\/?"/, "full Search is reached from the palette, not a second header entry");
+  assert.deepEqual(primaryNav.map((item) => item.href), ["/", "/courses/", "/paths/", "/ai/", "/about/"]);
+
+  // FD-02: the logo is the pinned Reltroner Learning emblem in a fixed 36px box; the link names it.
+  const brand = /<a [^>]*aria-label="Reltroner Learning Academy home"[^>]*>([\s\S]*?)<\/a>/.exec(header)?.[1] ?? "";
+  const emblem = /<img [^>]*>/.exec(brand)?.[0] ?? "";
+  assert.equal(decode(/ src="([^"]*)"/.exec(emblem)?.[1] ?? ""), brandEmblemSrc);
+  assert.match(emblem, / alt=""/, "decorative inside the named link");
+  assert.match(emblem, / width="36" height="36"/, "intrinsic size reserves its space");
+  assert.match(emblem, / fetchPriority="low"/i, "never competes with a hero or gets preloaded on every route");
+  assert.match(brand, /class="block h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-midnight"/);
+  assert.doesNotMatch(brand, /<svg/, "no generic graduation-cap icon");
+  assert.equal(textOf(brand), "Reltroner Learning Academy");
+  const footerBrand = /aria-label="Reltroner Learning Academy home"[^>]*>([\s\S]*?)<\/a>/.exec(render(h(Footer)))?.[1] ?? "";
+  assert.ok(decode(footerBrand).includes(`src="${brandEmblemSrc}" alt=""`), "footer uses the same logo");
+  assert.doesNotMatch(read("src/components/ui/icons.tsx"), /GraduationIcon/);
+
+  // FD-07: the account entry says what it opens; nothing claims a working sign-in.
+  const account = /<a [^>]*href="\/account\/?"[^>]*>([\s\S]*?)<\/a>/.exec(header);
+  assert.ok(account, "account link keeps its destination");
+  assert.equal(textOf(account[1]), "Account preview");
+  assert.doesNotMatch(account[0], /aria-label=/, "the visible label is the accessible name");
+  assert.doesNotMatch(textOf(header), /Sign in|Log in|PREVIEW/);
+  const mobile = read("src/components/layout/MobileMenu.tsx");
+  assert.match(mobile, /href="\/account\/"[\s\S]*?>\s*Account preview\s*<\/Link>/);
+  assert.doesNotMatch(mobile, /Sign in|Quick search|openPalette\(/);
+  const accountPage = textOf(shell(h(AccountPage)));
+  assert.match(accountPage, /Sign-in is not connected yet/);
+  assert.match(accountPage, /“Account preview” leads here because there is no working sign-in on this site yet/);
+  assert.match(read("src/components/layout/PrototypeBanner.tsx"), /sign-in, saved progress, mentorship booking and newsletter\s+sign-up are previews/);
+});
+
+test("FD-03 headings: eyebrows are optional context, never empty or decorative, and every audited page keeps one h1", () => {
+  const bare = render(h(PageHero, { title: "Title" }));
+  assert.doesNotMatch(bare, /class="eyebrow/, "no eyebrow element without an eyebrow");
+  assert.match(bare, /<h1 class="font-display /, "the h1 carries no margin reserved for a missing label");
+  assert.match(render(h(PageHero, { eyebrow: "Learning path", title: "T" })), /<p class="eyebrow mb-3">Learning path<\/p><h1/);
+  assert.doesNotMatch(render(h(SectionHeading, { title: "T", id: "t" })), /eyebrow|mt-2/);
+
+  // Sentence case: the shared label style no longer forces capitals or wide tracking.
+  const eyebrowRule = /\.eyebrow \{([^}]*)\}/.exec(read("src/app/globals.css"))[1];
+  assert.doesNotMatch(eyebrowRule, /text-transform|letter-spacing/);
+
+  const pages = { home: render(h(HomePage)), about: render(h(AboutPage)), paths: render(h(PathsPage)),
+    courses: render(h(CoursesPage)), account: shell(h(AccountPage)) };
+  for (const [name, html] of Object.entries(pages)) {
+    assertHeadingOutline(html, name);
+    for (const [, label] of html.matchAll(/<p class="eyebrow[^"]*">([^<]*)<\/p>/g)) assert.ok(label.trim(), `${name}: empty eyebrow`);
+  }
+  // Only labels that add information remain: the brand positioning and the two destinations' names.
+  assert.deepEqual([...pages.home.matchAll(/<p class="eyebrow[^"]*">([^<]*)</g)].map(([, l]) => l),
+    ["Systemic Creative Architect", "Reltroner Learning", "Reltroner Studio"]);
+  for (const name of ["about", "paths", "courses", "account"]) assert.doesNotMatch(pages[name], /class="eyebrow/, name);
+  for (const file of ["src/app/ai/page.tsx", "src/app/search/page.tsx"]) assert.doesNotMatch(read(file), /eyebrow=/, file);
+  assert.doesNotMatch(render(h(PathCard, { path: queries.getPathBySlug("worldbuilding-operating-system") })), /uppercase|eyebrow/);
+  // The newsletter band on every route: a sentence-case label, not a tracked all-caps one.
+  assert.match(render(h(GlobalNewsletterSection)), /<p class="text-sm font-semibold text-\[#8fe9f4\]">Stay connected<\/p>/);
+  assert.doesNotMatch(render(h(GlobalNewsletterSection)), /uppercase|tracking-\[/);
+});
+
+test("FD-04 cards: tones carry roles, only cards that lead somewhere respond to hover, and real sequences read as one track", () => {
+  const surface = render(h(Card, null, "x"));
+  assert.doesNotMatch(surface, /shadow/, "a content card needs no drop shadow");
+  assert.notEqual(render(h(Card, { tone: "muted" }, "x")), surface);
+  assert.notEqual(render(h(Card, { tone: "primary" }, "x")), surface);
+  const interactive = render(h(Card, { interactive: true }, "x"));
+  assert.match(interactive, /hover:shadow-md/);
+  assert.doesNotMatch(interactive, /translate|scale/, "hover feedback without movement");
+  assert.match(render(h(CourseCard, { course: wos, inventory: queries.getCourseInventory(wos.slug) })), /hover:shadow-md/);
+  const pathArticle = /<article class="([^"]*)"/.exec(render(h(PathCard, { path: queries.getPathBySlug("worldbuilding-operating-system") })))[1];
+  assert.doesNotMatch(pathArticle, /hover:|shadow/, "the path card is not itself a link, so it does not respond like one");
+
+  // About: the four-step lesson order is one numbered list, not four identical boxed cards.
+  const approach = sectionOf(render(h(AboutPage)), "approach-heading");
+  assert.equal(approach.match(/<ol\b/g)?.length, 1);
+  assert.equal(approach.match(/<li\b/g)?.length, 4);
+  assert.equal(approach.match(/aria-hidden="true"[^>]*>0[1-4]</g)?.length, 4, "visible numbers repeat the list order");
+  assert.doesNotMatch(approach, /rounded-3xl/);
+  // Paths: the three how-it-works steps are a list inside one note, not boxes nested in a card.
+  const paths = render(h(PathsPage));
+  const howItWorks = paths.slice(paths.indexOf("How paths work"));
+  assert.equal(howItWorks.match(/<li\b/g)?.length, 3);
+  assert.doesNotMatch(howItWorks.slice(0, howItWorks.indexOf("</ol>")), /rounded-2xl border/);
+  // AI Guide: the can / cannot comparison is two columns; only the privacy note keeps a panel.
+  const ai = read("src/app/ai/page.tsx");
+  assert.equal(ai.match(/<Card\b/g)?.length, 1);
+  assert.match(ai, /<Card tone="muted" className="p-6 md:col-span-2">\s*<h2[^>]*>Privacy and status/);
+});
+
+test("FD-05 catalog: discovery controls follow the published inventory (none, one, or many courses)", () => {
+  const inventory = queries.getCourseInventory(wos.slug);
+  const inventories = { [wos.slug]: inventory };
+
+  // Zero: an honest empty state and no controls.
+  const empty = render(h(CourseCatalog, { courses: [], inventories: {} }));
+  assert.match(empty, /No courses are published yet/);
+  assert.doesNotMatch(empty, /<input|<select|aria-pressed/);
+
+  // One: the course itself, its availability and its link; no search, filters, sorting or result count.
+  const single = render(h(CourseCatalog, { courses: [wos], inventories }));
+  assert.doesNotMatch(single, /<input|<select|aria-pressed|Showing|Clear filters/);
+  assert.match(single, /Worldbuilding Operating System/);
+  assert.match(single, />1 lesson available</);
+  assert.match(single, /href="\/courses\/worldbuilding-operating-system\/?"/);
+  assert.match(single, /md:grid-cols-2/, "a lone course fills the row instead of half an empty grid");
+  assert.deepEqual(catalogControls([wos], inventories),
+    { search: false, categories: [], levels: [], availableToggle: false, sort: false, sortByAvailable: false });
+  const page = render(h(CoursesPage));
+  assert.doesNotMatch(page, /<input|<select/, "/courses/ renders the real one-course catalog");
+
+  // Many: synthetic test courses only (fixtures are untouched). Each filter appears only with values to compare.
+  const second = { ...wos, id: "test-second", slug: "test-second", title: "A Second Test Course", category: "creative-system", level: "intermediate", modules: [] };
+  const third = { ...wos, id: "test-third", slug: "test-third", title: "Bridges of Memory", modules: [] };
+  const many = { ...inventories, "test-second": { ...inventory, availableLessonCount: 0 }, "test-third": inventory };
+  const varied = render(h(CourseCatalog, { courses: [wos, second, third], inventories: many }));
+  assert.match(varied, /<input[^>]*type="search"[^>]*aria-label="Search courses"/);
+  assert.match(varied, />All topics</);
+  assert.match(varied, />All levels</);
+  assert.match(varied, /aria-pressed="false"[^>]*>Available now</);
+  assert.match(varied, />Sort: Most lessons available</);
+  assert.match(varied, /Showing <span[^>]*>3<\/span> of 3 published courses/);
+  assert.equal(varied.match(/<article\b/g)?.length, 3);
+
+  const alike = { ...wos, id: "test-alike", slug: "test-alike", title: "Alike Course", modules: [] };
+  const sameControls = catalogControls([wos, alike], { ...inventories, "test-alike": inventory });
+  assert.deepEqual(sameControls, { search: true, categories: [], levels: [], availableToggle: false, sort: true, sortByAvailable: false });
+  const sameHtml = render(h(CourseCatalog, { courses: [wos, alike], inventories: { ...inventories, "test-alike": inventory } }));
+  assert.doesNotMatch(sameHtml, /All topics|All levels|Available now|Most lessons available/, "no single-value filters");
+
+  // Filtering, no-result and published-only behaviour of the pure filter.
+  const none = { query: "", category: "all", level: "all", availableOnly: false, sort: "relevance" };
+  assert.deepEqual(filterCourses([wos, second, third], many, { ...none, query: "zzzz-no-such-topic" }), []);
+  assert.deepEqual(filterCourses([wos, second, third], many, { ...none, category: "creative-system" }).map((c) => c.slug), ["test-second"]);
+  assert.deepEqual(filterCourses([wos, second, third], many, { ...none, availableOnly: true }).map((c) => c.slug), [wos.slug, "test-third"]);
+  assert.deepEqual(filterCourses([wos, second, third], many, { ...none, sort: "title" }).map((c) => c.title),
+    ["A Second Test Course", "Bridges of Memory", "Worldbuilding Operating System"]);
+  assert.deepEqual(filterCourses([wos, second, third], many, none).map((c) => c.slug), [wos.slug, "test-second", "test-third"],
+    "clearing the filters restores every published course in catalog order");
+});
+
+test("FD-06 home hero: the Lumenhaven world, a real first-lesson action, and nothing fabricated", () => {
+  const home = render(h(HomePage));
+  const hero = home.slice(0, home.indexOf("</section>"));
+  assert.match(hero, /<h1[^>]*>Turn an idea into a world of possibilities\.<\/h1>/);
+  assert.match(textOf(hero), /Learn worldbuilding as a system: how one imagined condition shapes the choices people make/);
+  // One dominant image: the approved Lumenhaven scene, loaded first, with a caption drawn from the published lesson.
+  assert.deepEqual(framesOf(hero), [{ slot: "HOME_CAUSAL_MODEL", ratio: "3 / 2", src: resourceImage("lms-image-1.webp") }]);
+  assert.match(/<img [^>]*>/.exec(hero)[0], / loading="eager"/);
+  assert.match(textOf(/<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(hero)[1]),
+    /^Lumenhaven, an invented city from a published lesson: sharing a lantern-held memory needs its owner's permission/);
+  // The caption restates the published lesson: Lumenhaven is its invented city, and sharing a memory needs permission.
+  assert.equal(queries.getLessonBySlug(wos.slug, "01-01-what-is-worldbuilding").status, "published");
+  const source = read("content/courses/worldbuilding-operating-system/module-01-worldbuilding-fundamentals/01-01-what-is-worldbuilding.mdx");
+  assert.match(source, /invented city called \*\*Lumenhaven\*\*/);
+  assert.match(source, /sharing a stored memory requires its owner's permission/);
+  // Actions: the real first lesson first, then its course; both resolve to published routes.
+  const actions = [...hero.matchAll(/<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map(([, href, label]) => [href.replace(/\/$/, ""), textOf(label)]);
+  assert.deepEqual(actions, [[wosLesson, "Start Lesson 01.01"], ["/courses/worldbuilding-operating-system", "Explore Worldbuilding Operating System"]]);
+  const [startCta, courseCta] = [...hero.matchAll(/<a [^>]*class="([^"]*)"/g)].map(([, cls]) => cls);
+  assert.match(startCta, /border-primary bg-primary/, "starting the first lesson is the primary action");
+  assert.match(courseCta, /border-border bg-card/, "exploring the course is the secondary action");
+  // No invented proof: no learner, student, rating or course counts anywhere on the page.
+  assert.doesNotMatch(textOf(home), /\d[\d,.]*\+?\s*(?:students|learners|creators|reviews|ratings|courses)\b|testimonial|★/i);
+});
+
+test("FD-08 theme: deliberate display type, no decorative washes or lifting, focus and reduced motion intact", () => {
+  const layout = read("src/app/layout.tsx");
+  assert.match(layout, /const sora = Sora\(\{\s*variable: "--font-display"/, "Sora display face, shared with Reltroner Studio");
+  assert.match(layout, /\$\{inter\.variable\} \$\{sora\.variable\}/, "Inter stays the text face");
+  const css = read("src/app/globals.css");
+  assert.match(css, /--font-display: var\(--font-display\);/);
+  const body = /\n {2}body \{([^}]*)\}/.exec(css)[1];
+  assert.doesNotMatch(body, /gradient/, "no page-wide gradient wash");
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?transition-duration: 0\.01ms !important;[\s\S]*?animation-duration: 0\.01ms !important;/);
+  assert.match(css, /:focus-visible \{\s*outline: 2px solid var\(--ring\);/);
+  assert.match(css, /\.surface-midnight :focus-visible \{\s*outline-color: var\(--brand-cyan\);/);
+  for (const variant of ["primary", "secondary", "ghost", "danger"]) {
+    const classes = buttonClassNames({ variant });
+    assert.match(classes, /focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring/, variant);
+    assert.match(classes, /disabled:pointer-events-none disabled:opacity-60/, variant);
+    assert.doesNotMatch(classes, /shadow/, `${variant}: no decorative glow`);
+  }
+  assert.notEqual(buttonClassNames({ variant: "primary" }), buttonClassNames({ variant: "secondary" }));
+  assert.doesNotMatch(read("src/components/assistant/FloatingChatWidget.tsx"), /hover:scale|bg-gradient/);
+  assert.match(render(h(PageHero, { title: "T" })), /<h1 class="font-display/);
+  assert.match(render(h(SectionHeading, { title: "T" })), /<h2 class="font-display/);
 });
 
 test("assistant: every reply states whether AI wrote it; retrieval-only shows excerpts, not generated text", () => {

@@ -16,15 +16,13 @@ type ConceptImageProps = {
 // from assistive technology (they carry no information) and visibly marked as pending artwork.
 export function ConceptImage({ slot: id, className, caption, priority = false, framed = true }: ConceptImageProps) {
   const slot = resolveImageSlot(id);
-  const frame = cn("relative overflow-hidden", framed && "rounded-3xl border border-cobalt/40 shadow-lg", className);
+  const frame = cn("relative overflow-hidden", framed && "rounded-3xl border border-cobalt/40", className);
 
   if (slot.approved) {
-    const contain = slot.fit === "contain";
     return (
       <figure className="space-y-2">
-        <div data-image-slot={slot.id} className={cn(frame, contain && "bg-midnight")} style={{ aspectRatio: slot.aspectRatio }}>
-          <SlotImage src={slot.src} alt={slot.alt} loading={priority ? "eager" : "lazy"}
-            className={cn("h-full w-full", contain ? "object-contain" : "object-cover")} />
+        <div data-image-slot={slot.id} className={frame} style={{ aspectRatio: slot.aspectRatio }}>
+          <SlotImage src={slot.src} alt={slot.alt} loading={priority ? "eager" : "lazy"} className="h-full w-full object-cover" />
         </div>
         {caption && <figcaption className="text-sm text-muted-foreground">{caption}</figcaption>}
       </figure>

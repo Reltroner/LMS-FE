@@ -4,7 +4,6 @@ import { lessonImageSource } from "../content/lesson-media.ts";
 // renders a labelled design placeholder. To fill one, set `src` to a commit-pinned jsDelivr asset
 // from an approved resource repository (or a file in public/) and write alt text describing it.
 export type ImageSlotId =
-  | "HOME_HERO"
   | "HOME_CAUSAL_MODEL"
   | "COURSE_WOS_COVER"
   | "PATH_WOS_JOURNEY"
@@ -23,8 +22,6 @@ export type ImageSlot = Readonly<{
   motif: SlotMotif;
   src?: string;
   alt?: string;
-  // "contain" letterboxes artwork that must stay whole (on midnight) instead of cropping it.
-  fit?: "cover" | "contain";
 }>;
 
 // Approved artwork, pinned to one reviewed commit of the resource repository (never a branch or tag).
@@ -33,11 +30,14 @@ const resourceImage = (file: string) =>
 // The WOS identity cover: one asset, presented by both the 16:9 course cover and the 3:2 path card.
 const WOS_COVER_IMAGE = resourceImage("lms-image-3.webp");
 
+// The official Reltroner Learning emblem (open book, city skyline, celestial elements): the logo in
+// the header and footer. It is not a slot; it must still be a pinned approved asset.
+export const brandEmblemSrc = resourceImage("reltroner-learning-profile-picture.webp");
+if (!lessonImageSource(brandEmblemSrc)) throw new Error("The brand emblem needs a pinned approved source");
+
+// HOME_CAUSAL_MODEL is the homepage hero: Lumenhaven, the invented city the first published lesson
+// uses to teach condition, choice, and possible effect.
 export const imageSlots: Readonly<Record<ImageSlotId, ImageSlot>> = {
-  HOME_HERO: { id: "HOME_HERO", aspectRatio: "16 / 9", motif: "book-world",
-    subject: "A luminous open book becoming a connected city",
-    src: resourceImage("reltroner-learning-profile-picture.webp"), fit: "contain",
-    alt: "Official Reltroner Learning emblem featuring an open book, a city skyline, and celestial elements." },
   HOME_CAUSAL_MODEL: { id: "HOME_CAUSAL_MODEL", aspectRatio: "3 / 2", motif: "causal",
     subject: "Condition, choice, and possible effect", src: resourceImage("lms-image-1.webp"),
     alt: "A fictional memory archive illustrating how permission requirements influence a teacher's choice of learning materials." },

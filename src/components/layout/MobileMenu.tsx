@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
-import { MenuIcon, SearchIcon, XIcon } from "@/components/ui/icons";
+import { MenuIcon, XIcon } from "@/components/ui/icons";
 import { ExternalLink } from "@/components/ui/ExternalLink";
 import { ecosystemLinks, isActiveRoute, primaryNav, studioLinks } from "@/lib/site/links";
 import { cn } from "@/lib/utils/cn";
-import { PALETTE_OPEN_EVENT, useSearchPalette } from "@/components/search/SearchPaletteProvider";
+import { PALETTE_OPEN_EVENT } from "@/components/search/SearchPaletteProvider";
 import { ThemeToggle } from "./ThemeToggle";
 
 // Below the lg breakpoint the navigation lives in this modal menu: focus moves in when it
@@ -16,7 +16,6 @@ import { ThemeToggle } from "./ThemeToggle";
 export function MobileMenu() {
   const id = useId();
   const pathname = usePathname();
-  const { openPalette } = useSearchPalette();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -102,10 +101,6 @@ export function MobileMenu() {
                 </li>
               </ul>
             </nav>
-            <button type="button" onClick={() => { close(false); openPalette(); }}
-              className={cn(itemClass, "mt-2 w-full gap-2 border border-border text-foreground hover:bg-background-elevated")}>
-              <SearchIcon width={16} height={16} /> Quick search
-            </button>
             <p className="eyebrow mt-5 px-4">Ecosystem</p>
             <ul className="mt-1 grid gap-1">
               {ecosystemLinks.map((link) => (
@@ -122,9 +117,9 @@ export function MobileMenu() {
             </ul>
             <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-border px-1 pt-4">
               <ThemeToggle showLabel />
-              <Link href="/account/" onClick={() => close(false)} aria-label="Sign in (prototype only — no real authentication)"
-                className="inline-flex h-10 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium text-foreground">
-                Sign in <span aria-hidden="true" className="rounded bg-background-elevated px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">PREVIEW</span>
+              <Link href="/account/" onClick={() => close(false)}
+                className="inline-flex h-10 items-center rounded-full border border-border px-4 text-sm font-medium text-foreground">
+                Account preview
               </Link>
             </div>
           </div>

@@ -66,7 +66,7 @@ async function PathDetailContent({ params }: Props) {
     <>
       <PageHero
         breadcrumb={<Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Paths", href: "/paths/" }, { label: path.title }]} />}
-        eyebrow="Learning journey"
+        eyebrow="Learning path"
         title={path.title}
         lede={path.summary}
         actions={
@@ -95,7 +95,7 @@ async function PathDetailContent({ params }: Props) {
       <Container>
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <section aria-labelledby="route-heading" className="min-w-0">
-            <SectionHeading eyebrow="Sequence" id="route-heading" title="Learning route"
+            <SectionHeading id="route-heading" title="Learning route"
               lede="Each stage is a module of the course this path follows. Published lessons open in the reader; planned stages are listed so you can see where the path is going — without promising dates." />
             {courses.map((course) => (
               <Card key={course.id} className="mt-6 p-6 sm:p-8">

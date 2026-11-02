@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { ButtonLink } from "@/components/ui/Button";
+import { ButtonLink, buttonClassNames } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
 import { ExternalLink } from "@/components/ui/ExternalLink";
-import { ArrowRightIcon, CompassIcon, SparklesIcon } from "@/components/ui/icons";
+import { CompassIcon, SparklesIcon } from "@/components/ui/icons";
 import { PageHero, SectionHeading } from "@/components/marketing/PageHero";
 import { ConceptImage } from "@/components/marketing/ConceptImage";
 import { FlowSteps } from "@/components/learning/FlowSteps";
@@ -18,7 +18,8 @@ import { lessonNumber } from "@/components/search/result-meta";
 
 // Answers "Why learn worldbuilding here, and where do I start?" using only published data.
 // The Lumenhaven demonstrator and the AI Guide sample are retrieved from the public index at
-// build time, so they appear only while that lesson content is actually published.
+// build time, so they appear only while that lesson content is actually published. The hero shows
+// Lumenhaven itself: the invented world behind the first model, not the brand emblem (that is the logo).
 export default function HomePage() {
   const course = getPublishedCourses()[0];
   const inventory = course && getCourseInventory(course.slug);
@@ -35,61 +36,57 @@ export default function HomePage() {
       <PageHero
         eyebrow="Systemic Creative Architect"
         title="Turn an idea into a world of possibilities."
-        lede="Explore how fictional conditions shape choices, consequences, and the next creative question."
+        lede="Learn worldbuilding as a system: how one imagined condition shapes the choices people make, and what might change because of them."
         actions={course ? (
           <>
-            <ButtonLink href={courseRoute(course.slug)} size="lg">
-              Explore {course.title} <ArrowRightIcon width={18} height={18} />
-            </ButtonLink>
             {firstLesson && (
-              <ButtonLink href={lessonRoute(course.slug, firstLesson.slug)} variant="secondary" size="lg">
+              <ButtonLink href={lessonRoute(course.slug, firstLesson.slug)} size="lg">
                 Start Lesson {firstNumber ?? firstLesson.title}
               </ButtonLink>
             )}
+            <ButtonLink href={courseRoute(course.slug)} variant={firstLesson ? "secondary" : "primary"} size="lg">
+              Explore {course.title}
+            </ButtonLink>
           </>
         ) : (
           <ButtonLink href="/courses/" size="lg">Browse courses</ButtonLink>
         )}
-        aside={<ConceptImage slot="HOME_HERO" priority />}
-      >
-        <p className="mt-5 text-sm text-muted-foreground">Start small. Discover connections. Build at your own pace.</p>
-      </PageHero>
+        aside={<ConceptImage slot="HOME_CAUSAL_MODEL" priority caption={lumenhaven &&
+          "Lumenhaven, an invented city from a published lesson: sharing a lantern-held memory needs its owner's permission, so a teacher chooses another source."} />}
+      />
 
       <section aria-labelledby="start-heading" className="py-12">
         <Container>
-          <SectionHeading eyebrow="Start here" id="start-heading" title="Your first meaningful connection"
+          <SectionHeading id="start-heading" title="Your first meaningful connection"
             action={firstLesson && <AvailabilityBadge available label={`${firstNumber ? `Lesson ${firstNumber}` : firstLesson.title} available`} />} />
-          <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-            <Card className="p-6 sm:p-8">
-              {lumenhaven ? (
-                <>
-                  <FlowSteps label="Condition, choice, and possible effect in Lumenhaven" steps={[
-                    { title: "Condition", detail: "Sharing a memory needs its owner's permission." },
-                    { title: "Choice", detail: "The teacher changes the source used for class." },
-                    { title: "Possible effect", detail: "Students encounter a different account." },
-                  ]} />
-                  <p className="mt-5 text-sm leading-6 text-muted-foreground">
-                    In Lumenhaven, people keep memories inside glowing lanterns. Lumenhaven is an invented teaching
-                    example, not official Asthortera canon. “Possible” matters: the model explains one plausible
-                    connection — it does not promise a single predictable outcome.
-                  </p>
-                  <ButtonLink href={lumenhaven.sourceUrl} variant="secondary" className="mt-5">
-                    Learn the model in the lesson <ArrowRightIcon width={16} height={16} />
-                  </ButtonLink>
-                </>
-              ) : (
-                <>
-                  <FlowSteps label="Condition, choice, and possible effect" steps={[
-                    { title: "Condition" }, { title: "Choice" }, { title: "Possible effect" },
-                  ]} />
-                  <p className="mt-5 text-sm leading-6 text-muted-foreground">
-                    One imagined condition shapes the choices available to someone, and a choice can lead to a
-                    possible effect. The first lesson that teaches this model is not published yet.
-                  </p>
-                </>
-              )}
-            </Card>
-            <ConceptImage slot="HOME_CAUSAL_MODEL" />
+          <div className="mt-8 max-w-4xl">
+            {lumenhaven ? (
+              <>
+                <FlowSteps label="Condition, choice, and possible effect in Lumenhaven" steps={[
+                  { title: "Condition", detail: "Sharing a memory needs its owner's permission." },
+                  { title: "Choice", detail: "The teacher changes the source used for class." },
+                  { title: "Possible effect", detail: "Students encounter a different account." },
+                ]} />
+                <p className="mt-5 max-w-3xl text-sm leading-6 text-muted-foreground">
+                  In Lumenhaven, people keep memories inside glowing lanterns. Lumenhaven is an invented teaching
+                  example, not official Asthortera canon. “Possible” matters: the model explains one plausible
+                  connection — it does not promise a single predictable outcome.
+                </p>
+                <ButtonLink href={lumenhaven.sourceUrl} variant="secondary" className="mt-5">
+                  Learn the model in the lesson
+                </ButtonLink>
+              </>
+            ) : (
+              <>
+                <FlowSteps label="Condition, choice, and possible effect" steps={[
+                  { title: "Condition" }, { title: "Choice" }, { title: "Possible effect" },
+                ]} />
+                <p className="mt-5 max-w-3xl text-sm leading-6 text-muted-foreground">
+                  One imagined condition shapes the choices available to someone, and a choice can lead to a
+                  possible effect. The first lesson that teaches this model is not published yet.
+                </p>
+              </>
+            )}
           </div>
         </Container>
       </section>
@@ -97,7 +94,7 @@ export default function HomePage() {
       {course && inventory && (
         <section aria-labelledby="path-heading" className="py-12">
           <Container>
-            <SectionHeading eyebrow="Follow a path" id="path-heading" title="Learn through a connected journey."
+            <SectionHeading id="path-heading" title="Learn through a connected journey."
               lede={`${inventory.moduleCount} planned modules, ${inventory.availableLessonCount} published ${inventory.availableLessonCount === 1 ? "lesson" : "lessons"} so far. New lessons appear here only after they are written, reviewed, and published.`}
               action={path && (
                 <ButtonLink href={pathRoute(path.slug)} variant="secondary">
@@ -125,7 +122,7 @@ export default function HomePage() {
         <Container>
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
-              <SectionHeading eyebrow="AI Guide" id="guide-heading" title="Ask a question. Follow a source."
+              <SectionHeading id="guide-heading" title="Ask a question. Follow a source."
                 lede="Search and the AI Guide answer from published lessons only, and every reply links to the passage it came from. When no AI model is connected, you get the passages themselves — never invented text." />
               <ButtonLink href="/ai/" className="mt-6">
                 <SparklesIcon width={16} height={16} /> Open the AI Guide
@@ -153,28 +150,28 @@ export default function HomePage() {
       <section aria-labelledby="studio-heading" className="py-12">
         <Container>
           <h2 id="studio-heading" className="sr-only">Reltroner Learning and Reltroner Studio</h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className="p-6 sm:p-8">
-              <p className="eyebrow">Creative practice</p>
-              <h3 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Learn the method.</h3>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          {/* Two destinations side by side, labelled by name: columns under a rule, not two more cards. */}
+          <div className="grid gap-10 md:grid-cols-2">
+            <div className="border-t border-border pt-6">
+              <p className="eyebrow">Reltroner Learning</p>
+              <h3 className="font-display mt-2 text-2xl font-bold tracking-tight text-foreground">Learn the method.</h3>
+              <p className="mt-3 max-w-prose text-sm leading-6 text-muted-foreground">
                 Worldbuilding can help you practise exploring how rules, constraints, and choices affect an imagined
                 world. Reltroner Learning teaches the methods, one lesson at a time.
               </p>
               <ButtonLink href="/about/" variant="secondary" className="mt-5">About Reltroner Learning</ButtonLink>
-            </Card>
-            <Card className="p-6 sm:p-8">
-              <p className="eyebrow">The Studio connection</p>
-              <h3 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Explore what it makes possible.</h3>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            </div>
+            <div className="border-t border-border pt-6">
+              <p className="eyebrow">Reltroner Studio</p>
+              <h3 className="font-display mt-2 text-2xl font-bold tracking-tight text-foreground">Explore what it makes possible.</h3>
+              <p className="mt-3 max-w-prose text-sm leading-6 text-muted-foreground">
                 Reltroner Studio develops stories, Asthortera, and creative experiments. You don&apos;t need to know
                 any Studio lore to start learning here.
               </p>
-              <ExternalLink href={studioLinks.home}
-                className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-5 text-sm font-semibold text-foreground shadow-sm hover:border-primary/30 hover:text-primary">
+              <ExternalLink href={studioLinks.home} className={buttonClassNames({ variant: "secondary", className: "mt-5" })}>
                 Discover Reltroner Studio
               </ExternalLink>
-            </Card>
+            </div>
           </div>
         </Container>
       </section>

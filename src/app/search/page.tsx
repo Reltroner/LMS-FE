@@ -11,7 +11,7 @@ export const metadata = {
 export default function SearchRoute() {
   return (
     <>
-      <PageHero eyebrow="Knowledge discovery" title="Search the academy."
+      <PageHero title="Search the academy."
         lede="Find a published lesson, a definition, or the original passage behind a learning concept. Results use the same index as quick search (Ctrl K) and the AI Guide." />
       <Container size="md">
         {/* The prerendered page shows the empty search; a ?q= query fills in on the client. */}

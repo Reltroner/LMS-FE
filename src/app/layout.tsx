@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Sora } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { PrototypeBanner } from "@/components/layout/PrototypeBanner";
 import { Header } from "@/components/layout/Header";
@@ -11,6 +11,14 @@ import "./globals.css";
 
 const inter = Inter({
   variable: "--font-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Display face for page and section titles, shared with Reltroner Studio (Sora headings over Inter
+// text). One variable file, self-hosted at build time like Inter.
+const sora = Sora({
+  variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
 });
@@ -51,7 +59,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full`}
+      className={`${inter.variable} ${sora.variable} ${jetbrainsMono.variable} h-full`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
