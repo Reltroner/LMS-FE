@@ -90,7 +90,8 @@ test("shell: one newsletter immediately above one footer, rendered only by the r
 });
 
 test("navigation: canonical order, external Contact, Ecosystem is a disclosure not a route", () => {
-  assert.deepEqual(primaryNav.map((item) => item.label), ["Home", "Courses", "Paths", "Search", "AI Guide", "About"]);
+  assert.deepEqual(primaryNav.map((item) => item.label), ["Home", "Courses", "Paths", "AI Guide", "About"]);
+  assert.ok(!primaryNav.some((item) => item.href === "/search/"), "Search is a single header control, not a second nav link");
   assert.equal(studioLinks.contact, "https://www.reltroner.com/contact");
   assert.deepEqual(ecosystemLinks.map((link) => [link.label, link.href]), [
     ["Reltroner Studio", "https://www.reltroner.com/"],
@@ -101,6 +102,12 @@ test("navigation: canonical order, external Contact, Ecosystem is a disclosure n
   const header = read("src/components/layout/Header.tsx");
   assert.match(header, /<ExternalLink href=\{studioLinks\.contact\}/);
   assert.match(header, /<EcosystemMenu \/>/);
+  assert.match(header, /aria-label="Open search" aria-keyshortcuts="Control\+K Meta\+K"/);
+  assert.equal(header.match(/onClick=\{\(\) => openPalette\(\)\}/g)?.length, 1, "one header search trigger");
+  const mobile = read("src/components/layout/MobileMenu.tsx");
+  assert.doesNotMatch(mobile, /Quick search|<SearchIcon\b|openPalette\(/, "mobile menu cannot duplicate header search");
+  assert.ok(fs.existsSync(path.join(root, "src/app/search/page.tsx")), "full search route remains available");
+  assert.match(read("src/components/search/GlobalSearchPalette.tsx"), /href=\{trimmed \? searchHref\(trimmed\) : "\/search\/"\}/, "palette links to full Search");
   assert.doesNotMatch(header, /href="\/admin|Admin/, "no public Admin demo link");
   assert.match(read("src/components/layout/EcosystemMenu.tsx"), /aria-expanded=\{open\}[\s\S]*aria-controls=/);
   const link = render(h(ExternalLink, { href: studioLinks.contact, className: "x" }, "Contact"));
