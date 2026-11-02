@@ -1,9 +1,10 @@
-// Newsletter capability for this LMS build. Deliberately a reviewed code constant, not an
-// environment flag: an env var cannot prove that Studio accepts the LMS origin or that its WAF
-// rule is active. Switch to "live" (with the Studio endpoint) only after that is verified.
+// Canonical newsletter lives at Reltroner Studio. LMS is a second consent form, not a
+// separate subscriber database, Resend provider, or serverless API. Deploy the Studio origin-
+// allowlist/CORS change before releasing this static LMS build to the production hostname.
+// Cross-origin Studio requests omit credentials; only https://lms.reltroner.com is approved.
 export type NewsletterMode = "live" | "preview" | "unavailable";
 
 export const newsletterIntegration: Readonly<{ mode: NewsletterMode; endpoint: string | null }> = {
-  mode: "preview",
-  endpoint: null,
+  mode: "live",
+  endpoint: "https://www.reltroner.com/api/newsletter",
 };
