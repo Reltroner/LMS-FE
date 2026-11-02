@@ -1,10 +1,10 @@
 import { validateSubscription, type SubscriptionInput, type SubscriptionResult } from "./schema.ts";
 
 // Browser transport for the canonical Studio newsletter endpoint, ported from Reltroner Studio
-// lib/newsletter/subscription.client.ts. It is NOT wired to a live endpoint: Studio's
-// POST /api/newsletter accepts same-origin requests from approved hostnames only. Use this
-// client only after Studio explicitly allows https://lms.reltroner.com (Origin check, OPTIONS
-// preflight, narrow Access-Control-Allow-Origin, WAF/rate limits) and that change is deployed.
+// lib/newsletter/subscription.client.ts. Studio owns the subscriber record, consent,
+// deduplication and WAF; this LMS only submits explicit opt-ins to its approved endpoint.
+// Studio must deploy the exact https://lms.reltroner.com Origin allowlist and OPTIONS CORS
+// handling BEFORE this live frontend is released. No credentials, tokens or cookies are sent.
 //
 // Guarantees: at most one POST per call, never retried; a non-JSON or redirected response is
 // never trusted; any unconfirmed outcome holds further submissions; no address in diagnostics.
