@@ -11,13 +11,12 @@ export const academyUrl = "https://lms.reltroner.com/";
 
 export type NavItem = Readonly<{ href: string; label: string; wideOnly?: boolean }>;
 
-// wideOnly items collapse first on laptop widths: the logo already links Home, and the
-// search button beside the nav opens the palette, whose footer links to full Search.
+// Home collapses first at laptop widths because the logo already links home.
+// Search has one global entry point in the header palette; its footer links to full Search.
 export const primaryNav: readonly NavItem[] = [
   { href: "/", label: "Home", wideOnly: true },
   { href: "/courses/", label: "Courses" },
   { href: "/paths/", label: "Paths" },
-  { href: "/search/", label: "Search", wideOnly: true },
   { href: "/ai/", label: "AI Guide" },
   { href: "/about/", label: "About" },
 ];
