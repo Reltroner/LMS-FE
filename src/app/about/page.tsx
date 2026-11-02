@@ -1,11 +1,11 @@
-import { ButtonLink } from "@/components/ui/Button";
+import { ButtonLink, buttonClassNames } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
 import { ExternalLink } from "@/components/ui/ExternalLink";
-import { ArrowRightIcon } from "@/components/ui/icons";
 import { PageHero, SectionHeading } from "@/components/marketing/PageHero";
 import { ConceptImage } from "@/components/marketing/ConceptImage";
 import { FlowSteps } from "@/components/learning/FlowSteps";
+import { NumberedSteps } from "@/components/learning/NumberedSteps";
 import { getCourseInventory, getPublishedCourses } from "@/lib/fixtures/courses";
 import { lessonRoute } from "@/lib/routes/route-builders";
 import { studioLinks } from "@/lib/site/links";
@@ -36,18 +36,16 @@ export default function AboutPage() {
   return (
     <>
       <PageHero
-        eyebrow="Why Reltroner Learning"
         title="Why does a promising idea sometimes stop growing?"
         lede="Imagination creates a starting point. Understanding the relationships inside an idea can help you discover what it makes possible next — and that is what this academy sets out to teach."
         actions={
           <>
             {course && first && (
               <ButtonLink href={lessonRoute(course.slug, first.slug)} size="lg">
-                Start learning <ArrowRightIcon width={18} height={18} />
+                Start learning
               </ButtonLink>
             )}
-            <ExternalLink href={studioLinks.home}
-              className="inline-flex min-h-12 items-center gap-2 rounded-full border border-border bg-card px-7 text-base font-semibold text-foreground shadow-sm hover:border-primary/30 hover:text-primary">
+            <ExternalLink href={studioLinks.home} className={buttonClassNames({ variant: "secondary", size: "lg" })}>
               Discover Reltroner Studio
             </ExternalLink>
           </>
@@ -57,23 +55,13 @@ export default function AboutPage() {
 
       <Container className="space-y-16">
         <section aria-labelledby="approach-heading">
-          <SectionHeading eyebrow="The approach" id="approach-heading" title="How lessons are built"
+          <SectionHeading id="approach-heading" title="How lessons are built"
             lede="Every lesson follows the same order, so you always know why you are reading something and how far it goes." />
-          <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {approach.map((step, index) => (
-              <li key={step.title}>
-                <Card className="h-full p-5">
-                  <p className="text-xs font-bold text-primary">{String(index + 1).padStart(2, "0")}</p>
-                  <h3 className="mt-1 font-semibold text-foreground">{step.title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{step.text}</p>
-                </Card>
-              </li>
-            ))}
-          </ol>
+          <NumberedSteps className="mt-8" steps={approach} />
         </section>
 
         <section aria-labelledby="model-heading">
-          <SectionHeading eyebrow="Learning through consequences" id="model-heading" title="Conditions, choices, and possible effects"
+          <SectionHeading id="model-heading" title="Conditions, choices, and possible effects"
             lede="Worldbuilding is practised here as a way of asking what changes when something imagined is true. The first model is deliberately small." />
           <FlowSteps className="mt-6" label="The first mental model" steps={[
             { title: "Condition", detail: "What is true, limited, or costly in this world?" },
@@ -87,7 +75,7 @@ export default function AboutPage() {
         </section>
 
         <section aria-labelledby="destinations-heading">
-          <SectionHeading eyebrow="Two connected destinations" id="destinations-heading" title="Reltroner Learning and Reltroner Studio" />
+          <SectionHeading id="destinations-heading" title="Reltroner Learning and Reltroner Studio" />
           <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_0.9fr] lg:items-stretch">
             <Card className="p-6">
               <h3 className="text-lg font-semibold text-foreground">Reltroner Learning</h3>
@@ -101,8 +89,7 @@ export default function AboutPage() {
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Worldbuilding, Asthortera, narratives, and creative experiments — where the methods are put to work.
               </p>
-              <ExternalLink href={studioLinks.home}
-                className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-5 text-sm font-semibold text-foreground shadow-sm hover:border-primary/30 hover:text-primary">
+              <ExternalLink href={studioLinks.home} className={buttonClassNames({ variant: "secondary", className: "mt-5" })}>
                 Visit Reltroner Studio
               </ExternalLink>
             </Card>
@@ -111,8 +98,8 @@ export default function AboutPage() {
         </section>
 
         <section aria-labelledby="limits-heading">
-          <SectionHeading eyebrow="Learner agency" id="limits-heading" title="What this is — and what it isn't" />
-          <Card className="mt-6 p-6 sm:p-8">
+          <SectionHeading id="limits-heading" title="What this is — and what it isn't" />
+          <Card tone="muted" className="mt-6 p-6 sm:p-8">
             <ul className="space-y-3">
               {limits.map((item) => (
                 <li key={item} className="flex gap-3 text-sm leading-6 text-foreground">
@@ -129,12 +116,12 @@ export default function AboutPage() {
 
         {course && first && (
           <section aria-labelledby="cta-heading" className="surface-midnight rounded-3xl p-8 text-center sm:p-12">
-            <h2 id="cta-heading" className="text-2xl font-bold tracking-tight text-white sm:text-3xl">Start with one idea.</h2>
+            <h2 id="cta-heading" className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">Start with one idea.</h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#c1d5ec]">
               The first published lesson takes about {first.durationMinutes} minutes and needs nothing but a notebook.
             </p>
             <ButtonLink href={lessonRoute(course.slug, first.slug)} size="lg" className="mt-6">
-              Open {first.title} <ArrowRightIcon width={18} height={18} />
+              Open {first.title}
             </ButtonLink>
           </section>
         )}

@@ -113,7 +113,7 @@ async function CourseDetailContent({ params }: Props) {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="min-w-0 space-y-14">
             <section aria-labelledby="outcomes-heading">
-              <SectionHeading eyebrow="Learning outcomes" id="outcomes-heading" title="What you'll start exploring" lede={course.summary} />
+              <SectionHeading id="outcomes-heading" title="What you'll start exploring" lede={course.summary} />
               <ul className="mt-6 grid gap-4 sm:grid-cols-3">
                 {outcomes.map((outcome) => (
                   <li key={outcome.title}>
@@ -128,7 +128,7 @@ async function CourseDetailContent({ params }: Props) {
 
             {first && (
               <section aria-labelledby="activity-heading">
-                <SectionHeading eyebrow="Example activity" id="activity-heading" title="Your first piece of practice" />
+                <SectionHeading id="activity-heading" title="Your first piece of practice" />
                 <Card className="mt-6 p-6">
                   <p className="text-sm leading-6 text-foreground">
                     In <Link href={lessonRoute(course.slug, first.slug)} className="font-semibold text-primary underline-offset-2 hover:underline">{first.title}</Link>{" "}
@@ -143,7 +143,7 @@ async function CourseDetailContent({ params }: Props) {
 
             {first && (
               <section aria-labelledby="formats-heading">
-                <SectionHeading eyebrow="Formats" id="formats-heading" title="One lesson, several ways in"
+                <SectionHeading id="formats-heading" title="One lesson, several ways in"
                   lede={`Reading is always available. ${firstNumber ? `Lesson ${firstNumber}` : first.title} also offers the formats below; formats vary by lesson.`} />
                 <ul className="mt-6 flex flex-wrap gap-3">
                   {formats.map(({ label, icon: Icon }) => (
@@ -156,7 +156,7 @@ async function CourseDetailContent({ params }: Props) {
             )}
 
             <section aria-labelledby="curriculum-heading">
-              <SectionHeading eyebrow="Curriculum" id="curriculum-heading" title="Course curriculum"
+              <SectionHeading id="curriculum-heading" title="Course curriculum"
                 lede={`${inventory.moduleCount} modules and ${inventory.plannedLessonCount} planned lessons. ${inventory.availableLessonCount} ${inventory.availableLessonCount === 1 ? "is" : "are"} published; the rest are planned, not locked.`} />
               <div className="mt-6"><CourseCurriculum course={course} lessons={lessons} /></div>
             </section>

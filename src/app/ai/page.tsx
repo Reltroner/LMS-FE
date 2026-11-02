@@ -31,7 +31,6 @@ export default function AIGuidePage() {
   return (
     <>
       <PageHero
-        eyebrow="Source-grounded learning"
         title="Ask questions. Explore the reasoning. Follow the source."
         lede="The Reltroner Learning Guide answers from published lesson material and shows the passages it relies on, so you can check every explanation yourself."
         actions={
@@ -42,7 +41,7 @@ export default function AIGuidePage() {
         }
         aside={<ConceptImage slot="AI_KNOWLEDGE_NETWORK" priority />}
       >
-        <p className="mt-6 inline-flex rounded-full border border-primary/25 bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
+        <p className="mt-6 inline-flex rounded-md border border-primary/25 bg-primary-soft px-2.5 py-1 text-xs font-semibold text-primary">
           {serviceConfigured ? "Status: connected to the knowledge service" : "Status: source-excerpt mode — no AI model is connected"}
         </p>
       </PageHero>
@@ -55,7 +54,7 @@ export default function AIGuidePage() {
 
       <Container className="mt-16 space-y-12">
         <section aria-labelledby="how-heading">
-          <SectionHeading eyebrow="How it works" id="how-heading" title="Published content in, cited passages out"
+          <SectionHeading id="how-heading" title="Published content in, cited passages out"
             lede="Retrieval always runs. Writing an explanation needs an authorized AI model; without one, you see the passages themselves, labelled as excerpts." />
           <FlowSteps className="mt-6" label="How the guide answers" steps={[
             { title: "Published lessons", detail: "Only reviewed, public material is indexed." },
@@ -65,20 +64,21 @@ export default function AIGuidePage() {
           ]} />
         </section>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          <Card className="p-6">
+        {/* Can and cannot are one comparison, read side by side; privacy is a separate note. */}
+        <div className="grid gap-x-10 gap-y-8 md:grid-cols-2">
+          <div className="border-t border-border pt-5">
             <h2 className="text-base font-semibold text-foreground">What it can help with</h2>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
               {canHelp.map((item) => <li key={item}>{item}</li>)}
             </ul>
-          </Card>
-          <Card className="p-6">
+          </div>
+          <div className="border-t border-border pt-5">
             <h2 className="text-base font-semibold text-foreground">What it cannot verify</h2>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
               {cannotVerify.map((item) => <li key={item}>{item}</li>)}
             </ul>
-          </Card>
-          <Card className="p-6">
+          </div>
+          <Card tone="muted" className="p-6 md:col-span-2">
             <h2 className="text-base font-semibold text-foreground">Privacy and status</h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
               {serviceConfigured

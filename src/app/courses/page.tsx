@@ -19,8 +19,8 @@ export default function CoursesPage() {
 
   return (
     <>
-      <PageHero eyebrow="Course discovery" title="Find a starting point."
-        lede="Find a starting point for building connected fictional worlds. Every course listed here is published, and its lessons appear as they are written and reviewed." />
+      <PageHero title="Find a starting point."
+        lede="Courses for building connected fictional worlds. Every course listed here is published, and its lessons appear as they are written and reviewed." />
       <Container>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <CourseCatalog courses={courses} inventories={inventories} />

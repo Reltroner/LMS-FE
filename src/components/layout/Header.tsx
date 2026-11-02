@@ -13,13 +13,14 @@ import { MobileMenu } from "./MobileMenu";
 import { ThemeToggle } from "./ThemeToggle";
 
 // No display utility here: cn() only joins classes, so "hidden" and "inline-flex" must never both
-// apply — each link picks exactly one display rule below.
-const navLink = "h-10 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-sm font-medium transition";
+// apply — each link picks exactly one display rule below. Slightly tighter padding from lg to xl
+// keeps the search shortcut and "Account preview" on one line at 1024px.
+const navLink = "h-10 items-center gap-1 whitespace-nowrap rounded-full px-2 text-sm font-medium transition xl:px-2.5";
 
 // Logo → Home → Courses → Paths → AI Guide → About → Contact ↗ → Ecosystem ▾ →
-// Search [Ctrl K] → Theme → Sign in. Below lg the nav moves into MobileMenu; the one
+// Search [Ctrl K] → Theme → Account preview. Below lg the nav moves into MobileMenu; the one
 // global search control stays visible beside the logo and menu.
-// Sign-in is not connected: the link leads to the Account page, which explains that honestly.
+// Sign-in is not connected, so the account link is named for what it opens: a preview page.
 export function Header() {
   const pathname = usePathname();
   const { openPalette } = useSearchPalette();
@@ -55,16 +56,14 @@ export function Header() {
             className="inline-flex h-10 items-center gap-2 rounded-full border border-border bg-card px-3 text-sm font-medium text-muted-foreground transition hover:border-primary/30 hover:text-foreground max-lg:w-10 max-lg:justify-center max-lg:px-0">
             <SearchIcon width={17} height={17} />
             <span className="hidden xl:inline">Search</span>
-            <kbd aria-hidden="true" className="hidden rounded-md border border-border bg-background-elevated px-1.5 py-0.5 font-sans text-[11px] text-muted-foreground lg:inline">
+            <kbd aria-hidden="true" className="hidden whitespace-nowrap rounded-md border border-border bg-background-elevated px-1.5 py-0.5 font-sans text-[11px] text-muted-foreground lg:inline">
               {shortcut}
             </kbd>
           </button>
           <span className="hidden lg:flex"><ThemeToggle /></span>
-          <Link href="/account/" aria-label="Sign in (prototype only — no real authentication)"
-            aria-current={isActiveRoute(pathname, "/account/") ? "page" : undefined}
-            className="hidden h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 lg:inline-flex">
-            Sign in
-            <span aria-hidden="true" className="hidden rounded border border-white/60 px-1 text-[10px] font-bold xl:inline">PREVIEW</span>
+          <Link href="/account/" aria-current={isActiveRoute(pathname, "/account/") ? "page" : undefined}
+            className="hidden h-10 items-center whitespace-nowrap rounded-full border border-border bg-card px-4 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:text-primary lg:inline-flex">
+            Account preview
           </Link>
           <MobileMenu />
         </div>

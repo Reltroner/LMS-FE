@@ -39,7 +39,7 @@ export function AssistantPage({ initialQuestion }: { initialQuestion?: string })
   return (
     <div id="guide-chat" className="flex min-w-0 flex-col rounded-3xl border border-border bg-card shadow-sm">
       <div className="flex flex-wrap items-center gap-3 border-b border-border p-4">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-midnight text-cyan">
           <SparklesIcon width={18} height={18} />
         </span>
         <div className="min-w-0 flex-1">

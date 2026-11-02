@@ -11,10 +11,10 @@ export function GlobalNewsletterSection() {
   return (
     <section aria-labelledby="newsletter-heading" data-newsletter-mode={mode} className="mt-16 sm:mt-20">
       <Container>
-        <div className="surface-midnight grid gap-8 rounded-3xl p-6 shadow-lg sm:p-9 lg:grid-cols-[1.05fr_1fr] lg:items-center">
+        <div className="surface-midnight grid gap-8 rounded-3xl p-6 sm:p-9 lg:grid-cols-[1.05fr_1fr] lg:items-center">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8fe9f4]">Stay connected</p>
-            <h2 id="newsletter-heading" className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            <p className="text-sm font-semibold text-[#8fe9f4]">Stay connected</p>
+            <h2 id="newsletter-heading" className="font-display mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Keep a little curiosity in your inbox.
             </h2>
             <p className="mt-3 text-sm leading-6 text-[#c1d5ec]">
