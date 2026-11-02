@@ -238,17 +238,17 @@ test("newsletter: validation mirrors Studio's schema", () => {
   assert.equal(validateSubscription(null).field, "email");
 });
 
-test("newsletter: this build is preview-only and holds no secrets", () => {
-  assert.deepEqual(newsletterIntegration, { mode: "preview", endpoint: null });
+test("newsletter: LMS delegates opt-in to the canonical Studio endpoint without secrets", () => {
+  assert.deepEqual(newsletterIntegration, { mode: "live", endpoint: "https://www.reltroner.com/api/newsletter" });
   const html = render(h(GlobalNewsletterSection));
-  assert.match(html, /data-newsletter-mode="preview"/);
+  assert.match(html, /data-newsletter-mode="live"/);
   assert.match(html, /Keep a little curiosity in your inbox\./);
   assert.match(html, /<label[^>]*>Email address<\/label>/);
   assert.match(html, /type="email"[^>]*autoComplete="email"|autocomplete="email"/);
   assert.match(html, /I choose to receive Reltroner Studio updates\. I can unsubscribe through the link provided in future newsletters\./);
-  assert.match(html, />Preview newsletter opt-in</);
-  assert.match(html, /role="status" aria-live="polite"[^>]*>Preview: this form checks your entry here only\. It does not send your address or create a subscription\./);
-  assert.doesNotMatch(html, /Subscribe to Studio updates|action=|method=/);
+  assert.match(html, />Subscribe to Studio updates</);
+  assert.doesNotMatch(html, /Preview: this form checks your entry here only/);
+  assert.doesNotMatch(html, /Preview newsletter opt-in|action=|method=/);
   assert.ok(html.includes(`href="${studioLinks.privacy}"`) && html.includes(`href="${studioLinks.newsletterPreferences}"`));
   for (const file of [...listSource("src"), ...listSource("scripts")]) {
     assert.doesNotMatch(read(file), /RESEND_API_KEY|NEXT_PUBLIC_[A-Z_]*(?:KEY|SECRET|TOKEN)\b|\bre_[A-Za-z0-9]{20,}/, file);
@@ -493,7 +493,10 @@ test("FD-01/02/07 header: one global search trigger, the approved emblem as the 
   const accountPage = textOf(shell(h(AccountPage)));
   assert.match(accountPage, /Sign-in is not connected yet/);
   assert.match(accountPage, /“Account preview” leads here because there is no working sign-in on this site yet/);
-  assert.match(read("src/components/layout/PrototypeBanner.tsx"), /sign-in, saved progress, mentorship booking and newsletter\s+sign-up are previews/);
+  const banner = read("src/components/layout/PrototypeBanner.tsx");
+  assert.match(banner, /account, saved progress and mentorship booking are previews/);
+  assert.match(banner, /Newsletter sign-up is provided by Reltroner Studio/);
+  assert.doesNotMatch(banner, /newsletter\s+sign-up are previews/);
 });
 
 test("FD-03 headings: eyebrows are optional context, never empty or decorative, and every audited page keeps one h1", () => {
