@@ -1,5 +1,9 @@
 Reltroner LMS is a Next.js static-export frontend with course definitions and MDX authoring. See [Course architecture and onboarding](COURSE_ARCHITECTURE.md) and [verification report](COURSE_REFACTOR_REPORT.md).
 
+## 🌐 Live Deployment
+
+[https://lms.reltroner.com/](https://lms.reltroner.com/)
+
 ## Getting Started
 
 First, run the development server:
